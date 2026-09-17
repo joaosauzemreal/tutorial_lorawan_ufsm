@@ -21,6 +21,8 @@ Este repositório contém a documentação completa, o passo a passo de configur
 1. Acesse o console da TTN na região Europeia: [https://eu1.cloud.thethings.network/console](https://eu1.cloud.thethings.network/console).
 2. Faça login e selecione **Applications** > **+ Create application**.
 3. Preencha o **Application ID** (ex: `ufsm-heltec-v3-telemetria`) e confirme.
+<img width="870" height="762" alt="image" src="https://github.com/user-attachments/assets/0ef71949-dee6-4a65-81ad-0cb172f54237" />
+
 
 ### 2. Cadastrar Dispositivo (End Device)
 1. Dentro da sua aplicação, clique em **+ Register end device**.
@@ -28,12 +30,16 @@ Este repositório contém a documentação completa, o passo a passo de configur
 3. **Frequency plan:** Selecione `Australia 915-928 MHz, FSB 2` (Utilizado no Brasil e na UFSM).
 4. **LoRaWAN version:** Selecione `LoRaWAN Specification 1.0.2` (Padrão das bibliotecas Heltec).
 5. **Regional Parameters version:** Selecione `RP001 Regional Parameters 1.0.2 Rev B`.
+<img width="632" height="370" alt="image" src="https://github.com/user-attachments/assets/5cb62f40-ce69-4517-b429-aeed14841de8" />
+
 
 ### 3. Configurar Credenciais OTAA (EUIs e AppKey)
 1. **JoinEUI (AppEUI):** Configure com zeros (`0000000000000000`).
 2. **DevEUI:** Clique em **Generate** para criar uma chave única global ou insira o identificador físico do seu chip.
 3. **AppKey:** Clique em **Generate** para criar a chave secreta de criptografia.
 4. Clique em **Register end device**.
+<img width="629" height="372" alt="image" src="https://github.com/user-attachments/assets/cacee287-d883-4d7d-9f45-d0e33363b3e9" />
+
 
 ---
 # 📦 Biblioteca e Suporte Oficial Heltec para Arduino IDE
@@ -72,7 +78,7 @@ A licença é uma chave de 32 bits gerada através do Chip ID único do ESP32-S3
 2. Acesse o site oficial de validação da Heltec: [https://resource.heltec.cn/search](https://resource.heltec.cn/search).
 3. Cole o seu **Chip ID** de 12 dígitos na caixa de busca e clique em **Confirm**.
 4. Copie a licença de 32 bits gerada (exemplo: `0x4819D3A6, 0x3C4015EF, 0xC76E3CE5, 0x9742010D`).
-   <img width="709" height="416" alt="image" src="https://github.com/user-attachments/assets/ee225285-d21e-4dcc-8ada-d0d1257a7ae3" />
+<img width="709" height="416" alt="image" src="https://github.com/user-attachments/assets/ee225285-d21e-4dcc-8ada-d0d1257a7ae3" />
 
 
 ### Formas de Injetar a Licença:
@@ -80,3 +86,11 @@ A licença é uma chave de 32 bits gerada através do Chip ID único do ESP32-S3
 * **Via Comando AT (Serial):** Com o código carregado e a serial aberta, envie o comando AT+CDKEY=(LICENÇA):
   ```text
   AT+CDKEY=4819D3A63C4015EFC76E3CE59742010D
+
+---
+## 🔑 Configuração de Credenciais
+
+1. Navegue até a pasta do código-fonte.
+2. Faça uma cópia do arquivo `secrets_example.h` e renomeie a cópia para `secrets.h`.
+3. Abra o arquivo `secrets.h` e insira sua licença Heltec e as chaves OTAA (`devEui`, `appEui`, `appKey`) geradas na TTN.
+4. No código fonte dever haver o `#include "secrets.h"` para que ele consiga buscar as suas credenciais.
