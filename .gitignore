@@ -1,0 +1,8 @@
+# Ignorar credenciais e licenças privadas
+secrets.h
+
+# Arquivos de compilação e temporários
+.pio/
+.vscode/
+*.bin
+*.elf
