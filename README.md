@@ -41,6 +41,25 @@ Este repositório contém a documentação completa, o passo a passo de configur
 <img width="629" height="372" alt="image" src="https://github.com/user-attachments/assets/cacee287-d883-4d7d-9f45-d0e33363b3e9" />
 
 
+### 4. Configurar Decodificador de Payload (Payload Formatter)
+Para sincronizar o formato dos dados enviados pela placa e permitir que a TTN decodifique a mensagem recebida:
+1. No menu da sua aplicação/dispositivo no console da TTN, acesse **Payload formatters** > **Uplink**.
+2. Selecione o **Formatter type** como **Custom javascript formatter**.
+3. No campo de código, insira a função de decodificação:
+   ```javascript
+   function decodeUplink(input) {
+     var tempInt = (input.bytes[0] << 8) | input.bytes[1];
+     if (tempInt & 0x8000) {
+       tempInt = tempInt - 0x10000;
+     }
+     return {
+       data: {
+         cpu_temperature: tempInt / 100.0
+       }
+     };
+   }
+
+
 ---
 # 📦 Biblioteca e Suporte Oficial Heltec para Arduino IDE
 
@@ -88,9 +107,42 @@ A licença é uma chave de 32 bits gerada através do Chip ID único do ESP32-S3
   AT+CDKEY=4819D3A63C4015EFC76E3CE59742010D
 
 ---
-## 🔑 Configuração de Credenciais
+## 🚀 Upload do Código de Exemplo: Telemetria da Temperatura Interna da CPU
 
-1. Navegue até a pasta do código-fonte.
-2. Faça uma cópia do arquivo `secrets_example.h` e renomeie a cópia para `secrets.h`.
-3. Abra o arquivo `secrets.h` e insira sua licença Heltec e as chaves OTAA (`devEui`, `appEui`, `appKey`) geradas na TTN.
-4. No código fonte dever haver o `#include "secrets.h"` para que ele consiga buscar as suas credenciais.
+Esta seção descreve o procedimento completo para configurar as credenciais, realizar o upload do firmware de teste (localizado em `src/heltec_lorawan/`) e validar o envio da temperatura interna do microcontrolador (capturada via função nativa do ESP32-S3) para a rede LoRaWAN.
+
+> 🚨 **ALERTA MÁXIMO DE SEGURANÇA — CONEXÃO DA ANTENA:**
+> **ANTES de conectar o cabo USB para ligar ou alimentar a placa Heltec V3 ao computador, a antena de rádio DEVE obrigatoriamente estar conectada ao conector da placa.** Ligar ou alimentar o dispositivo sem a antena conectada durante as rotinas de inicialização/transmissão pode danificar irreversivelmente o circuito de recepção e transmissão de rádio (SX1262).
+
+---
+
+### 1. Configuração de Credenciais (`secrets.h`)
+
+1. No repositório, acesse a pasta **`src/`** e navegue até a subpasta **`heltec_lorawan/`** (onde estão localizados o arquivo `.ino`/C++ do código de teste e os arquivos de cabeçalho).
+2. Localize o arquivo de exemplo **`secrets_example.h`**.
+3. Crie uma cópia desse arquivo no mesmo diretório e renomeie a cópia exatamente para **`secrets.h`**.
+4. Abra o `secrets.h` e substitua os valores padrão pelas credenciais reais que foram geradas dentro do painel da TTN (`devEui`, `appEui`, `appKey`) e pela sua licença da Heltec (`license`).
+5. Certifique-se de que no arquivo principal do código (`.ino`) exista a linha `#include "secrets.h"` para que o programa inclua e utilize suas chaves privadas.
+
+> 🔒 *Importante:* O arquivo `secrets.h` é ignorado pelo `.gitignore` para garantir que suas credenciais privadas não sejam expostas publicamente ao enviar atualizações para o GitHub.
+
+---
+
+### 2. Conexão USB e Upload para a Placa
+
+1. Verifique novamente se a antena está conectada ao conector RF da placa.
+2. Conecte a Heltec V3 ao computador utilizando um cabo USB-C.
+3. Abra o arquivo do código na **Arduino IDE**, selecione a porta serial correspondente em **Ferramentas > Porta** e clique em **Carregar (Upload)**.
+
+---
+
+### 3. Validação do Envio, Teste de Distância e Recepção de ACK
+
+1. Após concluir o upload com sucesso, abra o Monitor Serial (115200 baud) ou verifique o display OLED integrado da placa para acompanhar o progresso de conexão (*Join*).
+2. Desloque-se para uma distância razoável e sem obstruções severas em relação a um dos Gateways LoRaWAN do campus da UFSM.
+
+<img width="1242" height="869" alt="image" src="https://github.com/user-attachments/assets/b112e789-ebb0-4496-b0e5-e39c7a212815" />
+
+3. **Observação crítica sobre o enlace de comunicação (Uplink vs. Downlink):**
+   - Dependendo da sua localização em relação aos Gateways da UFSM, a Heltec V3 pode conseguir enviar o *payload* com a temperatura (*Uplink*) até o Gateway, mas o sinal de resposta de confirmação do Gateway (*Downlink / ACK*) pode não ser forte o suficiente para alcançar a placa de volta devido a obstáculos.
+   - **Consulta indispensável:** É fundamental consultar a aba **Live Data** no painel da TTN para confirmar se as mensagens estão chegando e sendo decodificadas no servidor, mesmo que a placa na bancada não tenha recebido a confirmação de ACK.
