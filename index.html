@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tecnologia LoRaWAN & Rede UFSM - Apresentação Interativa (Tema Claro)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* */
+    body {
+      font-family: 'Inter', sans-serif;
+      user-select: none;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+
+    .font-mono-code {
+      font-family: 'Fira Code', monospace;
+    }
+
+    .slide {
+      display: none;
+      opacity: 0;
+      transform: translateY(16px) scale(0.98);
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .slide.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Keyframe Animations */
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.06); }
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .animate-float { animation: floatSlow 4s ease-in-out infinite; }
+    .animate-pulse-glow { animation: pulseGlow 4s ease-in-out infinite; }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #0284c7 0%, #059669 50%, #0d9488 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 6s ease infinite;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.05);
+    }
+    
+    .glass-card-hover {
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card-hover:hover {
+      transform: translateY(-5px);
+      border-color: rgba(56, 189, 248, 0.6);
+      box-shadow: 0 20px 35px -10px rgba(14, 165, 233, 0.15);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-hidden relative selection:bg-sky-500 selection:text-white">
+
+  <!-- Header Section -->
+  <header class="w-full bg-white/90 backdrop-blur-md border-b border-slate-200/90 px-6 py-3.5 flex justify-between items-center z-20 shadow-sm">
+    <div class="flex items-center space-x-3">
+      <div class="relative flex items-center justify-center w-3 h-3">
+        <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
+      </div>
+      <span class="text-xs uppercase tracking-widest font-extrabold text-slate-800">UFSM • Infraestrutura LoRaWAN & IoT</span>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button onclick="toggleFullScreen()" class="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs text-slate-700 font-semibold transition flex items-center gap-1.5 cursor-pointer shadow-sm">
+        <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+        <span>Tela Cheia</span>
+      </button>
+      <div class="text-xs text-sky-700 font-mono-code bg-sky-50 border border-sky-200 px-3 py-1.5 rounded-full font-bold shadow-sm" id="slide-counter">
+        Slide 1 / 7
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Slides Container -->
+  <main class="flex-1 relative flex items-center justify-center p-6 md:p-10 overflow-hidden">
+
+    <!-- Glowing Subtle Light Background Lights -->
+    <div class="absolute -top-40 -left-40 w-[35rem] h-[35rem] bg-sky-200/40 rounded-full blur-3xl pointer-events-none animate-pulse-glow"></div>
+    <div class="absolute -bottom-40 -right-40 w-[35rem] h-[35rem] bg-emerald-200/40 rounded-full blur-3xl pointer-events-none animate-pulse-glow"></div>
+
+    <!-- ================= SLIDE 1: Capa ================= -->
+    <div class="slide active w-full max-w-5xl flex-col items-center text-center justify-center space-y-8 my-auto z-10">
+      <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-sky-50 border border-sky-200 text-sky-800 text-xs md:text-sm font-semibold tracking-wide shadow-sm animate-float">
+        <span class="w-2.5 h-2.5 rounded-full bg-sky-500 animate-pulse"></span>
+        Internet das Coisas & Conectividade de Longo Alcance
+      </div>
+
+      <h1 class="text-4xl md:text-6xl font-black tracking-tight leading-tight max-w-4xl text-slate-900">
+        Tecnologia <span class="gradient-text">LoRaWAN</span> e a Infraestrutura de Rede na UFSM
+      </h1>
+
+      <p class="text-slate-600 text-lg md:text-xl max-w-3xl font-normal leading-relaxed">
+        Como funcionam as redes IoT de longo alcance, ultrabaixo consumo de energia e faixa de rádio isenta de licença no campus.
+      </p>
+
+      <div class="pt-4 flex flex-wrap justify-center gap-5">
+        <div class="px-5 py-3 rounded-2xl glass-card flex items-center gap-3.5 text-xs md:text-sm text-slate-700">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 border border-emerald-200 flex items-center justify-center text-xl shrink-0">🔋</div>
+          <div class="text-left"><div class="font-extrabold text-emerald-800">Baixo Consumo</div><div class="text-slate-500 text-[11px]">Bateria por Anos (Deep Sleep)</div></div>
+        </div>
+        <div class="px-5 py-3 rounded-2xl glass-card flex items-center gap-3.5 text-xs md:text-sm text-slate-700">
+          <div class="w-10 h-10 rounded-xl bg-sky-100 border border-sky-200 flex items-center justify-center text-xl shrink-0">📡</div>
+          <div class="text-left"><div class="font-extrabold text-sky-800">Longo Alcance</div><div class="text-slate-500 text-[11px]">Quilômetros de Cobertura</div></div>
+        </div>
+        <div class="px-5 py-3 rounded-2xl glass-card flex items-center gap-3.5 text-xs md:text-sm text-slate-700">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center text-xl shrink-0">💰</div>
+          <div class="text-left"><div class="font-extrabold text-amber-800">Isento de Licença</div><div class="text-slate-500 text-[11px]">Banda ISM (Custo Zero de Tráfego)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SLIDE 2: O Desafio & Os 3 Pilares ================= -->
+    <div class="slide w-full max-w-5xl flex-col justify-center space-y-7 my-auto z-10">
+      <div class="text-center md:text-left space-y-2">
+        <span class="text-xs uppercase tracking-widest font-bold text-sky-700">Fundamentos de IoT</span>
+        <h2 class="text-3xl md:text-5xl font-black text-slate-900">O Desafio do IoT & Os 3 Pilares do LoRaWAN</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Pilar 1 -->
+        <div class="p-6 rounded-2xl glass-card glass-card-hover flex flex-col justify-between space-y-4 border-sky-200 group">
+          <div class="space-y-3">
+            <div class="w-12 h-12 rounded-xl bg-sky-100 border border-sky-200 flex items-center justify-center text-sky-700 text-2xl group-hover:scale-110 transition-transform">
+              📡
+            </div>
+            <h3 class="text-xl font-bold text-slate-900">1. Longo Alcance</h3>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Sinais de rádio que cobrem de <span class="font-bold text-sky-800">2 km a 5 km em zonas urbanas</span> e até mais de <span class="font-bold text-sky-800">15 km em visada direta</span> no campo.
+            </p>
+          </div>
+          <div class="pt-3 border-t border-slate-200 text-[11px] font-mono-code text-sky-700 font-semibold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+            Cobertura do campus com poucas antenas
+          </div>
+        </div>
+
+        <!-- Pilar 2 -->
+        <div class="p-6 rounded-2xl glass-card glass-card-hover flex flex-col justify-between space-y-4 border-emerald-200 group">
+          <div class="space-y-3">
+            <div class="w-12 h-12 rounded-xl bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-700 text-2xl group-hover:scale-110 transition-transform">
+              🔋
+            </div>
+            <h3 class="text-xl font-bold text-slate-900">2. Baixo Consumo</h3>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Transmissão rápida de pequenos pacotes de telemetria. O modo repouso profundo (<span class="italic text-emerald-800 font-semibold">deep sleep</span>) garante autonomia de <span class="font-bold text-emerald-800">3 a 10 anos em baterias</span>.
+            </p>
+          </div>
+          <div class="pt-3 border-t border-slate-200 text-[11px] font-mono-code text-emerald-700 font-semibold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            Ideal para sensores em locais isolados
+          </div>
+        </div>
+
+        <!-- Pilar 3 -->
+        <div class="p-6 rounded-2xl glass-card glass-card-hover flex flex-col justify-between space-y-4 border-amber-200 group">
+          <div class="space-y-3">
+            <div class="w-12 h-12 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-700 text-2xl group-hover:scale-110 transition-transform">
+              💰
+            </div>
+            <h3 class="text-xl font-bold text-slate-900">3. Isento de Licença</h3>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Opera nas <span class="text-amber-800 font-bold">frequências abertas ISM (915 MHz)</span>. Não exige pagamentos de mensalidades, faturas, chips de operadoras ou licenças da Anatel.
+            </p>
+          </div>
+          <div class="pt-3 border-t border-slate-200 text-[11px] font-mono-code text-amber-700 font-semibold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+            Custo zero de tráfego para a universidade
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SLIDE 3: LoRa vs LoRaWAN ================= -->
+    <div class="slide w-full max-w-5xl flex-col justify-center space-y-7 my-auto z-10">
+      <div class="space-y-2">
+        <span class="text-xs uppercase tracking-widest font-bold text-emerald-700">Modelo OSI & Arquitetura</span>
+        <h2 class="text-3xl md:text-5xl font-black text-slate-900">Entendendo: LoRa vs. LoRaWAN</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- LoRa Card -->
+        <div class="p-7 rounded-2xl glass-card border-sky-300 space-y-5 relative overflow-hidden flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="px-3 py-1 rounded-full bg-sky-100 text-sky-800 text-xs font-mono-code font-bold uppercase tracking-wider border border-sky-200">Camada 1 • Física (RF)</span>
+              <span class="text-xs text-sky-700 font-mono-code font-semibold">Chirp Spread Spectrum</span>
+            </div>
+
+            <h3 class="text-3xl font-black text-slate-900">LoRa</h3>
+            
+            <p class="text-slate-600 text-xs md:text-sm leading-relaxed">
+              Tecnologia física de modulação sem fio patenteada. Varia a frequência do sinal de rádio no tempo (<span class="text-sky-800 italic font-mono-code font-bold text-[11px]">chirps</span>), garantindo altíssima imunidade a ruídos e sensibilidade extrema.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-sky-50 border border-sky-200 space-y-1.5">
+            <div class="text-[11px] text-sky-800 font-mono-code uppercase font-bold">Função da Camada Física:</div>
+            <div class="text-xs font-semibold text-slate-700">Converte bits digitais em ondas eletromagnéticas de rádio no ar.</div>
+          </div>
+        </div>
+
+        <!-- LoRaWAN Card -->
+        <div class="p-7 rounded-2xl glass-card border-emerald-300 space-y-5 relative overflow-hidden flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-mono-code font-bold uppercase tracking-wider border border-emerald-200">Camada 2 • Protocolo de Rede</span>
+              <span class="text-xs text-emerald-700 font-mono-code font-semibold">Dupla Criptografia AES-128</span>
+            </div>
+
+            <h3 class="text-3xl font-black text-slate-900">LoRaWAN</h3>
+            
+            <p class="text-slate-600 text-xs md:text-sm leading-relaxed">
+              É o protocolo de rede e a arquitetura do sistema. Define o roteamento das mensagens, gerencia o controle de acesso de dispositivos e aplica <span class="text-emerald-800 font-bold">criptografia dupla de ponta a ponta</span>.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-1.5">
+            <div class="text-[11px] text-emerald-800 font-mono-code uppercase font-bold">Função do Protocolo:</div>
+            <div class="text-xs font-semibold text-slate-700">Garante entrega segura e autenticada do nó sensor até o servidor web.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SLIDE 4: Classes de Dispositivos ================= -->
+    <div class="slide w-full max-w-5xl flex-col justify-center space-y-6 my-auto z-10">
+      <div class="space-y-2">
+        <span class="text-xs uppercase tracking-widest font-bold text-sky-700">Perfis de Comunicação</span>
+        <h2 class="text-3xl md:text-5xl font-black text-slate-900">Classes de Dispositivos LoRaWAN</h2>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Classe A -->
+        <div class="p-5 rounded-2xl glass-card border-emerald-300 hover:border-emerald-500 transition flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="space-y-2 max-w-2xl">
+            <div class="flex items-center gap-3">
+              <span class="px-3 py-1 rounded-lg bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs font-black font-mono-code">CLASSE A</span>
+              <h3 class="font-bold text-slate-900 text-lg">Foco Total em Bateria (Padrão)</h3>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              O dispositivo permanece em <span class="font-bold text-slate-800">Deep Sleep (&gt;99% do tempo)</span>. Acorda apenas para transmitir dados (TX) e abre duas janelas curtas de recepção (RX1 e RX2) logo em seguida.
+            </p>
+          </div>
+          <div class="px-4 py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-mono-code font-bold whitespace-nowrap text-center shadow-sm">
+            🔋 Anos de Autonomia (Bateria)
+          </div>
+        </div>
+
+        <!-- Classe B -->
+        <div class="p-5 rounded-2xl glass-card border-sky-200 hover:border-sky-400 transition flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="space-y-2 max-w-2xl">
+            <div class="flex items-center gap-3">
+              <span class="px-3 py-1 rounded-lg bg-sky-100 border border-sky-300 text-sky-800 text-xs font-black font-mono-code">CLASSE B</span>
+              <h3 class="font-bold text-slate-900 text-lg">Janelas Agendadas (Beacons)</h3>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Abre janelas extras de recepção em horários sincronizados com a rede. Permite receber comandos programados enviando mensagens sem aguardar um uplink prévio.
+            </p>
+          </div>
+          <div class="px-4 py-2.5 rounded-xl bg-sky-50 border border-sky-200 text-sky-800 text-xs font-mono-code font-bold whitespace-nowrap text-center shadow-sm">
+            ⏱️ Latência Sincronizada
+          </div>
+        </div>
+
+        <!-- Classe C -->
+        <div class="p-5 rounded-2xl glass-card border-amber-200 hover:border-amber-400 transition flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="space-y-2 max-w-2xl">
+            <div class="flex items-center gap-3">
+              <span class="px-3 py-1 rounded-lg bg-amber-100 border border-amber-300 text-amber-800 text-xs font-black font-mono-code">CLASSE C</span>
+              <h3 class="font-bold text-slate-900 text-lg">Recepção Contínua (Always On)</h3>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              O rádio permanece continuamente em escuta. Permite receber comandos instantaneamente sem latência, mas possui alto consumo de energia.
+            </p>
+          </div>
+          <div class="px-4 py-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-mono-code font-bold whitespace-nowrap text-center shadow-sm">
+            🔌 Requer Alimentação na Tomada
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SLIDE 5: Ativação OTAA & Spreading Factor ================= -->
+    <div class="slide w-full max-w-5xl flex-col justify-center space-y-7 my-auto z-10">
+      <div class="space-y-2">
+        <span class="text-xs uppercase tracking-widest font-bold text-sky-700">Segurança & Alcance</span>
+        <h2 class="text-3xl md:text-5xl font-black text-slate-900">Ativação OTAA & Spreading Factor</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- OTAA -->
+        <div class="p-6 rounded-2xl glass-card space-y-4 border-sky-300">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <span class="text-sky-700 font-mono-code">OTAA</span>
+            </h3>
+            <span class="text-[10px] font-mono-code px-2.5 py-1 rounded-md bg-sky-100 text-sky-800 border border-sky-300 font-bold">Over-The-Air Activation</span>
+          </div>
+          <p class="text-slate-600 text-xs leading-relaxed">
+            O nó sensor realiza uma troca inicial de mensagens chamadas <span class="font-bold text-slate-900">Join Request</span> e <span class="font-bold text-slate-900">Join Accept</span> com o servidor de rede.
+          </p>
+          <div class="p-3.5 rounded-xl bg-sky-50 border border-sky-200 space-y-2 text-xs">
+            <div class="text-sky-800 font-mono-code font-bold">✓ Chaves Dinâmicas de Sessão:</div>
+            <p class="text-slate-700 text-[11px] leading-normal">
+              A cada nova reconexão, chaves temporárias (NwkSKey e AppSKey) são geradas no ar, impedindo ataques de personificação ou interceptação.
+            </p>
+          </div>
+        </div>
+
+        <!-- Spreading Factor -->
+        <div class="p-6 rounded-2xl glass-card space-y-4 border-emerald-300">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <span class="text-emerald-700 font-mono-code">SF</span> — Spreading Factor
+            </h3>
+            <span class="text-[10px] font-mono-code px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold">SF7 a SF12</span>
+          </div>
+          <p class="text-slate-600 text-xs leading-relaxed">
+            Mede o compromisso físico entre velocidade de dados, alcance e tempo no ar (<span class="italic font-semibold text-slate-800">Airtime</span>):
+          </p>
+          
+          <div class="space-y-2.5 font-mono-code text-xs">
+            <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 flex justify-between items-center">
+              <div>
+                <span class="text-emerald-800 font-bold">• SF7</span>
+                <span class="text-slate-600 text-[11px] block">Alta Velocidade • Menor Airtime</span>
+              </div>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-1 rounded border border-emerald-300 font-bold">Bateria Máxima</span>
+            </div>
+            <div class="p-3 rounded-lg bg-amber-50 border border-amber-200 flex justify-between items-center">
+              <div>
+                <span class="text-amber-800 font-bold">• SF12</span>
+                <span class="text-slate-600 text-[11px] block">Sensibilidade Extrema • Alto Airtime</span>
+              </div>
+              <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-1 rounded border border-amber-300 font-bold">Longo Alcance</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SLIDE 6: A Infraestrutura da UFSM ================= -->
+    <div class="slide w-full max-w-5xl flex-col justify-center space-y-7 my-auto z-10">
+      <div class="space-y-2 text-center md:text-left">
+        <span class="text-xs uppercase tracking-widest font-bold text-emerald-700">Infraestrutura Local do Campus</span>
+        <h2 class="text-3xl md:text-5xl font-black text-slate-900">A Rede LoRaWAN na UFSM</h2>
+      </div>
+
+      <!-- Animated Topologia Diagram -->
+      <div class="p-6 rounded-2xl glass-card space-y-6 border-sky-300">
+        
+        <!-- Interactive Steps -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center relative">
+          
+          <!-- Step 1 -->
+          <div class="p-4 rounded-xl bg-white border border-sky-300 space-y-2 relative group hover:border-sky-500 transition shadow-sm">
+            <div class="text-3xl">📱</div>
+            <div class="text-[11px] text-slate-500 font-mono-code font-semibold">1. Dispositivo IoT</div>
+            <div class="font-bold text-sky-800 text-sm">Nó Sensor (Heltec)</div>
+            <div class="text-[10px] text-slate-500">Coleta e Criptografia</div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="p-4 rounded-xl bg-white border border-emerald-300 space-y-2 relative group hover:border-emerald-500 transition shadow-sm">
+            <div class="text-3xl text-emerald-600">📡</div>
+            <div class="text-[11px] text-slate-500 font-mono-code font-semibold">2. Sinal de Rádio</div>
+            <div class="font-bold text-emerald-800 text-sm">AU915 FSB2</div>
+            <div class="text-[10px] text-slate-500">Frequência ISM sem licença</div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="p-4 rounded-xl bg-white border border-amber-300 space-y-2 relative group hover:border-amber-500 transition shadow-sm">
+            <div class="text-3xl">🏢</div>
+            <div class="text-[11px] text-slate-500 font-mono-code font-semibold">3. Gateway do Campus</div>
+            <div class="font-bold text-amber-800 text-sm">Antena CT UFSM</div>
+            <div class="text-[10px] text-slate-500">Recepção de RF e Roteamento</div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="p-4 rounded-xl bg-white border border-sky-300 space-y-2 relative group hover:border-sky-500 transition shadow-sm">
+            <div class="text-3xl">☁️</div>
+            <div class="text-[11px] text-slate-500 font-mono-code font-semibold">4. Servidor de Rede</div>
+            <div class="font-bold text-sky-800 text-sm">TTN Cluster (eu1)</div>
+            <div class="text-[10px] text-slate-500">Servidor de Aplicação</div>
+          </div>
+        </div>
+
+        <!-- Detalhes de Configuração UFSM -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-300 flex gap-3.5 items-center">
+            <div class="text-3xl">📻</div>
+            <div>
+              <div class="text-xs font-bold text-emerald-800 font-mono-code uppercase">Plano de Frequência UFSM</div>
+              <div class="text-sm font-bold text-slate-900">AU915 Sub-banda 2 (FSB2)</div>
+              <div class="text-[11px] text-slate-600">Canais 8 a 15 (916.8 MHz a 918.2 MHz)</div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-sky-50 border border-sky-300 flex gap-3.5 items-center">
+            <div class="text-3xl">🌐</div>
+            <div>
+              <div class="text-xs font-bold text-sky-800 font-mono-code uppercase">Servidor de Rede Conectado</div>
+              <div class="text-sm font-bold text-slate-900">The Things Network — Europe (eu1)</div>
+              <div class="text-[11px] text-slate-600">O dispositivo DEVE ser registrado no cluster europeu</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SLIDE 7: Resumo & Próximos Passos ================= -->
+    <div class="slide w-full max-w-5xl flex-col justify-center space-y-8 my-auto z-10 text-center">
+      <div class="space-y-2">
+        <span class="text-xs uppercase tracking-widest font-bold text-emerald-700">Resumo Técnico</span>
+        <h2 class="text-3xl md:text-5xl font-black text-slate-900">Checklist de Aprendizado</h2>
+      </div>
+
+      <div class="p-8 rounded-2xl glass-card max-w-3xl mx-auto space-y-5 text-left border-emerald-300 shadow-xl">
+        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2 border-b border-slate-200 pb-3">
+          <span class="text-emerald-600 font-mono-code font-bold">✓</span> Conceitos Fundamentais para a Prática:
+        </h3>
+        
+        <ul class="space-y-4 text-xs md:text-sm text-slate-700">
+          <li class="flex items-start gap-3.5">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">1</span>
+            <span><strong class="text-slate-900">Três Pilares do LoRaWAN:</strong> Longo alcance (quilômetros), baixo consumo (anos de bateria) e isenção de licenças de rádio (banda ISM 915 MHz).</span>
+          </li>
+          <li class="flex items-start gap-3.5">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">2</span>
+            <span><strong class="text-slate-900">Perfil do Sensor:</strong> Operação padrão em Classe A com ativação segura via OTAA.</span>
+          </li>
+          <li class="flex items-start gap-3.5">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">3</span>
+            <span><strong class="text-slate-900">Rede UFSM:</strong> Frequência <strong>AU915 FSB2</strong> integrada ao <strong>Cluster Europeu (`eu1`) da TTN</strong>.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="pt-2">
+        <div class="inline-flex items-center gap-3 px-7 py-4 rounded-2xl bg-gradient-to-r from-sky-600 via-teal-600 to-emerald-600 text-white font-black text-sm md:text-base shadow-xl shadow-emerald-600/20 animate-float">
+          <span>Próximo Vídeo: Prática com Heltec V3, TTN e Arduino IDE</span>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer Controls -->
+  <footer class="w-full bg-white/90 backdrop-blur-md border-t border-slate-200/90 px-6 py-4 flex justify-between items-center z-20 shadow-sm">
+    <button id="btn-prev" onclick="changeSlide(-1)" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1.5 border border-slate-300">
+      ← Anterior
+    </button>
+
+    <div class="flex gap-2.5 items-center" id="slide-dots"></div>
+
+    <button id="btn-next" onclick="changeSlide(1)" class="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-black transition flex items-center gap-1.5 shadow-md shadow-sky-600/20">
+      Próximo →
+    </button>
+  </footer>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const slideCounter = document.getElementById('slide-counter');
+    const dotsContainer = document.getElementById('slide-dots');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+
+    // Render navigation dots dynamically
+    slides.forEach((_, idx) => {
+      const dot = document.createElement('button');
+      dot.className = `h-2.5 rounded-full transition-all ${idx === 0 ? 'bg-sky-600 w-8' : 'bg-slate-300 w-2.5 hover:bg-slate-400'}`;
+      dot.onclick = () => goToSlide(idx);
+      dotsContainer.appendChild(dot);
+    });
+
+    function updateUI() {
+      slides.forEach((slide, idx) => {
+        if (idx === currentSlide) {
+          slide.classList.add('active');
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+
+      slideCounter.innerText = `Slide ${currentSlide + 1} / ${slides.length}`;
+
+      // Update Dots
+      const dots = dotsContainer.children;
+      Array.from(dots).forEach((dot, idx) => {
+        if (idx === currentSlide) {
+          dot.className = 'w-8 h-2.5 rounded-full bg-sky-600 transition-all';
+        } else {
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-slate-300 hover:bg-slate-400 transition-all';
+        }
+      });
+
+      btnPrev.disabled = currentSlide === 0;
+      btnNext.disabled = currentSlide === slides.length - 1;
+    }
+
+    function changeSlide(direction) {
+      if (currentSlide + direction >= 0 && currentSlide + direction < slides.length) {
+        currentSlide += direction;
+        updateUI();
+      }
+    }
+
+    function goToSlide(index) {
+      currentSlide = index;
+      updateUI();
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.error(`Erro ao ativar tela cheia: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Keyboard Arrow Navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        changeSlide(1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        changeSlide(-1);
+      } else if (e.key === 'Home') {
+        goToSlide(0);
+      } else if (e.key === 'End') {
+        goToSlide(slides.length - 1);
+      }
+    });
+
+    updateUI();
+  </script>
+</body>
+</html>
