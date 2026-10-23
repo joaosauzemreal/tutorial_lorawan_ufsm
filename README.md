@@ -4,6 +4,16 @@ Este repositório contém a documentação completa, o passo a passo de configur
 
 ---
 
+## 🎥 Vídeo Tutorial
+
+Prefere acompanhar em vídeo? O passo a passo completo deste guia, da criação da aplicação na TTN até o primeiro uplink, está gravado no vídeo abaixo (clique na imagem para assistir no YouTube):
+
+[![Assista ao vídeo tutorial no YouTube](https://img.youtube.com/vi/S4UdSOCp6O0/maxresdefault.jpg)](https://www.youtube.com/watch?v=S4UdSOCp6O0)
+
+> 📺 O vídeo também pode ser assistido na [página do projeto no GitHub Pages](https://joaosauzemreal.github.io/tutorial_lorawan_ufsm/#video), junto com a apresentação teórica sobre LoRa, LoRaWAN e a infraestrutura da UFSM.
+
+---
+
 ## 📌 Conceitos Fundamentais
 
 * **LoRa e LoRaWAN:** **LoRa** (Long Range) é a tecnologia de modulação por rádio de baixo consumo e longo alcance (camada física). **LoRaWAN** é o protocolo de rede (camada de enlace e rede) que gerencia a segurança, o endereçamento dos nós sensores, a confirmação de pacotes e a comunicação bidirecional com os Gateways.

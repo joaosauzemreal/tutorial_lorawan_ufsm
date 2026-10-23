@@ -94,6 +94,10 @@
     </div>
 
     <div class="flex items-center gap-3">
+      <button onclick="goToVideo()" class="px-3.5 py-1.5 rounded-full bg-sky-600 hover:bg-sky-500 text-xs text-white font-semibold transition flex items-center gap-1.5 cursor-pointer shadow-sm">
+        <span>▶</span>
+        <span>Vídeo Tutorial</span>
+      </button>
       <button onclick="toggleFullScreen()" class="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs text-slate-700 font-semibold transition flex items-center gap-1.5 cursor-pointer shadow-sm">
         <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
         <span>Tela Cheia</span>
@@ -470,11 +474,35 @@
       </div>
 
       <div class="pt-2">
-        <div class="inline-flex items-center gap-3 px-7 py-4 rounded-2xl bg-gradient-to-r from-sky-600 via-teal-600 to-emerald-600 text-white font-black text-sm md:text-base shadow-xl shadow-emerald-600/20 animate-float">
+        <button type="button" onclick="goToVideo()" class="inline-flex items-center gap-3 px-7 py-4 rounded-2xl bg-gradient-to-r from-sky-600 via-teal-600 to-emerald-600 hover:brightness-110 text-white font-black text-sm md:text-base shadow-xl shadow-emerald-600/20 animate-float cursor-pointer transition">
           <span>Próximo Vídeo: Prática com Heltec V3, TTN e Arduino IDE</span>
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-        </div>
+        </button>
       </div>
+    </div>
+
+    <!-- ================= SLIDE 8: Vídeo Tutorial Prático ================= -->
+    <div class="slide w-full max-w-5xl flex-col items-center justify-center space-y-5 my-auto z-10 text-center" id="slide-video">
+      <div class="space-y-2">
+        <span class="text-xs uppercase tracking-widest font-bold text-sky-700">Hands-on</span>
+        <h2 class="text-3xl md:text-5xl font-black text-slate-900">Vídeo Tutorial Prático</h2>
+        <p class="text-slate-600 text-sm md:text-base">Heltec WiFi LoRa 32 V3 + The Things Network + Arduino IDE, do cadastro na TTN ao primeiro uplink.</p>
+      </div>
+
+      <div class="w-full rounded-2xl overflow-hidden glass-card shadow-xl border-sky-200 aspect-video mx-auto" style="max-width: min(100%, calc(60vh * 16 / 9));">
+        <iframe id="tutorial-video" class="w-full h-full"
+          src="https://www.youtube-nocookie.com/embed/S4UdSOCp6O0?enablejsapi=1&rel=0"
+          title="Vídeo tutorial: Heltec V3 na rede LoRaWAN/TTN da UFSM"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen></iframe>
+      </div>
+
+      <a href="https://github.com/joaosauzemreal/tutorial_lorawan_ufsm#readme" target="_blank" rel="noopener"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 text-xs md:text-sm font-bold shadow-sm transition">
+        📄 Tutorial escrito e código-fonte no GitHub
+      </a>
     </div>
 
   </main>
@@ -508,7 +536,24 @@
       dotsContainer.appendChild(dot);
     });
 
+    const videoSlideIndex = Array.from(slides).findIndex(s => s.id === 'slide-video');
+    const videoFrame = document.getElementById('tutorial-video');
+
+    // Pausa o vídeo do YouTube quando o usuário sai do slide do vídeo
+    function pauseVideo() {
+      if (videoFrame && videoFrame.contentWindow) {
+        videoFrame.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+      }
+    }
+
+    function goToVideo() {
+      goToSlide(videoSlideIndex);
+    }
+
     function updateUI() {
+      if (currentSlide !== videoSlideIndex) pauseVideo();
+      history.replaceState(null, '', currentSlide === videoSlideIndex ? '#video' : location.pathname + location.search);
+
       slides.forEach((slide, idx) => {
         if (idx === currentSlide) {
           slide.classList.add('active');
@@ -570,6 +615,8 @@
       }
     });
 
+    // Permite abrir direto no vídeo: .../tutorial_lorawan_ufsm/#video
+    if (location.hash === '#video') currentSlide = videoSlideIndex;
     updateUI();
   </script>
 </body>
