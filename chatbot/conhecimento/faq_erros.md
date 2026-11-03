@@ -62,6 +62,16 @@ Em **+ Register end device** > **Enter end device specifics manually**, use exat
 
 Depois clique em **Register end device**. A aplicação onde o dispositivo é cadastrado precisa estar no cluster **eu1**.
 
+## Qual versão do LoRaWAN escolher no cadastro do dispositivo?
+
+No cadastro do dispositivo na TTN, escolha **`LoRaWAN Specification 1.0.2`** no campo **LoRaWAN version** e **`RP001 Regional Parameters 1.0.2 Rev B`** no campo **Regional Parameters version**. Os dois campos aparecem juntos e precisam ser preenchidos assim. A versão 1.0.2 é a usada pela biblioteca da Heltec.
+
+## Posso usar outra placa ou módulo LoRa (RFM95, SX1276, Arduino Uno, outro ESP32)?
+
+Este tutorial cobre **só a placa Heltec WiFi LoRa 32 V3**, com a biblioteca da Heltec. Outras placas e módulos (por exemplo RFM95 ou SX1276 ligados a um Arduino Uno ou a outro ESP32) usam outras bibliotecas, como a LMIC, e outra ligação de pinos, que **não fazem parte deste tutorial**. Por isso o assistente não tem a pinagem nem o código para eles.
+
+O que vale para qualquer dispositivo na rede da UFSM é a configuração da rede: aplicação no cluster **eu1** da TTN, plano `Australia 915-928 MHz, FSB 2`, ativação OTAA e antena sempre conectada antes de ligar. Para a ligação de pinos e o código de outra placa, consulte a documentação do fabricante do módulo e da biblioteca escolhida.
+
 ## Em que ordem copiar as chaves da TTN para o secrets.h: msb ou lsb?
 
 Use a ordem **msb**, que é a ordem em que o console da TTN mostra as chaves por padrão.

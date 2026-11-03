@@ -33,6 +33,9 @@ KEEP_ALIVE: str | int = int(_keep_alive) if _keep_alive.lstrip("-").isdigit() el
 # Antes de responder, o modelo classifica se a pergunta é sobre o tutorial (SIM/NAO).
 # Se não for, o assistente devolve a frase de recusa sem gerar resposta. false = desliga o filtro.
 FILTRO_ASSUNTO = os.getenv("FILTRO_ASSUNTO", "true").strip().lower() != "false"
+# O filtro só pode recusar quando o trecho mais parecido da documentação tiver similaridade
+# abaixo deste valor. Perguntas muito parecidas com a documentação são sempre respondidas.
+LIMIAR_FILTRO = float(os.getenv("LIMIAR_FILTRO", "0.64"))
 
 # Modelos extras que podem ser escolhidos por pergunta, só para testes de comparação (separados por vírgula).
 # Ex.: MODELOS_TESTE=qwen3:14b,gemma3:12b  — são baixados automaticamente depois que o chat inicia.

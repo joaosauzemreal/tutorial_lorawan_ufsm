@@ -18,7 +18,7 @@ from datetime import datetime
 import httpx
 
 from . import config, rag
-from .motor import gerar_resposta, pergunta_no_assunto, preparar_conversa
+from .motor import deve_recusar, gerar_resposta, preparar_conversa
 from .prompts import RECUSA
 
 LINHA_RE = re.compile(r"^\|\s*(\d+)\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|\s*$")
@@ -51,8 +51,7 @@ async def principal(modelo: str) -> None:
             historico = [{"role": "user", "content": pergunta}]
             mensagens, fontes = await preparar_conversa(cliente, indice, historico)
             inicio = time.perf_counter()
-            no_assunto = not config.FILTRO_ASSUNTO or await pergunta_no_assunto(cliente, modelo, historico)
-            if no_assunto:
+            if not await deve_recusar(cliente, modelo, historico, fontes):
                 resposta = await gerar_resposta(cliente, modelo, mensagens)
             else:
                 resposta = f"_(recusada pelo filtro de assunto)_\n\n{RECUSA}"

@@ -117,6 +117,7 @@ O modelo é baixado automaticamente se ainda não existir. Para trocar o modelo 
 | `NUM_CTX` | `8192` | Tamanho da janela de contexto, em tokens |
 | `KEEP_ALIVE` | `60m` | Quanto tempo o modelo fica na RAM sem uso (`-1` = sempre) |
 | `FILTRO_ASSUNTO` | `true` | Antes de responder, o modelo classifica (SIM/NÃO) se a pergunta é sobre o tutorial; se não for, devolve a frase de recusa. `false` desliga |
+| `LIMIAR_FILTRO` | `0.64` | O filtro só pode recusar se o trecho mais parecido da documentação tiver similaridade abaixo deste valor |
 | `MODELOS_TESTE` | (vazio) | Modelos extras que podem ser escolhidos por pergunta via API, só para comparação. Ex.: `qwen3:14b,gemma3:12b` |
 | `THINK` | (vazio) | `false` desliga o "raciocínio" de modelos como o `qwen3`, que fica mais rápido. Deixe vazio para modelos sem raciocínio |
 

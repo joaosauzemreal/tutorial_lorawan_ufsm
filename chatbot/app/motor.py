@@ -60,7 +60,8 @@ async def pergunta_no_assunto(cliente: httpx.AsyncClient, modelo: str, historico
         ],
         "stream": False,
         "keep_alive": config.KEEP_ALIVE,
-        "options": {"temperature": 0, "num_predict": 5, "num_ctx": 2048},
+        # Mesmo num_ctx da resposta: com um valor diferente o Ollama recarrega o modelo a cada troca.
+        "options": {"temperature": 0, "num_predict": 5, "num_ctx": config.NUM_CTX},
     }
     if config.THINK is not None:
         corpo["think"] = False
@@ -72,6 +73,20 @@ async def pergunta_no_assunto(cliente: httpx.AsyncClient, modelo: str, historico
         return True
     texto = FiltroPensamento().alimentar(texto).strip().upper()
     return not (texto.startswith("NAO") or texto.startswith("NÃO"))
+
+
+async def deve_recusar(cliente: httpx.AsyncClient, modelo: str, historico: list[dict], fontes: list[dict]) -> bool:
+    """Decide se a pergunta deve receber a frase de recusa.
+
+    Só recusa quando o filtro está ligado, a documentação não tem nenhum trecho muito parecido
+    com a pergunta (similaridade abaixo de LIMIAR_FILTRO) e o classificador diz que o assunto é outro.
+    """
+    if not config.FILTRO_ASSUNTO:
+        return False
+    melhor = max((f["similaridade"] for f in fontes), default=0.0)
+    if melhor >= config.LIMIAR_FILTRO:
+        return False
+    return not await pergunta_no_assunto(cliente, modelo, historico)
 
 
 def _corpo(modelo: str, mensagens: list[dict], stream: bool, think: bool | None = None) -> dict:

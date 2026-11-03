@@ -35,22 +35,28 @@ LEMBRETE = """INSTRUÇÕES PARA ESTA RESPOSTA:
 # Classificador de assunto: uma pergunta de sim/não, separada da resposta.
 # Modelos pequenos erram menos quando decidir "responder ou recusar" é uma tarefa à parte.
 CLASSIFICADOR_SISTEMA = (
-    "Você classifica perguntas enviadas a um assistente de um tutorial sobre LoRaWAN. "
+    "Você classifica perguntas enviadas a um assistente de um tutorial técnico. "
     "Responda somente SIM ou NAO."
 )
 
-CLASSIFICADOR_PERGUNTA = """A pergunta abaixo tem relação com algum destes assuntos: LoRa, LoRaWAN, The Things Network (TTN), gateways, IoT, rádio, antenas, a placa Heltec, ESP32, Arduino IDE, programação da placa, o tutorial ou a rede LoRaWAN da UFSM?
+# Exemplos intercalados (SIM/NAO) e terminando em SIM: com vários NAO seguidos no fim,
+# modelos pequenos tendem a repetir NAO. Os exemplos não repetem as perguntas da avaliação.
+CLASSIFICADOR_PERGUNTA = """Um assistente tira dúvidas sobre um tutorial que ensina a conectar uma placa Heltec (ESP32 com rádio LoRa) à rede LoRaWAN da The Things Network na UFSM. Ele responde sobre: LoRa, LoRaWAN, TTN, gateways, rádio e antenas, a placa Heltec, ESP32, Arduino IDE, bibliotecas, erros de compilação, upload, portas USB, drivers, Monitor Serial, licença da Heltec, chaves e configuração da rede.
+
+A pergunta abaixo é sobre algum desses assuntos? Responda SIM ou NAO.
 
 Exemplos:
 Pergunta: minha placa não conecta na rede -> SIM
-Pergunta: o que é spreading factor -> SIM
-Pergunta: qual a diferença entre LoRa e LoRaWAN -> SIM
-Pergunta: e pelo comando AT, como faço? -> SIM
-Pergunta: posso usar outra placa em vez da Heltec? -> SIM
-Pergunta: qual a senha do wifi da ufsm? -> NAO
-Pergunta: me ajuda com meu trabalho de cálculo -> NAO
+Pergunta: qual a senha do eduroam? -> NAO
+Pergunta: a IDE diz que falta uma biblioteca ao compilar -> SIM
+Pergunta: o monitor serial mostra uma mensagem estranha -> SIM
+Pergunta: me ajuda com minha lista de exercícios de física -> NAO
+Pergunta: o computador não reconhece a placa no USB -> SIM
+Pergunta: o que são as classes de dispositivo -> SIM
 Pergunta: qual o cardápio do RU hoje? -> NAO
+Pergunta: o que é ADR -> SIM
 Pergunta: escreva um poema -> NAO
+Pergunta: e pelo comando AT, como faço? -> SIM
 {contexto}
 Pergunta: {pergunta} ->"""
 
