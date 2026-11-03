@@ -30,12 +30,11 @@ _keep_alive = os.getenv("KEEP_ALIVE", "60m").strip()  # quanto tempo o modelo fi
 # O Ollama aceita duração com unidade ("60m") ou número de segundos (-1); texto "-1" sem unidade dá erro.
 KEEP_ALIVE: str | int = int(_keep_alive) if _keep_alive.lstrip("-").isdigit() else _keep_alive
 
-# Antes de responder, o modelo classifica se a pergunta é sobre o tutorial (SIM/NAO).
-# Se não for, o assistente devolve a frase de recusa sem gerar resposta. false = desliga o filtro.
+# Filtro de assunto: a pergunta é recusada quando se parece mais com os exemplos de
+# app/exemplos_fora_do_assunto.txt do que com a documentação, por pelo menos MARGEM_FILTRO.
 FILTRO_ASSUNTO = os.getenv("FILTRO_ASSUNTO", "true").strip().lower() != "false"
-# O filtro só pode recusar quando o trecho mais parecido da documentação tiver similaridade
-# abaixo deste valor. Perguntas muito parecidas com a documentação são sempre respondidas.
-LIMIAR_FILTRO = float(os.getenv("LIMIAR_FILTRO", "0.64"))
+MARGEM_FILTRO = float(os.getenv("MARGEM_FILTRO", "0.05"))
+EXEMPLOS_FORA = Path(__file__).parent / "exemplos_fora_do_assunto.txt"
 
 # Modelos extras que podem ser escolhidos por pergunta, só para testes de comparação (separados por vírgula).
 # Ex.: MODELOS_TESTE=qwen3:14b,gemma3:12b  — são baixados automaticamente depois que o chat inicia.

@@ -38,7 +38,8 @@ async def preparar() -> None:
         await rag.garantir_modelo(cliente, config.CHAT_MODEL)
         estado["situacao"] = "indexando documentos"
         estado["indice"] = await rag.construir_indice(
-            cliente, config.DOCS_PATHS, config.EMBED_MODEL, config.CACHE_DIR
+            cliente, config.DOCS_PATHS, config.EMBED_MODEL, config.CACHE_DIR,
+            rag.ler_exemplos(config.EXEMPLOS_FORA),
         )
         estado["situacao"] = "pronto"
         log.info("Assistente pronto (modelo %s).", config.CHAT_MODEL)
@@ -116,12 +117,12 @@ async def chat(pedido: PedidoChat):
         raise HTTPException(400, "A última mensagem precisa ser do usuário.")
 
     try:
-        mensagens, fontes = await preparar_conversa(cliente, estado["indice"], historico)
+        mensagens, fontes, similaridade_fora = await preparar_conversa(cliente, estado["indice"], historico)
     except Exception as e:  # noqa: BLE001
         log.exception("Erro ao buscar nos documentos")
         raise HTTPException(502, f"Não consegui consultar o modelo de IA no servidor ({e.__class__.__name__}).") from e
 
-    if await deve_recusar(cliente, modelo, historico, fontes):
+    if deve_recusar(fontes, similaridade_fora):
         async def recusa():
             yield json.dumps({"tipo": "fontes", "fontes": []}) + "\n"
             yield json.dumps({"tipo": "texto", "texto": RECUSA}, ensure_ascii=False) + "\n"

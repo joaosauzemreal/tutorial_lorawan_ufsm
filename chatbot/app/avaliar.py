@@ -35,13 +35,15 @@ async def principal(modelo: str) -> None:
         await rag.esperar_ollama(cliente)
         await rag.garantir_modelo(cliente, config.EMBED_MODEL)
         await rag.garantir_modelo(cliente, modelo)
-        indice = await rag.construir_indice(cliente, config.DOCS_PATHS, config.EMBED_MODEL, config.CACHE_DIR)
+        indice = await rag.construir_indice(cliente, config.DOCS_PATHS, config.EMBED_MODEL, config.CACHE_DIR,
+                                            rag.ler_exemplos(config.EXEMPLOS_FORA))
 
         linhas = [
             f"# Avaliação: {modelo}",
             "",
             f"{datetime.now():%d/%m/%Y %H:%M} · embeddings: {config.EMBED_MODEL} · "
-            f"TOP_K={config.TOP_K} · temperatura={config.TEMPERATURE}",
+            f"TOP_K={config.TOP_K} · temperatura={config.TEMPERATURE} · "
+            f"filtro de assunto: {'ligado, margem ' + str(config.MARGEM_FILTRO) if config.FILTRO_ASSUNTO else 'desligado'}",
             "",
             "Marque cada resposta: ✅ acertou · 🟡 parcial · ❌ errou/inventou",
             "",
@@ -49,9 +51,9 @@ async def principal(modelo: str) -> None:
         tempos = []
         for numero, pergunta, esperado in perguntas:
             historico = [{"role": "user", "content": pergunta}]
-            mensagens, fontes = await preparar_conversa(cliente, indice, historico)
+            mensagens, fontes, sim_fora = await preparar_conversa(cliente, indice, historico)
             inicio = time.perf_counter()
-            if not await deve_recusar(cliente, modelo, historico, fontes):
+            if not deve_recusar(fontes, sim_fora):
                 resposta = await gerar_resposta(cliente, modelo, mensagens)
             else:
                 resposta = f"_(recusada pelo filtro de assunto)_\n\n{RECUSA}"
@@ -66,6 +68,11 @@ async def principal(modelo: str) -> None:
                 "**Fontes encontradas (similaridade):** " + ", ".join(
                     "{} ({:.2f})".format(f["titulo"], f["similaridade"]) for f in fontes
                 ),
+                "",
+                "**Filtro de assunto:** similaridade com exemplos fora do assunto {:.2f} · "
+                "melhor trecho da documentação {:.2f} · diferença {:+.2f} (recusa a partir de {:+.2f})".format(
+                    sim_fora, fontes[0]["similaridade"] if fontes else 0.0,
+                    sim_fora - (fontes[0]["similaridade"] if fontes else 0.0), config.MARGEM_FILTRO),
                 "",
                 f"**Resposta ({tempo:.1f} s):**",
                 "",

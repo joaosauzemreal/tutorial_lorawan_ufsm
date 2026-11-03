@@ -15,7 +15,7 @@ O código do tutorial começa a transmitir (join) logo depois de ligar, então a
 
 ## A placa fica em "ENVIANDO JOIN" e nunca conecta: o que conferir
 
-Confira o cluster **eu1**, o plano `Australia 915-928 MHz, FSB 2`, as chaves no `secrets.h` (ordem msb), a versão `LoRaWAN Specification 1.0.2` com `RP001 Regional Parameters 1.0.2 Rev B`, o alcance até o gateway e a antena.
+Confira seis itens: o cluster **eu1**, o plano `Australia 915-928 MHz, FSB 2`, as chaves no `secrets.h` (ordem msb), a versão `LoRaWAN Specification 1.0.2` com `RP001 Regional Parameters 1.0.2 Rev B`, o alcance até o gateway e a antena.
 
 **Sintomas:** o display mostra "ENVIANDO JOIN", o contador de tentativas só aumenta e a placa nunca passa para "JOIN SUCESSO".
 
@@ -46,7 +46,7 @@ Os gateways da UFSM estão registrados no cluster **eu1**. Se você criou a apli
 **Como resolver:**
 1. Confira a URL do console onde você criou a aplicação. Ela precisa começar com `eu1.cloud.thethings.network`.
 2. Se começar com outro endereço (por exemplo `nam1` ou `au1`), crie uma **nova** aplicação e um novo dispositivo em https://eu1.cloud.thethings.network/console. Não existe opção para mover uma aplicação de um cluster para outro.
-3. Copie as chaves do novo dispositivo para o `secrets.h` e grave o código de novo.
+3. Copie as chaves do novo dispositivo para o `secrets.h` e carregue o código na placa de novo.
 
 ## Quais opções escolher ao cadastrar o dispositivo (end device) na TTN
 
@@ -64,7 +64,11 @@ Depois clique em **Register end device**. A aplicação onde o dispositivo é ca
 
 ## Qual versão do LoRaWAN escolher no cadastro do dispositivo?
 
-No cadastro do dispositivo na TTN, escolha **`LoRaWAN Specification 1.0.2`** no campo **LoRaWAN version** e **`RP001 Regional Parameters 1.0.2 Rev B`** no campo **Regional Parameters version**. Os dois campos aparecem juntos e precisam ser preenchidos assim. A versão 1.0.2 é a usada pela biblioteca da Heltec.
+São dois campos de versão no cadastro do dispositivo, e os dois precisam ser preenchidos:
+1. **LoRaWAN version:** `LoRaWAN Specification 1.0.2`
+2. **Regional Parameters version:** `RP001 Regional Parameters 1.0.2 Rev B`
+
+A versão 1.0.2 é a usada pela biblioteca da Heltec.
 
 ## Posso usar outra placa ou módulo LoRa (RFM95, SX1276, Arduino Uno, outro ESP32)?
 

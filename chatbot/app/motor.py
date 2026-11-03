@@ -8,23 +8,24 @@ from collections.abc import AsyncIterator
 import httpx
 
 from . import config
-from .prompts import CLASSIFICADOR_PERGUNTA, CLASSIFICADOR_SISTEMA, SYSTEM_PROMPT, montar_pergunta
+from .prompts import SYSTEM_PROMPT, montar_pergunta
 from .rag import Indice
 
 
 async def preparar_conversa(
     cliente: httpx.AsyncClient, indice: Indice, historico: list[dict]
-) -> tuple[list[dict], list[dict]]:
+) -> tuple[list[dict], list[dict], float]:
     """Recebe o histórico [{role, content}, ...] terminando com a pergunta do usuário.
 
-    Devolve as mensagens para o Ollama e a lista de fontes usadas.
+    Devolve as mensagens para o Ollama, a lista de fontes usadas e a maior similaridade
+    da pergunta com os exemplos fora do assunto.
     """
     perguntas = [m["content"] for m in historico if m["role"] == "user"]
     pergunta = perguntas[-1]
     # Para perguntas de continuação ("e como faço isso?"), a pergunta anterior ajuda a busca.
     consulta = "\n".join(perguntas[-2:])
 
-    resultados = await indice.buscar(cliente, consulta, config.TOP_K)
+    resultados, similaridade_fora = await indice.buscar(cliente, consulta, config.TOP_K)
     trechos = [t.texto for t, _ in resultados]
 
     fontes, vistos = [], set()
@@ -45,48 +46,15 @@ async def preparar_conversa(
     mensagens = [{"role": "system", "content": SYSTEM_PROMPT}]
     mensagens += [{"role": m["role"], "content": m["content"]} for m in anteriores]
     mensagens.append({"role": "user", "content": montar_pergunta(pergunta, trechos)})
-    return mensagens, fontes
+    return mensagens, fontes, similaridade_fora
 
 
-async def pergunta_no_assunto(cliente: httpx.AsyncClient, modelo: str, historico: list[dict]) -> bool:
-    """Pergunta ao modelo, com SIM/NAO, se a pergunta é sobre o tutorial. Em caso de dúvida, responde True."""
-    perguntas = [m["content"] for m in historico if m["role"] == "user"]
-    contexto = f"Pergunta anterior do mesmo usuário: {perguntas[-2]}" if len(perguntas) > 1 else ""
-    corpo = {
-        "model": modelo,
-        "messages": [
-            {"role": "system", "content": CLASSIFICADOR_SISTEMA},
-            {"role": "user", "content": CLASSIFICADOR_PERGUNTA.format(contexto=contexto, pergunta=perguntas[-1])},
-        ],
-        "stream": False,
-        "keep_alive": config.KEEP_ALIVE,
-        # Mesmo num_ctx da resposta: com um valor diferente o Ollama recarrega o modelo a cada troca.
-        "options": {"temperature": 0, "num_predict": 5, "num_ctx": config.NUM_CTX},
-    }
-    if config.THINK is not None:
-        corpo["think"] = False
-    try:
-        r = await cliente.post("/api/chat", json=corpo, timeout=60)
-        r.raise_for_status()
-        texto = r.json().get("message", {}).get("content", "")
-    except Exception:  # noqa: BLE001  (se o classificador falhar, segue respondendo normalmente)
-        return True
-    texto = FiltroPensamento().alimentar(texto).strip().upper()
-    return not (texto.startswith("NAO") or texto.startswith("NÃO"))
-
-
-async def deve_recusar(cliente: httpx.AsyncClient, modelo: str, historico: list[dict], fontes: list[dict]) -> bool:
-    """Decide se a pergunta deve receber a frase de recusa.
-
-    Só recusa quando o filtro está ligado, a documentação não tem nenhum trecho muito parecido
-    com a pergunta (similaridade abaixo de LIMIAR_FILTRO) e o classificador diz que o assunto é outro.
-    """
+def deve_recusar(fontes: list[dict], similaridade_fora: float) -> bool:
+    """Recusa quando a pergunta se parece mais com os exemplos fora do assunto do que com a documentação."""
     if not config.FILTRO_ASSUNTO:
         return False
-    melhor = max((f["similaridade"] for f in fontes), default=0.0)
-    if melhor >= config.LIMIAR_FILTRO:
-        return False
-    return not await pergunta_no_assunto(cliente, modelo, historico)
+    melhor_doc = max((f["similaridade"] for f in fontes), default=0.0)
+    return similaridade_fora - melhor_doc >= config.MARGEM_FILTRO
 
 
 def _corpo(modelo: str, mensagens: list[dict], stream: bool, think: bool | None = None) -> dict:

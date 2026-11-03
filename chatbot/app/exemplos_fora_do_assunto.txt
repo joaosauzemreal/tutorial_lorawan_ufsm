@@ -1,0 +1,30 @@
+# Exemplos de perguntas FORA do assunto do assistente (uma por linha).
+# Uma pergunta é recusada quando ela se parece mais com estes exemplos do que com a documentação
+# (veja MARGEM_FILTRO). Para o assistente recusar um novo tipo de pergunta, acrescente um exemplo aqui.
+# Linhas começando com # são ignoradas.
+qual a senha do wifi?
+como eu conecto no eduroam?
+qual a senha do portal do aluno?
+me ajuda com meu trabalho de cálculo
+resolva esta integral para mim
+me ajuda com a lista de exercícios de física
+quando é a prova de álgebra linear?
+qual o cardápio do RU hoje?
+qual o horário do ônibus para o campus?
+como faço a matrícula nas disciplinas?
+onde eu vejo as minhas notas do semestre?
+quem ganhou o jogo de futebol ontem?
+qual a previsão do tempo para amanhã?
+me conta uma piada
+escreva um poema
+escreva uma redação sobre o meio ambiente
+me passa uma receita de bolo de chocolate
+qual a capital da França?
+quem foi o primeiro presidente do Brasil?
+me recomenda um filme para assistir
+traduza este texto para o inglês
+como eu faço um site em HTML?
+como instalar o Windows no meu computador?
+qual o melhor celular para comprar?
+como emagrecer rápido?
+o que você acha da política do Brasil?

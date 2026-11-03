@@ -151,20 +151,32 @@ async def gerar_embeddings(cliente: httpx.AsyncClient, modelo: str, textos: list
 # ---------------------------------------------------------------------------
 
 class Indice:
-    def __init__(self, trechos: list[Trecho], vetores: np.ndarray, modelo_embed: str):
+    def __init__(self, trechos: list[Trecho], vetores: np.ndarray, modelo_embed: str,
+                 vetores_fora: np.ndarray | None = None):
         self.trechos = trechos
         self.vetores = vetores
         self.modelo_embed = modelo_embed
+        self.vetores_fora = vetores_fora  # exemplos de perguntas fora do assunto
 
-    async def buscar(self, cliente: httpx.AsyncClient, consulta: str, k: int) -> list[tuple[Trecho, float]]:
+    async def buscar(self, cliente: httpx.AsyncClient, consulta: str, k: int) -> tuple[list[tuple[Trecho, float]], float]:
+        """Devolve os k trechos mais parecidos e a maior similaridade com os exemplos fora do assunto."""
         q = (await gerar_embeddings(cliente, self.modelo_embed, [consulta]))[0]
         pontuacoes = self.vetores @ q
         melhores = np.argsort(-pontuacoes)[:k]
-        return [(self.trechos[i], float(pontuacoes[i])) for i in melhores]
+        fora = float((self.vetores_fora @ q).max()) if self.vetores_fora is not None and len(self.vetores_fora) else 0.0
+        return [(self.trechos[i], float(pontuacoes[i])) for i in melhores], fora
+
+
+def ler_exemplos(caminho: Path) -> list[str]:
+    if not caminho.exists():
+        return []
+    linhas = (l.strip() for l in caminho.read_text(encoding="utf-8").splitlines())
+    return [l for l in linhas if l and not l.startswith("#")]
 
 
 async def construir_indice(
-    cliente: httpx.AsyncClient, caminhos: list[Path], modelo_embed: str, pasta_cache: Path
+    cliente: httpx.AsyncClient, caminhos: list[Path], modelo_embed: str, pasta_cache: Path,
+    exemplos_fora: list[str] | None = None,
 ) -> Indice:
     trechos: list[Trecho] = []
     for arq in listar_documentos(caminhos):
@@ -182,16 +194,19 @@ async def construir_indice(
         except Exception:
             log.warning("Cache de embeddings inválido; será recriado.")
 
-    chaves = [hashlib.sha256(t.texto.encode()).hexdigest() for t in trechos]
+    exemplos_fora = exemplos_fora or []
+    textos = [t.texto for t in trechos] + exemplos_fora
+    chaves = [hashlib.sha256(t.encode()).hexdigest() for t in textos]
     faltando = [i for i, c in enumerate(chaves) if c not in cache]
     if faltando:
-        log.info("Gerando embeddings de %d trechos...", len(faltando))
-        novos = await gerar_embeddings(cliente, modelo_embed, [trechos[i].texto for i in faltando])
+        log.info("Gerando embeddings de %d textos...", len(faltando))
+        novos = await gerar_embeddings(cliente, modelo_embed, [textos[i] for i in faltando])
         for i, v in zip(faltando, novos):
             cache[chaves[i]] = v.tolist()
     arq_cache.write_text(json.dumps({c: cache[c] for c in chaves}))
 
-    vetores = np.asarray([cache[c] for c in chaves], dtype=np.float32)
-    log.info("Base de conhecimento pronta: %d trechos de %d documentos.",
-             len(trechos), len({t.arquivo for t in trechos}))
-    return Indice(trechos, vetores, modelo_embed)
+    todos = np.asarray([cache[c] for c in chaves], dtype=np.float32)
+    vetores, vetores_fora = todos[:len(trechos)], todos[len(trechos):]
+    log.info("Base de conhecimento pronta: %d trechos de %d documentos; %d exemplos fora do assunto.",
+             len(trechos), len({t.arquivo for t in trechos}), len(exemplos_fora))
+    return Indice(trechos, vetores, modelo_embed, vetores_fora)

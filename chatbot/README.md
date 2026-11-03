@@ -8,7 +8,7 @@ O assistente usa **RAG** (geração aumentada por recuperação):
 
 1. Na inicialização, o [README do tutorial](../README.md) e os arquivos da pasta [`conhecimento/`](conhecimento/) são divididos em trechos pelos títulos. Cada trecho vira um vetor (*embedding*) gerado pelo modelo multilíngue `bge-m3`.
 2. A cada pergunta, o sistema busca os 5 trechos mais parecidos com ela.
-3. Antes de responder, o Phi-4-mini classifica, com SIM ou NÃO, se a pergunta é sobre o tutorial. Se não for, o assistente devolve uma frase de recusa pronta.
+3. Filtro de assunto: a pergunta também é comparada com exemplos de perguntas fora do assunto ([`app/exemplos_fora_do_assunto.txt`](app/exemplos_fora_do_assunto.txt)). Se ela se parecer mais com esses exemplos do que com a documentação, o assistente devolve uma frase de recusa pronta, sem chamar o modelo.
 4. O Phi-4-mini recebe a pergunta, esses trechos e as instruções do assistente ([`app/prompts.py`](app/prompts.py)), e escreve a resposta, que aparece aos poucos na tela junto com as fontes usadas.
 
 ```
@@ -116,8 +116,8 @@ O modelo é baixado automaticamente se ainda não existir. Para trocar o modelo 
 | `TEMPERATURE` | `0.2` | Criatividade (0 = mais previsível) |
 | `NUM_CTX` | `8192` | Tamanho da janela de contexto, em tokens |
 | `KEEP_ALIVE` | `60m` | Quanto tempo o modelo fica na RAM sem uso (`-1` = sempre) |
-| `FILTRO_ASSUNTO` | `true` | Antes de responder, o modelo classifica (SIM/NÃO) se a pergunta é sobre o tutorial; se não for, devolve a frase de recusa. `false` desliga |
-| `LIMIAR_FILTRO` | `0.64` | O filtro só pode recusar se o trecho mais parecido da documentação tiver similaridade abaixo deste valor |
+| `FILTRO_ASSUNTO` | `true` | Recusa perguntas que se parecem mais com os exemplos fora do assunto do que com a documentação. `false` desliga |
+| `MARGEM_FILTRO` | `0.05` | Quanto a similaridade com os exemplos fora do assunto precisa superar a do melhor trecho da documentação para recusar |
 | `MODELOS_TESTE` | (vazio) | Modelos extras que podem ser escolhidos por pergunta via API, só para comparação. Ex.: `qwen3:14b,gemma3:12b` |
 | `THINK` | (vazio) | `false` desliga o "raciocínio" de modelos como o `qwen3`, que fica mais rápido. Deixe vazio para modelos sem raciocínio |
 
