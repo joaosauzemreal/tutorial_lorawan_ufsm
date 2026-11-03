@@ -18,7 +18,8 @@ from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from . import config, rag
-from .motor import gerar_resposta_stream, preparar_conversa
+from .motor import gerar_resposta_stream, pergunta_no_assunto, preparar_conversa
+from .prompts import RECUSA
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 log = logging.getLogger("assistente")
@@ -113,6 +114,13 @@ async def chat(pedido: PedidoChat):
     historico = [{"role": m.role, "content": m.content} for m in pedido.messages]
     if historico[-1]["role"] != "user":
         raise HTTPException(400, "A última mensagem precisa ser do usuário.")
+
+    if config.FILTRO_ASSUNTO and not await pergunta_no_assunto(cliente, modelo, historico):
+        async def recusa():
+            yield json.dumps({"tipo": "fontes", "fontes": []}) + "\n"
+            yield json.dumps({"tipo": "texto", "texto": RECUSA}, ensure_ascii=False) + "\n"
+            yield json.dumps({"tipo": "fim"}) + "\n"
+        return StreamingResponse(recusa(), media_type="application/x-ndjson")
 
     try:
         mensagens, fontes = await preparar_conversa(cliente, estado["indice"], historico)

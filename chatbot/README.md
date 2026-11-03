@@ -8,7 +8,8 @@ O assistente usa **RAG** (geração aumentada por recuperação):
 
 1. Na inicialização, o [README do tutorial](../README.md) e os arquivos da pasta [`conhecimento/`](conhecimento/) são divididos em trechos pelos títulos. Cada trecho vira um vetor (*embedding*) gerado pelo modelo multilíngue `bge-m3`.
 2. A cada pergunta, o sistema busca os 5 trechos mais parecidos com ela.
-3. O Phi-4-mini recebe a pergunta, esses trechos e as instruções do assistente ([`app/prompts.py`](app/prompts.py)), e escreve a resposta, que aparece aos poucos na tela junto com as fontes usadas.
+3. Antes de responder, o Phi-4-mini classifica, com SIM ou NÃO, se a pergunta é sobre o tutorial. Se não for, o assistente devolve uma frase de recusa pronta.
+4. O Phi-4-mini recebe a pergunta, esses trechos e as instruções do assistente ([`app/prompts.py`](app/prompts.py)), e escreve a resposta, que aparece aos poucos na tela junto com as fontes usadas.
 
 ```
 chatbot/
@@ -115,6 +116,7 @@ O modelo é baixado automaticamente se ainda não existir. Para trocar o modelo 
 | `TEMPERATURE` | `0.2` | Criatividade (0 = mais previsível) |
 | `NUM_CTX` | `8192` | Tamanho da janela de contexto, em tokens |
 | `KEEP_ALIVE` | `60m` | Quanto tempo o modelo fica na RAM sem uso (`-1` = sempre) |
+| `FILTRO_ASSUNTO` | `true` | Antes de responder, o modelo classifica (SIM/NÃO) se a pergunta é sobre o tutorial; se não for, devolve a frase de recusa. `false` desliga |
 | `MODELOS_TESTE` | (vazio) | Modelos extras que podem ser escolhidos por pergunta via API, só para comparação. Ex.: `qwen3:14b,gemma3:12b` |
 | `THINK` | (vazio) | `false` desliga o "raciocínio" de modelos como o `qwen3`, que fica mais rápido. Deixe vazio para modelos sem raciocínio |
 

@@ -8,7 +8,7 @@ from collections.abc import AsyncIterator
 import httpx
 
 from . import config
-from .prompts import SYSTEM_PROMPT, montar_pergunta
+from .prompts import CLASSIFICADOR_PERGUNTA, CLASSIFICADOR_SISTEMA, SYSTEM_PROMPT, montar_pergunta
 from .rag import Indice
 
 
@@ -46,6 +46,32 @@ async def preparar_conversa(
     mensagens += [{"role": m["role"], "content": m["content"]} for m in anteriores]
     mensagens.append({"role": "user", "content": montar_pergunta(pergunta, trechos)})
     return mensagens, fontes
+
+
+async def pergunta_no_assunto(cliente: httpx.AsyncClient, modelo: str, historico: list[dict]) -> bool:
+    """Pergunta ao modelo, com SIM/NAO, se a pergunta é sobre o tutorial. Em caso de dúvida, responde True."""
+    perguntas = [m["content"] for m in historico if m["role"] == "user"]
+    contexto = f"Pergunta anterior do mesmo usuário: {perguntas[-2]}" if len(perguntas) > 1 else ""
+    corpo = {
+        "model": modelo,
+        "messages": [
+            {"role": "system", "content": CLASSIFICADOR_SISTEMA},
+            {"role": "user", "content": CLASSIFICADOR_PERGUNTA.format(contexto=contexto, pergunta=perguntas[-1])},
+        ],
+        "stream": False,
+        "keep_alive": config.KEEP_ALIVE,
+        "options": {"temperature": 0, "num_predict": 5, "num_ctx": 2048},
+    }
+    if config.THINK is not None:
+        corpo["think"] = False
+    try:
+        r = await cliente.post("/api/chat", json=corpo, timeout=60)
+        r.raise_for_status()
+        texto = r.json().get("message", {}).get("content", "")
+    except Exception:  # noqa: BLE001  (se o classificador falhar, segue respondendo normalmente)
+        return True
+    texto = FiltroPensamento().alimentar(texto).strip().upper()
+    return not (texto.startswith("NAO") or texto.startswith("NÃO"))
 
 
 def _corpo(modelo: str, mensagens: list[dict], stream: bool, think: bool | None = None) -> dict:

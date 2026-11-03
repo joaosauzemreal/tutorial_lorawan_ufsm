@@ -104,7 +104,9 @@ O **Data Rate (DR)** é o número que o LoRaWAN usa para combinar SF e largura d
 
 ## Planos de frequência: AU915 e a sub-banda 2 (FSB2)
 
-Cada região do mundo usa uma faixa de frequência para LoRaWAN. No Brasil, a LoRa Alliance indica o plano **AU915-928**, o mesmo da Austrália. Por isso, no cadastro da TTN se escolhe "Australia 915-928 MHz".
+Na rede da UFSM, o plano de frequência escolhido no cadastro da TTN é **`Australia 915-928 MHz, FSB 2`**.
+
+Cada região do mundo usa uma faixa de frequência para LoRaWAN. No Brasil, a LoRa Alliance indica o plano **AU915-928**, o mesmo da Austrália. Por isso o nome do plano começa com "Australia", e "FSB 2" indica a sub-banda usada pelos gateways da UFSM.
 
 O plano AU915 tem 64 canais de uplink de 125 kHz (canais 0 a 63, de 915,2 MHz em diante, a cada 200 kHz) e mais 8 canais de 500 kHz (canais 64 a 71). Um gateway comum escuta só 8 canais de 125 kHz por vez, então os canais são divididos em **sub-bandas** (FSB, *Frequency Sub-Band*) de 8 canais.
 
@@ -122,6 +124,8 @@ Na TTN:
 - **Integrações:** formas de levar os dados para fora da TTN, como MQTT, webhooks (HTTP) e o armazenamento de dados (Storage Integration).
 
 ## Clusters da TTN: por que usar o eu1 na UFSM
+
+Cluster e plano de frequência são coisas **independentes**. O cluster (**eu1**, na Europa) é o servidor da TTN onde os gateways da UFSM estão registrados, por isso a aplicação precisa ser criada nele. O plano de frequência (**AU915**) é a faixa de rádio que os dispositivos usam, e é o plano indicado para o Brasil. Um não depende do outro.
 
 A TTN é dividida em **clusters** regionais, cada um com o seu endereço de console: por exemplo **eu1** (Europa), **nam1** (América do Norte) e **au1** (Austrália). Cada gateway é registrado em um cluster. Os gateways da UFSM estão registrados no cluster **eu1**, então a aplicação e o dispositivo também devem ser criados no eu1 (`https://eu1.cloud.thethings.network/console`). O nome do cluster não tem relação com o plano de frequência: na UFSM se usa o cluster europeu com o plano de frequência AU915.
 

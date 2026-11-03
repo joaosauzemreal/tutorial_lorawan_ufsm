@@ -18,7 +18,8 @@ from datetime import datetime
 import httpx
 
 from . import config, rag
-from .motor import gerar_resposta, preparar_conversa
+from .motor import gerar_resposta, pergunta_no_assunto, preparar_conversa
+from .prompts import RECUSA
 
 LINHA_RE = re.compile(r"^\|\s*(\d+)\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|\s*$")
 
@@ -47,9 +48,14 @@ async def principal(modelo: str) -> None:
         ]
         tempos = []
         for numero, pergunta, esperado in perguntas:
-            mensagens, fontes = await preparar_conversa(cliente, indice, [{"role": "user", "content": pergunta}])
+            historico = [{"role": "user", "content": pergunta}]
+            mensagens, fontes = await preparar_conversa(cliente, indice, historico)
             inicio = time.perf_counter()
-            resposta = await gerar_resposta(cliente, modelo, mensagens)
+            no_assunto = not config.FILTRO_ASSUNTO or await pergunta_no_assunto(cliente, modelo, historico)
+            if no_assunto:
+                resposta = await gerar_resposta(cliente, modelo, mensagens)
+            else:
+                resposta = f"_(recusada pelo filtro de assunto)_\n\n{RECUSA}"
             tempo = time.perf_counter() - inicio
             tempos.append(tempo)
             print(f"[{numero}/{len(perguntas)}] {tempo:5.1f}s  {pergunta}")
