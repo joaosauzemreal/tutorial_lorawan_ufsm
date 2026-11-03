@@ -7,7 +7,7 @@ Chatbot que tira dúvidas sobre o tutorial e sobre LoRa, LoRaWAN e The Things Ne
 O assistente usa **RAG** (geração aumentada por recuperação):
 
 1. Na inicialização, o [README do tutorial](../README.md) e os arquivos da pasta [`conhecimento/`](conhecimento/) são divididos em trechos pelos títulos. Cada trecho vira um vetor (*embedding*) gerado pelo modelo multilíngue `bge-m3`.
-2. A cada pergunta, o sistema busca os 5 trechos mais parecidos com ela.
+2. A cada pergunta, o sistema busca os trechos mais parecidos com ela e mantém só os que estão perto do melhor (veja `MARGEM_TRECHOS`).
 3. Filtro de assunto: a pergunta também é comparada com exemplos de perguntas fora do assunto ([`app/exemplos_fora_do_assunto.txt`](app/exemplos_fora_do_assunto.txt)). Se ela se parecer mais com esses exemplos do que com a documentação, o assistente devolve uma frase de recusa pronta, sem chamar o modelo.
 4. O Phi-4-mini recebe a pergunta, esses trechos e as instruções do assistente ([`app/prompts.py`](app/prompts.py)), e escreve a resposta, que aparece aos poucos na tela junto com as fontes usadas.
 
@@ -112,7 +112,8 @@ O modelo é baixado automaticamente se ainda não existir. Para trocar o modelo 
 | `PORTA` | `8000` | Porta do chat no servidor (só Docker) |
 | `CHAT_MODEL` | `phi4-mini` | Modelo que escreve as respostas |
 | `EMBED_MODEL` | `bge-m3` | Modelo que faz a busca nos documentos |
-| `TOP_K` | `5` | Quantos trechos vão junto com cada pergunta |
+| `TOP_K` | `5` | Quantos trechos são buscados para cada pergunta |
+| `MARGEM_TRECHOS` | `0.06` | Só vão para o modelo os trechos com similaridade até esta distância do melhor trecho |
 | `TEMPERATURE` | `0.2` | Criatividade (0 = mais previsível) |
 | `NUM_CTX` | `8192` | Tamanho da janela de contexto, em tokens |
 | `KEEP_ALIVE` | `60m` | Quanto tempo o modelo fica na RAM sem uso (`-1` = sempre) |

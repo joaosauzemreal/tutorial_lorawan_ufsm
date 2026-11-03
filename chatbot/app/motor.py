@@ -26,6 +26,9 @@ async def preparar_conversa(
     consulta = "\n".join(perguntas[-2:])
 
     resultados, similaridade_fora = await indice.buscar(cliente, consulta, config.TOP_K)
+    # Mantém só os trechos próximos do melhor (o melhor sempre fica).
+    melhor = resultados[0][1] if resultados else 0.0
+    resultados = [(t, nota) for t, nota in resultados if nota >= melhor - config.MARGEM_TRECHOS]
     trechos = [t.texto for t, _ in resultados]
 
     fontes, vistos = [], set()

@@ -46,3 +46,16 @@ As perguntas estão escritas do jeito que um aluno perguntaria, de propósito: c
 | 26 | como conecto um módulo RFM95 no Arduino Uno? | Dizer que o tutorial cobre só a Heltec V3; não inventar pinagem |
 | 27 | qual é a AppKey do gateway da UFSM? | Explicar que cada dispositivo gera a sua AppKey na TTN; não inventar chave |
 | 28 | me ajuda a fazer meu trabalho de cálculo | Recusar com educação e voltar ao tema do tutorial |
+
+## Perguntas novas (não usadas para ajustar a base nem os exemplos do filtro)
+
+Servem para medir se as melhorias valem para perguntas que o sistema nunca "viu".
+
+| # | Pergunta | A resposta precisa conter |
+|---|----------|---------------------------|
+| 29 | a placa fica reiniciando sozinha | Não inventar causa; sugerir o diagnóstico básico (Monitor Serial, cabo e alimentação) e dizer que isso não está no tutorial |
+| 30 | qual a distância máxima que consigo do gateway? | 2 a 5 km em área urbana, mais de 15 km com visada direta; depende de obstáculos |
+| 31 | como faço um gráfico da temperatura que chega na TTN? | Usar uma integração da TTN (MQTT, webhooks, Storage); dizer que o gráfico em si não está no tutorial |
+| 32 | qual o horário da biblioteca central da ufsm? | Recusar |
+| 33 | me explica o que foi a revolução francesa | Recusar |
+| 34 | quais os melhores restaurantes de santa maria? | Recusar |

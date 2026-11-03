@@ -62,7 +62,7 @@ Em **+ Register end device** > **Enter end device specifics manually**, use exat
 
 Depois clique em **Register end device**. A aplicação onde o dispositivo é cadastrado precisa estar no cluster **eu1**.
 
-## Qual versão do LoRaWAN escolher no cadastro do dispositivo?
+## Quais versões escolher no cadastro do dispositivo (versão LoRaWAN e versão dos parâmetros regionais)?
 
 São dois campos de versão no cadastro do dispositivo, e os dois precisam ser preenchidos:
 1. **LoRaWAN version:** `LoRaWAN Specification 1.0.2`
@@ -122,8 +122,6 @@ O número é o **Chip ID**. Gere a licença em https://resource.heltec.cn/search
 2. Acesse https://resource.heltec.cn/search, cole o Chip ID e clique em Confirm.
 3. Copie a licença para o array `license` no arquivo `secrets.h`. A licença tem 4 números de 32 bits (128 bits no total), no formato `{ 0x4819D3A6, 0x3C4015EF, 0xC76E3CE5, 0x9742010D }` (exemplo).
 4. Grave o código de novo na placa.
-
-Depois de apagar toda a memória flash da placa, é preciso aplicar a licença de novo.
 
 **Atenção:** cada placa tem a sua própria licença. A licença de uma placa não funciona em outra.
 

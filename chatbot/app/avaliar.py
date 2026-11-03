@@ -42,7 +42,7 @@ async def principal(modelo: str) -> None:
             f"# Avaliação: {modelo}",
             "",
             f"{datetime.now():%d/%m/%Y %H:%M} · embeddings: {config.EMBED_MODEL} · "
-            f"TOP_K={config.TOP_K} · temperatura={config.TEMPERATURE} · "
+            f"TOP_K={config.TOP_K} · MARGEM_TRECHOS={config.MARGEM_TRECHOS} · temperatura={config.TEMPERATURE} · "
             f"filtro de assunto: {'ligado, margem ' + str(config.MARGEM_FILTRO) if config.FILTRO_ASSUNTO else 'desligado'}",
             "",
             "Marque cada resposta: ✅ acertou · 🟡 parcial · ❌ errou/inventou",
