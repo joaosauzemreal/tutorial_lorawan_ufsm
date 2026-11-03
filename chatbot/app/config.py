@@ -39,6 +39,11 @@ FILTRO_ASSUNTO = os.getenv("FILTRO_ASSUNTO", "true").strip().lower() != "false"
 MARGEM_FILTRO = float(os.getenv("MARGEM_FILTRO", "0.05"))
 EXEMPLOS_FORA = Path(__file__).parent / "exemplos_fora_do_assunto.txt"
 
+# Limite de perguntas, para o chat poder ficar aberto na internet (0 = sem limite).
+LIMITE_POR_MINUTO = int(os.getenv("LIMITE_POR_MINUTO", "10"))          # por pessoa (IP)
+LIMITE_POR_DIA = int(os.getenv("LIMITE_POR_DIA", "200"))               # por pessoa (IP)
+LIMITE_GLOBAL_POR_MINUTO = int(os.getenv("LIMITE_GLOBAL_POR_MINUTO", "120"))  # somando todo mundo
+
 # Modelos extras que podem ser escolhidos por pergunta, só para testes de comparação (separados por vírgula).
 # Ex.: MODELOS_TESTE=qwen3:14b,gemma3:12b  — são baixados automaticamente depois que o chat inicia.
 MODELOS_TESTE = [m.strip() for m in os.getenv("MODELOS_TESTE", "").split(",") if m.strip()]

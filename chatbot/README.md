@@ -119,6 +119,9 @@ O modelo é baixado automaticamente se ainda não existir. Para trocar o modelo 
 | `KEEP_ALIVE` | `60m` | Quanto tempo o modelo fica na RAM sem uso (`-1` = sempre) |
 | `FILTRO_ASSUNTO` | `true` | Recusa perguntas que se parecem mais com os exemplos fora do assunto do que com a documentação. `false` desliga |
 | `MARGEM_FILTRO` | `0.05` | Quanto a similaridade com os exemplos fora do assunto precisa superar a do melhor trecho da documentação para recusar |
+| `LIMITE_POR_MINUTO` | `10` | Perguntas por minuto por pessoa (endereço IP). `0` = sem limite |
+| `LIMITE_POR_DIA` | `200` | Perguntas por dia por pessoa |
+| `LIMITE_GLOBAL_POR_MINUTO` | `120` | Perguntas por minuto somando todo mundo |
 | `MODELOS_TESTE` | (vazio) | Modelos extras que podem ser escolhidos por pergunta via API, só para comparação. Ex.: `qwen3:14b,gemma3:12b` |
 | `THINK` | (vazio) | `false` desliga o "raciocínio" de modelos como o `qwen3`, que fica mais rápido. Deixe vazio para modelos sem raciocínio |
 
@@ -133,7 +136,10 @@ Sem GPU, quem define a velocidade é o processador. O tempo até a primeira pala
 ## Acesso pela rede
 
 - Na rede da UFSM, o chat fica em `http://IP-DO-SERVIDOR:8000`. Talvez seja preciso liberar a porta no firewall do servidor.
-- Para acesso de fora do campus, ou para colocar o chat dentro do GitHub Pages, o servidor precisa de um endereço **HTTPS** (por exemplo, um proxy reverso Nginx ou Caddy com certificado). Isso costuma ser feito pelo setor de TI.
+- Para acesso de fora do campus, ou para colocar o chat dentro do GitHub Pages, o servidor precisa de um endereço **HTTPS**. Duas opções:
+  - **Tailscale Funnel** (servidor já no Tailscale): `sudo tailscale funnel --bg 8000` publica o chat em `https://<máquina>.<tailnet>.ts.net`; `tailscale funnel status` mostra o endereço e `sudo tailscale funnel --bg 8000 off` desliga.
+  - **Endereço da UFSM**: um subdomínio com HTTPS e proxy reverso configurado pelo setor de TI.
+- Aberto na internet, o chat limita as perguntas por pessoa (veja `LIMITE_POR_MINUTO` e `LIMITE_POR_DIA`). O Ollama nunca fica exposto: só a aplicação fala com ele.
 
 ## Solução de problemas
 

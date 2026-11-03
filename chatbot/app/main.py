@@ -13,11 +13,12 @@ from pathlib import Path
 from typing import Literal
 
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from . import config, rag
+from .limite import Limitador, ip_do_cliente
 from .motor import deve_recusar, gerar_resposta_stream, preparar_conversa
 from .prompts import RECUSA
 
@@ -28,6 +29,7 @@ PASTA_STATIC = Path(__file__).parent / "static"
 
 estado: dict = {"situacao": "iniciando", "erro": None, "indice": None, "modelos_teste_prontos": []}
 cliente: httpx.AsyncClient | None = None
+limitador = Limitador(config.LIMITE_POR_MINUTO, config.LIMITE_POR_DIA, config.LIMITE_GLOBAL_POR_MINUTO)
 
 
 async def preparar() -> None:
@@ -102,9 +104,14 @@ async def status():
 
 
 @app.post("/api/chat")
-async def chat(pedido: PedidoChat):
+async def chat(pedido: PedidoChat, request: Request):
     if estado["situacao"] != "pronto":
         raise HTTPException(503, f"O assistente ainda está se preparando ({estado['situacao']}).")
+    ip = ip_do_cliente(request)
+    erro_limite = limitador.verificar(ip)
+    if erro_limite:
+        log.warning("Limite de perguntas atingido por %s", ip)
+        raise HTTPException(429, erro_limite)
     modelo = config.CHAT_MODEL
     if pedido.modelo and pedido.modelo != config.CHAT_MODEL:
         if pedido.modelo not in config.MODELOS_TESTE:
