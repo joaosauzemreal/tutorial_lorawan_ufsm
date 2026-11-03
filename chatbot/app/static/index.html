@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assistente LoRaWAN UFSM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --fundo: #f8fafc;
+      --cartao: #ffffff;
+      --borda: #e2e8f0;
+      --texto: #0f172a;
+      --texto-2: #475569;
+      --texto-3: #94a3b8;
+      --azul: #0284c7;
+      --azul-escuro: #0369a1;
+      --azul-claro: #e0f2fe;
+      --verde: #059669;
+      --vermelho: #b91c1c;
+      --codigo: #f1f5f9;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--fundo);
+      color: var(--texto);
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+    }
+    header {
+      background: rgba(255,255,255,.92);
+      border-bottom: 1px solid var(--borda);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .marca { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .ponto { width: 10px; height: 10px; border-radius: 50%; background: var(--texto-3); flex-shrink: 0; }
+    .ponto.pronto { background: var(--verde); box-shadow: 0 0 0 4px #d1fae5; }
+    .marca h1 { font-size: 15px; font-weight: 800; margin: 0; letter-spacing: -.01em; }
+    .marca p { font-size: 12px; color: var(--texto-2); margin: 2px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .acoes { display: flex; gap: 8px; flex-shrink: 0; }
+    .botao-sec {
+      font: inherit; font-size: 12px; font-weight: 600;
+      padding: 7px 12px; border-radius: 999px;
+      border: 1px solid #cbd5e1; background: #f1f5f9; color: #334155;
+      cursor: pointer; text-decoration: none; white-space: nowrap;
+    }
+    .botao-sec:hover { background: #e2e8f0; }
+
+    #aviso {
+      display: none;
+      margin: 12px auto 0; max-width: 760px; width: calc(100% - 32px);
+      padding: 10px 14px; border-radius: 12px;
+      background: #fffbeb; border: 1px solid #fde68a; color: #92400e; font-size: 13px;
+    }
+    #aviso.erro { background: #fef2f2; border-color: #fecaca; color: var(--vermelho); }
+
+    main { flex: 1; overflow-y: auto; padding: 24px 16px 8px; }
+    .coluna { max-width: 760px; margin: 0 auto; }
+
+    .boas-vindas { text-align: center; padding: 32px 0 8px; }
+    .boas-vindas .selo {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 600; color: #075985;
+      background: var(--azul-claro); border: 1px solid #bae6fd;
+      padding: 6px 12px; border-radius: 999px;
+    }
+    .boas-vindas h2 { font-size: clamp(24px, 4vw, 32px); font-weight: 800; letter-spacing: -.02em; margin: 16px 0 8px; }
+    .boas-vindas h2 span { color: var(--azul); }
+    .boas-vindas p { color: var(--texto-2); font-size: 15px; line-height: 1.6; margin: 0 auto; max-width: 520px; }
+    .sugestoes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 24px; text-align: left; }
+    .sugestao {
+      font: inherit; text-align: left; cursor: pointer;
+      background: var(--cartao); border: 1px solid var(--borda); border-radius: 14px;
+      padding: 12px 14px; color: var(--texto); font-size: 14px; line-height: 1.4;
+      transition: border-color .15s, transform .15s;
+    }
+    .sugestao:hover { border-color: #7dd3fc; transform: translateY(-1px); }
+    .sugestao small { display: block; color: var(--texto-3); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+
+    .msg { display: flex; margin: 0 0 16px; }
+    .msg.usuario { justify-content: flex-end; }
+    .balao { max-width: 85%; font-size: 15px; line-height: 1.65; overflow-wrap: anywhere; }
+    .usuario .balao { background: var(--azul); color: #fff; padding: 10px 14px; border-radius: 16px 16px 4px 16px; white-space: pre-wrap; }
+    .assistente .balao { background: var(--cartao); border: 1px solid var(--borda); padding: 12px 16px; border-radius: 16px 16px 16px 4px; box-shadow: 0 6px 20px -12px rgba(15,23,42,.15); }
+    .assistente .balao > :first-child { margin-top: 0; }
+    .assistente .balao > :last-child { margin-bottom: 0; }
+    .balao p { margin: 0 0 10px; }
+    .balao ul, .balao ol { margin: 0 0 10px; padding-left: 22px; }
+    .balao li { margin: 3px 0; }
+    .balao code { font-family: 'Fira Code', monospace; font-size: 13px; background: var(--codigo); padding: 1px 5px; border-radius: 5px; }
+    .balao pre { background: #0f172a; color: #e2e8f0; padding: 12px; border-radius: 10px; overflow-x: auto; }
+    .balao pre code { background: none; padding: 0; color: inherit; }
+    .balao a { color: var(--azul-escuro); }
+    .balao h1, .balao h2, .balao h3 { font-size: 15px; margin: 12px 0 6px; }
+    .balao table { border-collapse: collapse; font-size: 14px; margin-bottom: 10px; }
+    .balao th, .balao td { border: 1px solid var(--borda); padding: 4px 8px; }
+    .fontes { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--borda); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .fontes span.rotulo { font-size: 11px; font-weight: 700; color: var(--texto-3); text-transform: uppercase; letter-spacing: .06em; margin-right: 2px; }
+    .fonte { font-size: 12px; color: #075985; background: #f0f9ff; border: 1px solid #bae6fd; padding: 2px 8px; border-radius: 999px; text-decoration: none; }
+    a.fonte:hover { background: var(--azul-claro); }
+    .digitando { display: inline-flex; gap: 4px; padding: 4px 0; }
+    .digitando i { width: 7px; height: 7px; border-radius: 50%; background: var(--texto-3); animation: pulo 1s infinite ease-in-out; }
+    .digitando i:nth-child(2) { animation-delay: .15s; }
+    .digitando i:nth-child(3) { animation-delay: .3s; }
+    @keyframes pulo { 0%, 80%, 100% { opacity: .3; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+    .msg-erro { color: var(--vermelho); font-size: 14px; }
+
+    footer { padding: 8px 16px 14px; background: linear-gradient(to top, var(--fundo) 70%, transparent); }
+    form {
+      max-width: 760px; margin: 0 auto;
+      display: flex; gap: 8px; align-items: flex-end;
+      background: var(--cartao); border: 1px solid #cbd5e1; border-radius: 18px;
+      padding: 8px 8px 8px 14px; box-shadow: 0 10px 30px -16px rgba(15,23,42,.25);
+    }
+    form:focus-within { border-color: #7dd3fc; }
+    textarea {
+      flex: 1; border: 0; outline: 0; resize: none; background: transparent;
+      font: inherit; font-size: 15px; line-height: 1.5; color: var(--texto);
+      max-height: 160px; padding: 6px 0;
+    }
+    #enviar {
+      font: inherit; font-size: 14px; font-weight: 700; border: 0; cursor: pointer;
+      background: var(--azul); color: #fff; border-radius: 12px; padding: 9px 16px;
+    }
+    #enviar:hover { background: var(--azul-escuro); }
+    #enviar:disabled { opacity: .4; cursor: not-allowed; }
+    #enviar.parar { background: #334155; }
+    .nota { max-width: 760px; margin: 8px auto 0; text-align: center; font-size: 11px; color: var(--texto-3); }
+    @media (max-width: 560px) {
+      .sugestoes { grid-template-columns: 1fr; }
+      .balao { max-width: 92%; }
+      .acoes a { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="marca">
+      <span class="ponto" id="ponto"></span>
+      <div>
+        <h1>Assistente LoRaWAN UFSM</h1>
+        <p id="subtitulo">Tutorial Heltec V3 + The Things Network</p>
+      </div>
+    </div>
+    <div class="acoes">
+      <a class="botao-sec" href="https://github.com/joaosauzemreal/tutorial_lorawan_ufsm#readme" target="_blank" rel="noopener">Tutorial</a>
+      <button class="botao-sec" id="nova" type="button">Nova conversa</button>
+    </div>
+  </header>
+
+  <div id="aviso" role="status"></div>
+
+  <main id="rolagem">
+    <div class="coluna" id="conversa">
+      <section class="boas-vindas" id="boas-vindas">
+        <span class="selo">📡 Projeto Integrador IV · UFSM</span>
+        <h2>Dúvidas sobre <span>LoRaWAN</span> e o tutorial?</h2>
+        <p>Pergunte sobre qualquer etapa da conexão da Heltec WiFi LoRa 32 V3 à rede da UFSM, sobre erros que apareceram ou sobre como funcionam LoRa, LoRaWAN e a TTN.</p>
+        <div class="sugestoes">
+          <button class="sugestao" type="button"><small>Problema</small>Minha placa fica em "ENVIANDO JOIN" e não conecta</button>
+          <button class="sugestao" type="button"><small>Configuração</small>Como eu gero e coloco a licença da Heltec?</button>
+          <button class="sugestao" type="button"><small>Conceito</small>Qual a diferença entre LoRa e LoRaWAN?</button>
+          <button class="sugestao" type="button"><small>Rede UFSM</small>Por que usar o cluster eu1 da TTN se a frequência é AU915?</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <form id="formulario">
+      <textarea id="entrada" rows="1" placeholder="Escreva sua dúvida…" aria-label="Sua pergunta" maxlength="4000"></textarea>
+      <button id="enviar" type="submit">Enviar</button>
+    </form>
+    <p class="nota">Respostas geradas por um modelo de IA rodando localmente no servidor. Confira sempre no tutorial.</p>
+  </footer>
+
+  <script>
+    const conversa = document.getElementById('conversa');
+    const rolagem = document.getElementById('rolagem');
+    const entrada = document.getElementById('entrada');
+    const botaoEnviar = document.getElementById('enviar');
+    const aviso = document.getElementById('aviso');
+    const ponto = document.getElementById('ponto');
+    const subtitulo = document.getElementById('subtitulo');
+
+    let historico = [];
+    let controlador = null;
+    let pronto = false;
+
+    // ---------- Markdown simples e seguro (sem bibliotecas externas) ----------
+    // Escapa todo o HTML primeiro e só depois aplica a formatação: o texto do modelo nunca vira HTML.
+    function escapar(t) {
+      return t.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    function formatarLinha(t) {
+      const codigos = [];
+      t = t.replace(/`([^`]+)`/g, (_, c) => `\u0000${codigos.push(c) - 1}\u0000`);
+      t = escapar(t)
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/(^|[^*\w])\*(?!\s)(.+?)\*(?!\w)/g, '$1<em>$2</em>')
+        .replace(/(^|[^\w])_(?!\s)(.+?)_(?!\w)/g, '$1<em>$2</em>')
+        .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+        .replace(/(^|[\s(])(https?:\/\/[^\s<)]*[^\s<).,;:!?])/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
+      return t.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${escapar(codigos[i])}</code>`);
+    }
+    function renderizar(md) {
+      const html = [];
+      let lista = null, paragrafo = [];
+      const fecharParagrafo = () => { if (paragrafo.length) { html.push(`<p>${paragrafo.join('<br>')}</p>`); paragrafo = []; } };
+      const fecharLista = () => { if (lista) { html.push(`</${lista}>`); lista = null; } };
+      const partes = md.split(/^```[^\n]*\n?/m);
+      partes.forEach((parte, i) => {
+        if (i % 2 === 1) {  // dentro de um bloco de código
+          fecharParagrafo(); fecharLista();
+          html.push(`<pre><code>${escapar(parte.replace(/\n$/, ''))}</code></pre>`);
+          return;
+        }
+        for (const linha of parte.split('\n')) {
+          let m;
+          if (!linha.trim()) { fecharParagrafo(); fecharLista(); }
+          else if ((m = linha.match(/^\s{0,3}#{1,6}\s+(.*)$/))) { fecharParagrafo(); fecharLista(); html.push(`<h3>${formatarLinha(m[1])}</h3>`); }
+          else if ((m = linha.match(/^\s*[-*•]\s+(.*)$/))) {
+            fecharParagrafo();
+            if (lista !== 'ul') { fecharLista(); html.push('<ul>'); lista = 'ul'; }
+            html.push(`<li>${formatarLinha(m[1])}</li>`);
+          }
+          else if ((m = linha.match(/^\s*(\d+)[.)]\s+(.*)$/))) {
+            fecharParagrafo();
+            // mantém a numeração mesmo quando o modelo separa os itens com linhas em branco
+            if (lista !== 'ol') { fecharLista(); html.push(`<ol start="${Number(m[1])}">`); lista = 'ol'; }
+            html.push(`<li>${formatarLinha(m[2])}</li>`);
+          }
+          else { fecharLista(); paragrafo.push(formatarLinha(linha.trim())); }
+        }
+      });
+      fecharParagrafo(); fecharLista();
+      return html.join('');
+    }
+
+    // ---------- Status do servidor ----------
+    async function verificarStatus() {
+      try {
+        const r = await fetch('api/status');
+        const s = await r.json();
+        pronto = s.situacao === 'pronto';
+        ponto.classList.toggle('pronto', pronto);
+        if (pronto) {
+          aviso.style.display = 'none';
+          subtitulo.textContent = `Tutorial Heltec V3 + TTN · modelo ${s.modelo}`;
+          return;
+        }
+        aviso.className = s.situacao === 'erro' ? 'erro' : '';
+        aviso.textContent = s.situacao === 'erro'
+          ? `O assistente encontrou um erro ao iniciar: ${s.erro}`
+          : `O assistente está se preparando (${s.situacao}). Isso pode levar alguns minutos na primeira vez.`;
+        aviso.style.display = 'block';
+      } catch {
+        pronto = false;
+        aviso.className = 'erro';
+        aviso.textContent = 'Não foi possível falar com o servidor do assistente.';
+        aviso.style.display = 'block';
+      }
+      setTimeout(verificarStatus, 5000);
+    }
+
+    // ---------- Mensagens ----------
+    function rolarParaFim() { rolagem.scrollTop = rolagem.scrollHeight; }
+
+    function adicionarMensagem(papel, html) {
+      document.getElementById('boas-vindas')?.remove();
+      const linha = document.createElement('div');
+      linha.className = `msg ${papel}`;
+      const balao = document.createElement('div');
+      balao.className = 'balao';
+      balao.innerHTML = html;
+      linha.appendChild(balao);
+      conversa.appendChild(linha);
+      rolarParaFim();
+      return balao;
+    }
+
+    function mostrarFontes(balao, fontes) {
+      if (!fontes.length) return;
+      const caixa = document.createElement('div');
+      caixa.className = 'fontes';
+      caixa.innerHTML = '<span class="rotulo">Fontes</span>';
+      for (const f of fontes) {
+        const el = document.createElement(f.url ? 'a' : 'span');
+        el.className = 'fonte';
+        el.textContent = f.titulo.replace(/^[^\p{L}\p{N}]+/u, '');
+        el.title = f.arquivo;
+        if (f.url) { el.href = f.url; el.target = '_blank'; el.rel = 'noopener'; }
+        caixa.appendChild(el);
+      }
+      balao.appendChild(caixa);
+    }
+
+    function modoEnviando(ativo) {
+      botaoEnviar.textContent = ativo ? 'Parar' : 'Enviar';
+      botaoEnviar.classList.toggle('parar', ativo);
+    }
+
+    async function enviar(texto) {
+      texto = texto.trim();
+      if (!texto || controlador) return;
+      if (!pronto) { await verificarStatus(); if (!pronto) return; }
+
+      adicionarMensagem('usuario', escapar(texto));
+      historico.push({ role: 'user', content: texto });
+      entrada.value = '';
+      ajustarAltura();
+
+      const balao = adicionarMensagem('assistente', '<span class="digitando"><i></i><i></i><i></i></span>');
+      let resposta = '';
+      let fontes = [];
+      controlador = new AbortController();
+      modoEnviando(true);
+
+      try {
+        const r = await fetch('api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: historico.slice(-12) }),
+          signal: controlador.signal,
+        });
+        if (!r.ok) {
+          const erro = await r.json().catch(() => ({}));
+          throw new Error(erro.detail || `Erro ${r.status}`);
+        }
+        const leitor = r.body.getReader();
+        const decodificador = new TextDecoder();
+        let pendente = '';
+        while (true) {
+          const { value, done } = await leitor.read();
+          if (done) break;
+          pendente += decodificador.decode(value, { stream: true });
+          const linhas = pendente.split('\n');
+          pendente = linhas.pop();
+          for (const linha of linhas) {
+            if (!linha.trim()) continue;
+            const ev = JSON.parse(linha);
+            if (ev.tipo === 'fontes') fontes = ev.fontes;
+            else if (ev.tipo === 'texto') { resposta += ev.texto; balao.innerHTML = renderizar(resposta); rolarParaFim(); }
+            else if (ev.tipo === 'erro') throw new Error(ev.erro);
+          }
+        }
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          balao.innerHTML = renderizar(resposta) + `<p class="msg-erro">Não consegui responder agora: ${escapar(e.message)}</p>`;
+        }
+      } finally {
+        if (resposta) {
+          if (!balao.querySelector('.msg-erro')) balao.innerHTML = renderizar(resposta);
+          mostrarFontes(balao, fontes);
+          historico.push({ role: 'assistant', content: resposta });
+        } else if (!balao.querySelector('.msg-erro')) {
+          balao.innerHTML = '<p class="msg-erro">Resposta interrompida.</p>';
+        }
+        controlador = null;
+        modoEnviando(false);
+        rolarParaFim();
+        entrada.focus();
+      }
+    }
+
+    // ---------- Eventos ----------
+    function ajustarAltura() {
+      entrada.style.height = 'auto';
+      entrada.style.height = Math.min(entrada.scrollHeight, 160) + 'px';
+    }
+    entrada.addEventListener('input', ajustarAltura);
+    entrada.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); enviar(entrada.value); }
+    });
+    document.getElementById('formulario').addEventListener('submit', e => {
+      e.preventDefault();
+      if (controlador) controlador.abort(); else enviar(entrada.value);
+    });
+    document.querySelectorAll('.sugestao').forEach(b =>
+      b.addEventListener('click', () => enviar(b.lastChild.textContent))
+    );
+    document.getElementById('nova').addEventListener('click', () => location.reload());
+
+    verificarStatus();
+    entrada.focus();
+  </script>
+</body>
+</html>

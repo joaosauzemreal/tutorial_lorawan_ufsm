@@ -1,0 +1,47 @@
+# Assistente LoRaWAN UFSM: Ollama (modelos de IA) + aplicação web.
+# Uso, dentro da pasta chatbot/:   docker compose up -d --build
+# Na primeira vez, os modelos (~3 GB) são baixados automaticamente.
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    volumes:
+      - ollama_modelos:/root/.ollama
+    # O Ollama não fica exposto fora do servidor; só a aplicação fala com ele.
+    # Se o servidor tiver GPU NVIDIA (com o NVIDIA Container Toolkit instalado), descomente:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - ollama
+    ports:
+      - "${PORTA:-8000}:8000"
+    environment:
+      # Valores lidos do arquivo .env (opcional); depois de ":-" está o padrão.
+      CHAT_MODEL: ${CHAT_MODEL:-phi4-mini}
+      EMBED_MODEL: ${EMBED_MODEL:-bge-m3}
+      TOP_K: ${TOP_K:-5}
+      TEMPERATURE: ${TEMPERATURE:-0.2}
+      NUM_CTX: ${NUM_CTX:-8192}
+      KEEP_ALIVE: ${KEEP_ALIVE:-60m}
+      OLLAMA_URL: http://ollama:11434
+      DOCS_PATHS: /repo/README.md:/repo/chatbot/conhecimento
+      AVALIACAO_DIR: /repo/chatbot/avaliacao
+      CACHE_DIR: /app/cache
+    volumes:
+      # O repositório inteiro, para ler o README e a pasta conhecimento/ (atualiza com git pull + restart)
+      - ..:/repo
+      - cache_embeddings:/app/cache
+
+volumes:
+  ollama_modelos:
+  cache_embeddings:

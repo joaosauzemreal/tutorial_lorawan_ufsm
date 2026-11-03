@@ -1,0 +1,19 @@
+# Serviço systemd para rodar o assistente SEM Docker.
+# 1. Troque SEU_USUARIO e /caminho/para pelos valores reais.
+# 2. sudo cp deploy/assistente-lorawan.service /etc/systemd/system/
+# 3. sudo systemctl daemon-reload && sudo systemctl enable --now assistente-lorawan
+
+[Unit]
+Description=Assistente LoRaWAN UFSM (chatbot)
+After=network-online.target ollama.service
+Wants=ollama.service
+
+[Service]
+User=SEU_USUARIO
+WorkingDirectory=/caminho/para/tutorial_lorawan_ufsm/chatbot
+EnvironmentFile=-/caminho/para/tutorial_lorawan_ufsm/chatbot/.env
+ExecStart=/caminho/para/tutorial_lorawan_ufsm/chatbot/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
