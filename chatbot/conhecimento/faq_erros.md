@@ -13,19 +13,50 @@ Regras de segurança:
 
 O código do tutorial começa a transmitir (join) logo depois de ligar, então a placa transmite mesmo que você só queira testar o Monitor Serial ou o display.
 
-## A placa fica tentando o Join e nunca conecta na rede (fica em "ENVIANDO JOIN")
+## A placa fica em "ENVIANDO JOIN" e nunca conecta: o que conferir
 
-**Sintomas:** o display OLED mostra "ENVIANDO JOIN" e o contador de tentativas só aumenta. No Monitor Serial aparecem várias tentativas de join sem sucesso.
+**Sintomas:** o display mostra "ENVIANDO JOIN", o contador de tentativas só aumenta e a placa nunca passa para "JOIN SUCESSO".
 
-**Causas prováveis, da mais comum para a menos comum:**
-1. **Aplicação criada no cluster errado da TTN.** Os gateways da UFSM estão ligados ao cluster europeu **eu1** (`eu1.cloud.thethings.network`). Se a aplicação foi criada em outro cluster (nam1, au1), o join não é aceito. Confira a URL do console: ela precisa começar com `eu1.cloud.thethings.network`. Não dá para mover a aplicação de cluster; é preciso criar outra no eu1.
-2. **Plano de frequência errado.** No cadastro do end device na TTN deve estar `Australia 915-928 MHz, FSB 2`. Na Arduino IDE, em Ferramentas, a região deve ser `REGION_AU915`. No código, a máscara de canais `userChannelsMask` deve começar com `0xFF00` (sub-banda 2).
-3. **Chaves erradas.** DevEUI, JoinEUI (AppEUI) e AppKey no `secrets.h` precisam ser exatamente as mesmas do console da TTN. Um único byte trocado impede o join. No console da TTN, clique no ícone `<>` ao lado de cada chave para vê-la em formato de array C e copie na ordem **msb**, que é a ordem mostrada por padrão. Não inverta os bytes: a inversão (lsb) é usada pela biblioteca LMIC, não pela biblioteca da Heltec.
-4. **Versão LoRaWAN diferente.** No cadastro deve estar `LoRaWAN Specification 1.0.2` e `RP001 Regional Parameters 1.0.2 Rev B`.
-5. **Fora do alcance de um gateway.** Aproxime-se de um gateway do campus, de preferência com visada direta e sem prédios no caminho.
-6. **Antena desconectada ou mal encaixada.** Desligue a placa, confira a antena e só depois ligue de novo.
+Confira, nesta ordem:
+1. **Cluster da TTN:** a aplicação precisa estar no cluster europeu **eu1**. A URL do console deve começar com `eu1.cloud.thethings.network`.
+2. **Plano de frequência:** no cadastro do dispositivo, `Australia 915-928 MHz, FSB 2`. Na Arduino IDE, região `REGION_AU915`.
+3. **Chaves:** DevEUI, JoinEUI (AppEUI) e AppKey no `secrets.h` iguais às do console da TTN, na ordem msb.
+4. **Versão LoRaWAN:** `LoRaWAN Specification 1.0.2` e `RP001 Regional Parameters 1.0.2 Rev B`.
+5. **Alcance:** aproxime-se de um gateway do campus, com visada direta.
+6. **Antena:** desligue a placa, confira se a antena está bem conectada e ligue de novo.
 
-**Como investigar:** no console da TTN, abra o dispositivo e veja a aba **Live data**. Se aparecer "Join request" mas não "Join accept", a rede está ouvindo a placa e o problema provavelmente está nas chaves ou na versão LoRaWAN. Se não aparecer nada, a placa não está sendo ouvida: verifique o cluster, a frequência, o alcance e a antena.
+Para descobrir qual desses itens é o problema, use a aba Live data da TTN (veja a seção "Como usar o Live data para descobrir por que o join falha").
+
+## Como usar o Live data para descobrir por que o join falha
+
+No console da TTN, abra o seu dispositivo (end device) e a aba **Live data**, e deixe a placa tentando o join. Há dois casos:
+
+**Caso 1: aparece "Join request", mas nunca "Join accept".** A rede está ouvindo a placa. Então o cluster, a frequência, o alcance e a antena estão funcionando. O problema está nas **chaves** (DevEUI, JoinEUI ou AppKey diferentes do console, ou na ordem errada) ou na **versão LoRaWAN** do cadastro.
+
+**Caso 2: não aparece nada.** A rede não está ouvindo a placa. O problema está no **cluster** (aplicação fora do eu1), no **plano de frequência** (não é AU915 FSB 2), no **alcance** (longe do gateway) ou na **antena**.
+
+## Criei a aplicação no console da TTN e não funciona (cluster errado)
+
+O console da TTN é dividido em **clusters** regionais, e cada um é um console separado: Europe 1 (**eu1**), North America 1 (**nam1**), Australia 1 (**au1**). Ao entrar no console pela página da TTN, é preciso escolher um deles.
+
+Os gateways da UFSM estão registrados no cluster **eu1**. Se você criou a aplicação em qualquer outro cluster, a rede da UFSM não entrega as mensagens da sua placa, e o join nunca é aceito.
+
+**Como resolver:**
+1. Confira a URL do console onde você criou a aplicação. Ela precisa começar com `eu1.cloud.thethings.network`.
+2. Se começar com outro endereço (por exemplo `nam1` ou `au1`), crie uma **nova** aplicação e um novo dispositivo em https://eu1.cloud.thethings.network/console. Não existe opção para mover uma aplicação de um cluster para outro.
+3. Copie as chaves do novo dispositivo para o `secrets.h` e grave o código de novo.
+
+## Quais opções escolher ao cadastrar o dispositivo (end device) na TTN
+
+Em **+ Register end device** > **Enter end device specifics manually**, use exatamente:
+- **Frequency plan:** `Australia 915-928 MHz, FSB 2`
+- **LoRaWAN version:** `LoRaWAN Specification 1.0.2`
+- **Regional Parameters version:** `RP001 Regional Parameters 1.0.2 Rev B`
+- **JoinEUI (AppEUI):** `0000000000000000` (zeros)
+- **DevEUI:** clique em **Generate**
+- **AppKey:** clique em **Generate**
+
+Depois clique em **Register end device**. A aplicação onde o dispositivo é cadastrado precisa estar no cluster **eu1**.
 
 ## Em que ordem copiar as chaves da TTN para o secrets.h: msb ou lsb?
 
@@ -110,7 +141,11 @@ Os menus "LoRaWAN Region" e "LoRaWAN Debug Level" só aparecem em Ferramentas co
 **Causas prováveis e soluções:**
 1. **Cabo USB só de carga.** Alguns cabos USB-C não transmitem dados. Teste outro cabo.
 2. **Driver do conversor USB-serial.** A Heltec V3 usa um conversor USB-serial CP2102. No Windows, se a porta não aparecer, instale o driver CP210x da Silicon Labs.
-3. **Placa não entrou em modo de gravação.** Segure o botão **PRG** (boot), aperte e solte o **RST**, solte o PRG e tente o upload de novo.
+3. **Placa não entrou em modo de gravação.** Coloque a placa em modo de gravação com os dois botões dela, nesta ordem:
+   1. aperte e **mantenha apertado** o botão **PRG** (boot);
+   2. com o PRG ainda apertado, aperte e solte o botão **RST**;
+   3. solte o **PRG**;
+   4. clique em **Carregar** na Arduino IDE.
 4. **Porta ocupada.** Feche o Monitor Serial ou outro programa que esteja usando a porta.
 
 ## Os dados chegam na TTN, mas a placa não recebe a confirmação (ACK)
@@ -120,9 +155,9 @@ Os menus "LoRaWAN Region" e "LoRaWAN Debug Level" só aparecem em Ferramentas co
 **Causa:** o caminho de volta (downlink, do gateway para a placa) é mais difícil que o de ida. Dependendo da distância e dos obstáculos, o gateway ouve a placa, mas a placa não ouve a resposta.
 
 **Como resolver:**
-- O mais importante é confirmar na aba **Live data** da TTN que as mensagens estão chegando. Se chegam, a conexão está funcionando.
-- Aproxime-se de um gateway ou procure um lugar com visada direta.
-- Se não precisar de confirmação, use mensagens não confirmadas (`isTxConfirmed = false` no código). Isso também ajuda a respeitar o limite de downlinks da TTN (veja a seção sobre a política de uso justo).
+1. Confirme na aba **Live data** da TTN que as mensagens estão chegando. Se chegam, a conexão está funcionando, mesmo sem o ACK.
+2. Aproxime-se de um gateway ou procure um lugar com visada direta, para a placa conseguir ouvir a resposta.
+3. Para a placa parar de esperar o ACK, desligue a confirmação no código: `isTxConfirmed = false`. Isso também ajuda a respeitar o limite de 10 downlinks por dia da TTN.
 
 ## Na TTN aparecem só bytes em hexadecimal, sem o campo cpu_temperature
 

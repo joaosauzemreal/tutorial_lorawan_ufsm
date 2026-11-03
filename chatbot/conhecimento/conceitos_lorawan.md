@@ -83,7 +83,9 @@ O LoRaWAN usa criptografia **AES-128** em duas camadas (rede e aplicação). Nem
 
 ## Spreading Factor (SF), Data Rate (DR), airtime e ADR
 
-O **Spreading Factor (SF)** vai de SF7 a SF12 e define quanto tempo cada símbolo de rádio dura:
+O **Spreading Factor (SF)** é um ajuste do rádio LoRa que vai de **SF7 a SF12**. Resumo: **SF maior = mais alcance, porém mais tempo no ar e mais consumo de bateria; SF menor = menos alcance, porém transmissão mais rápida e econômica.**
+
+O SF define quanto tempo cada símbolo de rádio dura:
 - **SF menor (SF7):** transmissão mais rápida, menos tempo no ar (airtime) e menos consumo, mas alcance menor.
 - **SF maior (SF12):** alcance e sensibilidade maiores, mas a mensagem fica muito mais tempo no ar e gasta mais bateria. Cada SF a mais praticamente dobra o tempo no ar.
 

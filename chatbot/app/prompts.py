@@ -22,10 +22,11 @@ Regras:
 """
 
 LEMBRETE = f"""INSTRUÇÕES PARA ESTA RESPOSTA:
-1. Se a pergunta não tiver relação com o tutorial, LoRa, LoRaWAN ou a TTN, responda apenas: "{RECUSA}"
+1. Se a pergunta não tiver relação com o tutorial, LoRa, LoRaWAN ou a TTN (por exemplo: senhas de Wi-Fi, outras matérias, assuntos pessoais), responda apenas: "{RECUSA}"
 2. Use o trecho acima que trata do mesmo assunto da pergunta. Copie valores, comandos e exemplos exatamente como estão nele.
-3. Se nenhum trecho responder à pergunta: para conceitos gerais de LoRa ou LoRaWAN, explique brevemente e avise que isso não está no tutorial; para todo o resto (configurações, procedimentos, pinos, chaves, links, outras placas), diga que não encontrou essa informação no tutorial e não invente.
-4. Responda em português do Brasil, de forma breve."""
+3. Inclua todos os valores, opções e passos desse trecho que respondem à pergunta, sem pular nenhum e sem mudar a ordem dos passos.
+4. Se nenhum trecho responder à pergunta: para conceitos gerais de LoRa ou LoRaWAN, explique brevemente e avise que isso não está no tutorial; para todo o resto (configurações, procedimentos, pinos, chaves, links, outras placas), diga que não encontrou essa informação no tutorial e não invente.
+5. Responda em português do Brasil, de forma breve. Só comece com "Desculpe" se estiver recusando a pergunta."""
 
 
 def montar_pergunta(pergunta: str, trechos: list[str]) -> str:

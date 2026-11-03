@@ -25,6 +25,12 @@ O material do projeto tem três partes:
 3. **Gateway do campus:** antena que recebe o sinal de rádio e repassa os pacotes pela internet. A apresentação do projeto cita o gateway do CT (Centro de Tecnologia) da UFSM.
 4. **Servidor de rede (TTN, cluster eu1):** recebe os pacotes, confere a segurança e entrega os dados para a aplicação do usuário no console da TTN.
 
+## Onde fica o gateway LoRaWAN da UFSM
+
+Segundo a apresentação deste projeto, um gateway LoRaWAN da UFSM fica no **CT (Centro de Tecnologia)** da universidade. O gateway é uma antena que recebe o sinal de rádio das placas e repassa as mensagens para a TTN, no cluster eu1.
+
+Para conseguir conectar, aproxime-se do CT, de preferência com visada direta para o prédio. A localização exata de outros gateways do campus não faz parte deste tutorial.
+
 ## O que este assistente sabe responder
 
 O assistente responde dúvidas sobre este tutorial e sobre o funcionamento de LoRa, LoRaWAN e da The Things Network: conceitos, cadastro na TTN, configuração da Arduino IDE e da placa Heltec V3, licença da Heltec, o código de exemplo e erros comuns. Ele não substitui a documentação oficial da TTN e da Heltec, e não responde assuntos fora desses temas.
