@@ -25,7 +25,7 @@ log = logging.getLogger("assistente")
 
 PASTA_STATIC = Path(__file__).parent / "static"
 
-estado: dict = {"situacao": "iniciando", "erro": None, "indice": None}
+estado: dict = {"situacao": "iniciando", "erro": None, "indice": None, "modelos_teste_prontos": []}
 cliente: httpx.AsyncClient | None = None
 
 
@@ -45,6 +45,14 @@ async def preparar() -> None:
         log.exception("Falha ao preparar o assistente")
         estado["situacao"] = "erro"
         estado["erro"] = str(e)
+        return
+    # Modelos extras, só para comparação (MODELOS_TESTE): baixados depois que o chat já está no ar.
+    for modelo in config.MODELOS_TESTE:
+        try:
+            await rag.garantir_modelo(cliente, modelo)
+            estado["modelos_teste_prontos"].append(modelo)
+        except Exception:  # noqa: BLE001
+            log.exception("Não consegui baixar o modelo de teste %s", modelo)
 
 
 @asynccontextmanager
@@ -67,6 +75,9 @@ class Mensagem(BaseModel):
 
 class PedidoChat(BaseModel):
     messages: list[Mensagem] = Field(min_length=1, max_length=40)
+    # Só para testes: escolher outro modelo da lista MODELOS_TESTE e ligar/desligar o raciocínio.
+    modelo: str | None = None
+    think: bool | None = None
 
 
 @app.get("/")
@@ -83,6 +94,8 @@ async def status():
         "modelo": config.CHAT_MODEL,
         "modelo_embeddings": config.EMBED_MODEL,
         "trechos": len(indice.trechos) if indice else 0,
+        "modelos_teste": config.MODELOS_TESTE,
+        "modelos_teste_prontos": estado["modelos_teste_prontos"],
     }
 
 
@@ -90,7 +103,14 @@ async def status():
 async def chat(pedido: PedidoChat):
     if estado["situacao"] != "pronto":
         raise HTTPException(503, f"O assistente ainda está se preparando ({estado['situacao']}).")
-    historico = [m.model_dump() for m in pedido.messages]
+    modelo = config.CHAT_MODEL
+    if pedido.modelo and pedido.modelo != config.CHAT_MODEL:
+        if pedido.modelo not in config.MODELOS_TESTE:
+            raise HTTPException(400, "Modelo não permitido. Os modelos de teste ficam em MODELOS_TESTE no .env.")
+        if pedido.modelo not in estado["modelos_teste_prontos"]:
+            raise HTTPException(503, f"O modelo {pedido.modelo} ainda está sendo baixado.")
+        modelo = pedido.modelo
+    historico = [{"role": m.role, "content": m.content} for m in pedido.messages]
     if historico[-1]["role"] != "user":
         raise HTTPException(400, "A última mensagem precisa ser do usuário.")
 
@@ -103,7 +123,7 @@ async def chat(pedido: PedidoChat):
     async def eventos():
         yield json.dumps({"tipo": "fontes", "fontes": fontes}, ensure_ascii=False) + "\n"
         try:
-            async for pedaco in gerar_resposta_stream(cliente, config.CHAT_MODEL, mensagens):
+            async for pedaco in gerar_resposta_stream(cliente, modelo, mensagens, pedido.think):
                 yield json.dumps({"tipo": "texto", "texto": pedaco}, ensure_ascii=False) + "\n"
             yield json.dumps({"tipo": "fim"}) + "\n"
         except Exception as e:  # noqa: BLE001

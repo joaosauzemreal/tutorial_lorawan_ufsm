@@ -29,7 +29,7 @@ Resumo: **LoRa é o rádio; LoRaWAN é a rede.** É possível usar LoRa sem LoRa
 Uma rede LoRaWAN tem quatro partes, numa topologia em estrela:
 
 1. **Dispositivo final (end device ou nó sensor):** a placa com o sensor e o rádio LoRa, por exemplo a Heltec WiFi LoRa 32 V3. Ela envia mensagens por rádio.
-2. **Gateway:** recebe por rádio as mensagens de todos os dispositivos ao alcance e as repassa pela internet para o servidor de rede. O gateway não interpreta nem descriptografa os dados; ele só repassa. O dispositivo não se conecta a um gateway específico: qualquer gateway que ouvir a mensagem a encaminha, e vários gateways podem receber a mesma mensagem.
+2. **Gateway:** recebe por rádio as mensagens de todos os dispositivos ao alcance e as repassa pela internet para o servidor de rede. O gateway não interpreta, não descriptografa e não verifica as mensagens; ele só repassa. Quem confere se a mensagem é autêntica é o servidor de rede. O dispositivo não se conecta a um gateway específico: qualquer gateway que ouvir a mensagem a encaminha, e vários gateways podem receber a mesma mensagem.
 3. **Servidor de rede (Network Server):** recebe os pacotes vindos dos gateways, descarta as cópias repetidas, confere a autenticidade das mensagens, controla o ADR e escolhe por qual gateway responder.
 4. **Servidor de aplicação (Application Server):** descriptografa os dados e os entrega à aplicação do usuário, por exemplo no console da TTN, por MQTT ou por webhooks.
 

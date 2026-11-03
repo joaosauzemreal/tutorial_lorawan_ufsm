@@ -100,7 +100,7 @@ void loop() {
     {
       // Inicializa o stack do protocolo LoRaWAN na região e classe definidas
       LoRaWAN.init(loraWanClass, loraWanRegion);
-      LoRaWAN.setDefaultDR(3); // Define Data Rate inicial (DR3 = SF7/125kHz no AU915)
+      LoRaWAN.setDefaultDR(3); // Define Data Rate inicial (DR3 = SF9/125kHz no AU915)
       break;
     }
     case DEVICE_STATE_JOIN:

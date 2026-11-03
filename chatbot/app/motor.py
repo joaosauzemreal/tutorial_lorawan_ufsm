@@ -47,20 +47,80 @@ async def preparar_conversa(
     return mensagens, fontes
 
 
-def _corpo(modelo: str, mensagens: list[dict], stream: bool) -> dict:
-    return {
+def _corpo(modelo: str, mensagens: list[dict], stream: bool, think: bool | None = None) -> dict:
+    corpo = {
         "model": modelo,
         "messages": mensagens,
         "stream": stream,
         "keep_alive": config.KEEP_ALIVE,
         "options": {"temperature": config.TEMPERATURE, "num_ctx": config.NUM_CTX},
     }
+    think = config.THINK if think is None else think
+    if think is not None:  # liga/desliga o "raciocínio" de modelos como o qwen3
+        corpo["think"] = think
+    return corpo
+
+
+class FiltroPensamento:
+    """Remove blocos <think>...</think> que alguns modelos (ex.: qwen3) escrevem antes da resposta.
+
+    Funciona com o texto chegando aos pedaços, mesmo com a marcação partida entre dois pedaços.
+    """
+
+    ABRE, FECHA = "<think>", "</think>"
+
+    def __init__(self) -> None:
+        self.pendente = ""
+        self.dentro = False
+        self.inicio = True  # ainda não saiu nenhum texto visível
+
+    def _sufixo_parcial(self, texto: str, marca: str) -> int:
+        for n in range(min(len(marca) - 1, len(texto)), 0, -1):
+            if texto.endswith(marca[:n]):
+                return n
+        return 0
+
+    def alimentar(self, pedaco: str) -> str:
+        self.pendente += pedaco
+        saida = []
+        while self.pendente:
+            if self.dentro:
+                i = self.pendente.find(self.FECHA)
+                if i < 0:
+                    n = self._sufixo_parcial(self.pendente, self.FECHA)
+                    self.pendente = self.pendente[len(self.pendente) - n:] if n else ""
+                    break
+                self.pendente = self.pendente[i + len(self.FECHA):]
+                self.dentro = False
+            else:
+                i = self.pendente.find(self.ABRE)
+                if i < 0:
+                    n = self._sufixo_parcial(self.pendente, self.ABRE)
+                    corte = len(self.pendente) - n
+                    saida.append(self.pendente[:corte])
+                    self.pendente = self.pendente[corte:]
+                    break
+                saida.append(self.pendente[:i])
+                self.pendente = self.pendente[i + len(self.ABRE):]
+                self.dentro = True
+        texto = "".join(saida)
+        if self.inicio:  # não começa a resposta com linhas em branco que sobraram do bloco
+            texto = texto.lstrip()
+            self.inicio = not texto
+        return texto
+
+    def finalizar(self) -> str:
+        resto = "" if self.dentro else self.pendente
+        self.pendente = ""
+        return resto.lstrip() if self.inicio else resto
 
 
 async def gerar_resposta_stream(
-    cliente: httpx.AsyncClient, modelo: str, mensagens: list[dict]
+    cliente: httpx.AsyncClient, modelo: str, mensagens: list[dict], think: bool | None = None
 ) -> AsyncIterator[str]:
-    async with cliente.stream("POST", "/api/chat", json=_corpo(modelo, mensagens, True), timeout=None) as r:
+    filtro = FiltroPensamento()
+    corpo = _corpo(modelo, mensagens, True, think)
+    async with cliente.stream("POST", "/api/chat", json=corpo, timeout=None) as r:
         if r.status_code != 200:
             detalhe = (await r.aread()).decode(errors="replace")
             raise RuntimeError(f"Ollama respondeu {r.status_code}: {detalhe}")
@@ -70,11 +130,15 @@ async def gerar_resposta_stream(
             dado = json.loads(linha)
             if dado.get("error"):
                 raise RuntimeError(dado["error"])
-            pedaco = dado.get("message", {}).get("content", "")
+            # O raciocínio pode vir no campo "thinking" (ignorado) ou dentro do texto (filtrado).
+            pedaco = filtro.alimentar(dado.get("message", {}).get("content", ""))
             if pedaco:
                 yield pedaco
             if dado.get("done"):
                 break
+    resto = filtro.finalizar()
+    if resto:
+        yield resto
 
 
 async def gerar_resposta(cliente: httpx.AsyncClient, modelo: str, mensagens: list[dict]) -> str:

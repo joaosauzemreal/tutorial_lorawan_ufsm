@@ -2,6 +2,17 @@
 
 Cada seção abaixo descreve um problema, os sintomas, as causas prováveis e como resolver.
 
+## Posso ligar a placa sem antena, só para testar?
+
+**Não.** Nunca ligue nem alimente a Heltec WiFi LoRa 32 V3 sem a antena conectada, nem para um teste rápido. Sem antena, a energia transmitida pelo rádio volta para o circuito e pode **danificar de forma permanente o rádio LoRa (SX1262)** da placa.
+
+Regras de segurança:
+1. Conecte a antena **antes** de ligar o cabo USB.
+2. Para trocar ou retirar a antena, **desligue a placa primeiro** (tire o cabo USB).
+3. Confira se o conector da antena está bem encaixado.
+
+O código do tutorial começa a transmitir (join) logo depois de ligar, então a placa transmite mesmo que você só queira testar o Monitor Serial ou o display.
+
 ## A placa fica tentando o Join e nunca conecta na rede (fica em "ENVIANDO JOIN")
 
 **Sintomas:** o display OLED mostra "ENVIANDO JOIN" e o contador de tentativas só aumenta. No Monitor Serial aparecem várias tentativas de join sem sucesso.
@@ -16,19 +27,64 @@ Cada seção abaixo descreve um problema, os sintomas, as causas prováveis e co
 
 **Como investigar:** no console da TTN, abra o dispositivo e veja a aba **Live data**. Se aparecer "Join request" mas não "Join accept", a rede está ouvindo a placa e o problema provavelmente está nas chaves ou na versão LoRaWAN. Se não aparecer nada, a placa não está sendo ouvida: verifique o cluster, a frequência, o alcance e a antena.
 
+## Em que ordem copiar as chaves da TTN para o secrets.h: msb ou lsb?
+
+Use a ordem **msb**, que é a ordem em que o console da TTN mostra as chaves por padrão.
+
+São três chaves, todas copiadas do dispositivo (end device) no console da TTN para o arquivo `secrets.h`:
+- `devEui`: DevEUI, 8 bytes;
+- `appEui`: JoinEUI (AppEUI), 8 bytes, zerado no tutorial da UFSM;
+- `appKey`: AppKey, 16 bytes.
+
+Como copiar sem erro:
+1. No console da TTN, ao lado de cada chave, clique no ícone `<>` para ver o valor em formato de array C, por exemplo `{ 0x70, 0xB3, 0xD5, ... }`.
+2. Confira que está selecionada a ordem **msb**.
+3. Clique no ícone de copiar e cole no array correspondente do `secrets.h`.
+
+Não inverta os bytes. A ordem lsb (invertida) é usada pela biblioteca LMIC, não pela biblioteca da Heltec usada neste tutorial. Uma chave com a ordem errada faz o join falhar.
+
+## Preciso de alguma chave ou senha do gateway da UFSM? (AppKey do gateway)
+
+**Não.** Gateways não têm AppKey, e você não precisa de nenhum acesso ao gateway da UFSM. A **AppKey pertence a cada dispositivo**: ela é gerada por você, no console da TTN, quando cadastra o seu dispositivo na sua aplicação (clicando em **Generate**). O gateway apenas repassa as mensagens de rádio para a TTN, sem precisar de chaves suas.
+
+Nunca compartilhe a sua AppKey. Ela fica no `secrets.h`, que não vai para o GitHub.
+
+## O que a placa envia? Tamanho e formato do payload
+
+No código do tutorial, cada mensagem (uplink) leva um **payload de 2 bytes** com a temperatura interna do processador ESP32-S3, enviado na porta 2:
+1. A temperatura é lida em graus Celsius e multiplicada por 100, para guardar 2 casas decimais em um número inteiro de 16 bits com sinal. Exemplo: 36,25 °C vira 3625.
+2. O número é dividido em 2 bytes: primeiro o byte mais significativo (MSB), depois o menos significativo (LSB). Exemplo: 3625 = `0x0E29`, então os bytes enviados são `0E 29`.
+3. Na TTN, o Payload formatter (`decodeUplink`) junta os 2 bytes, trata números negativos e divide por 100, mostrando o campo `cpu_temperature`.
+
+Os cabeçalhos do LoRaWAN (endereço, contador, verificação de integridade) são acrescentados automaticamente pela biblioteca e não fazem parte do payload. Para enviar outros dados, aumente `appDataSize` e preencha mais posições de `appData` na função `prepareTxFrame`, e atualize o `decodeUplink` na TTN.
+
 ## Erro de licença: a placa trava na inicialização e mostra o Chip ID no Monitor Serial
 
 **Sintomas:** logo após ligar, o Monitor Serial (115200 baud) mostra uma mensagem em inglês pedindo uma licença correta (algo como "Please provide a correct license!") junto com o ESP32ChipID, e o programa não avança.
 
-**Causa:** a biblioteca LoRaWAN da Heltec exige uma licença gratuita ligada ao Chip ID de cada placa. Sem a licença correta, ou depois de apagar toda a memória flash, a placa para.
+**Causa:** o número que aparece é o **Chip ID** da placa. A biblioteca LoRaWAN da Heltec exige uma licença gratuita ligada ao Chip ID de cada placa. Isso não tem relação com o join nem com a TTN. Sem a licença correta, ou depois de apagar toda a memória flash, a placa para.
 
 **Como resolver:**
 1. Copie o Chip ID que aparece no Monitor Serial.
 2. Acesse https://resource.heltec.cn/search, cole o Chip ID e clique em Confirm.
-3. Copie a licença (4 números de 32 bits) para o array `license` no arquivo `secrets.h`, no formato `{ 0x........, 0x........, 0x........, 0x........ }`.
-4. Grave o código de novo. Outra opção é enviar pelo Monitor Serial o comando `AT+CDKEY=` seguido da licença, sem espaços e sem `0x`.
+3. Copie a licença para o array `license` no arquivo `secrets.h`. A licença tem 4 números de 32 bits (128 bits no total), no formato `{ 0x4819D3A6, 0x3C4015EF, 0xC76E3CE5, 0x9742010D }` (exemplo).
+4. Grave o código de novo na placa.
+
+Depois de apagar toda a memória flash da placa, é preciso aplicar a licença de novo.
 
 **Atenção:** cada placa tem a sua própria licença. A licença de uma placa não funciona em outra.
+
+## Como enviar a licença da Heltec pelo Monitor Serial (comando AT+CDKEY)
+
+Em vez de colocar a licença no código, dá para enviá-la pelo Monitor Serial, com o código já gravado na placa e o Monitor Serial aberto em 115200 baud.
+
+O comando é `AT+CDKEY=` seguido dos 4 números da licença **colados um no outro**: sem `0x`, sem vírgulas e sem espaços. São 32 caracteres hexadecimais no total.
+
+Exemplo: a licença `0x4819D3A6, 0x3C4015EF, 0xC76E3CE5, 0x9742010D` vira o comando:
+
+```
+AT+CDKEY=4819D3A63C4015EFC76E3CE59742010D
+```
 
 ## Erro de compilação: "LoRaWan_APP.h: No such file or directory" ou a placa Heltec não aparece na lista
 
@@ -68,7 +124,9 @@ Os menus "LoRaWAN Region" e "LoRaWAN Debug Level" só aparecem em Ferramentas co
 - Aproxime-se de um gateway ou procure um lugar com visada direta.
 - Se não precisar de confirmação, use mensagens não confirmadas (`isTxConfirmed = false` no código). Isso também ajuda a respeitar o limite de downlinks da TTN (veja a seção sobre a política de uso justo).
 
-## As mensagens chegam na TTN, mas sem o campo cpu_temperature (só bytes em hexadecimal)
+## Na TTN aparecem só bytes em hexadecimal, sem o campo cpu_temperature
+
+**Isso não é um problema de conexão:** se as mensagens aparecem na TTN, a placa já está conectada e enviando dados. Falta só traduzir os bytes.
 
 **Causa:** o decodificador de payload (Payload formatter) não foi configurado ou está com erro.
 
@@ -82,15 +140,18 @@ Os menus "LoRaWAN Region" e "LoRaWAN Debug Level" só aparecem em Ferramentas co
 
 ## Posso deixar a placa enviando a cada 15 segundos o dia inteiro? (política de uso justo da TTN)
 
-**Resposta curta:** para testes de alguns minutos, sim. Para deixar ligado o dia todo, não.
+**Não.** Enviar a cada 15 segundos o dia inteiro ultrapassa os limites da rede pública da TTN. Esse intervalo serve só para testes de alguns minutos, durante a prática do tutorial.
 
-A rede pública da TTN tem uma política de uso justo (Fair Use Policy) por dispositivo:
+A política de uso justo (Fair Use Policy) da TTN permite, por dispositivo:
 - no máximo **30 segundos de tempo no ar (airtime) de uplink a cada 24 horas**;
 - no máximo **10 mensagens de downlink a cada 24 horas**. A confirmação (ACK) de uma mensagem confirmada é um downlink.
 
-O exemplo do tutorial envia a cada 15 segundos com confirmação. Isso é bom para ver o resultado rápido durante a prática, mas, se ficar ligado o dia todo, passa bastante dos dois limites.
+O exemplo do tutorial envia a cada 15 segundos (`appTxDutyCycle = 15000`) com confirmação (`isTxConfirmed = true`). Ligado o dia todo, isso dá milhares de mensagens e de ACKs por dia, muito acima dos dois limites.
 
-**Para uso contínuo:** aumente `appTxDutyCycle` para vários minutos (por exemplo `600000`, que são 10 minutos) e use `isTxConfirmed = false`. Para saber quanto tempo no ar cada mensagem gasta, use uma calculadora de airtime LoRaWAN.
+**Para deixar a placa ligada por muito tempo:**
+1. Aumente o intervalo entre envios: `appTxDutyCycle` é o intervalo em milissegundos. Por exemplo, `600000` = 10 minutos.
+2. Use mensagens não confirmadas: `isTxConfirmed = false`.
+3. Para saber quanto tempo no ar cada mensagem gasta, use uma calculadora de airtime LoRaWAN.
 
 ## O que significa setDefaultDR(3) no código?
 

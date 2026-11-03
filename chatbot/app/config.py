@@ -26,7 +26,18 @@ TOP_K = int(os.getenv("TOP_K", "5"))                # quantos trechos vão junto
 NUM_CTX = int(os.getenv("NUM_CTX", "8192"))         # janela de contexto do modelo (tokens)
 TEMPERATURE = float(os.getenv("TEMPERATURE", "0.2"))
 MAX_HISTORICO = int(os.getenv("MAX_HISTORICO", "6"))  # mensagens anteriores enviadas ao modelo
-KEEP_ALIVE = os.getenv("KEEP_ALIVE", "60m")         # quanto tempo o modelo fica carregado na RAM
+_keep_alive = os.getenv("KEEP_ALIVE", "60m").strip()  # quanto tempo o modelo fica carregado (-1 = sempre)
+# O Ollama aceita duração com unidade ("60m") ou número de segundos (-1); texto "-1" sem unidade dá erro.
+KEEP_ALIVE: str | int = int(_keep_alive) if _keep_alive.lstrip("-").isdigit() else _keep_alive
+
+# Modelos extras que podem ser escolhidos por pergunta, só para testes de comparação (separados por vírgula).
+# Ex.: MODELOS_TESTE=qwen3:14b,gemma3:12b  — são baixados automaticamente depois que o chat inicia.
+MODELOS_TESTE = [m.strip() for m in os.getenv("MODELOS_TESTE", "").split(",") if m.strip()]
+
+# "Raciocínio" de modelos que pensam antes de responder (ex.: qwen3). false = mais rápido.
+# Vazio = usa o padrão do modelo. Só defina para modelos que suportam raciocínio.
+_think = os.getenv("THINK", "").strip().lower()
+THINK: bool | None = {"true": True, "false": False}.get(_think)
 
 FONTES_URL_BASE = os.getenv(
     "FONTES_URL_BASE", "https://github.com/joaosauzemreal/tutorial_lorawan_ufsm/blob/main/"

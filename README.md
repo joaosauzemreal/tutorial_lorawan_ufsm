@@ -100,19 +100,19 @@ Após a instalação, configure a IDE com as seguintes opções no menu **Ferram
 Para utilizar a biblioteca oficial de LoRaWAN da Heltec, o microcontrolador necessita de uma **licença vinculada ao seu Chip ID**.
 
 ### O que é e por que é necessária?
-A licença é uma chave de 32 bits gerada através do Chip ID único do ESP32-S3. Caso a memória flash da placa seja totalmente apagada ou o firmware travado na inicialização exibindo o Chip ID na porta serial, a licença precisa ser reinjetada.
+A licença é uma chave de 128 bits (4 números de 32 bits) gerada a partir do Chip ID único do ESP32-S3. Caso a memória flash da placa seja totalmente apagada ou o firmware travado na inicialização exibindo o Chip ID na porta serial, a licença precisa ser reinjetada.
 
 ### Como Obter a Licença Gratuita:
 1. Abra o Monitor Serial na velocidade **115200 baud** e grave qualquer código básico na placa para identificar o **Chip ID de 12 dígitos** impresso na inicialização.
 2. Acesse o site oficial de validação da Heltec: [https://resource.heltec.cn/search](https://resource.heltec.cn/search).
 3. Cole o seu **Chip ID** de 12 dígitos na caixa de busca e clique em **Confirm**.
-4. Copie a licença de 32 bits gerada (exemplo: `0x4819D3A6, 0x3C4015EF, 0xC76E3CE5, 0x9742010D`).
+4. Copie a licença gerada, formada por 4 números de 32 bits (exemplo: `0x4819D3A6, 0x3C4015EF, 0xC76E3CE5, 0x9742010D`).
 <img width="709" height="416" alt="image" src="https://github.com/user-attachments/assets/ee225285-d21e-4dcc-8ada-d0d1257a7ae3" />
 
 
 ### Formas de Injetar a Licença:
 * **Via Código C++ (Recomendado):** Declare no array `uint32_t license[4]` no seu código e passe na função `Mcu.setlicense(license, HELTEC_BOARD);` no `setup()`.
-* **Via Comando AT (Serial):** Com o código carregado e a serial aberta, envie o comando AT+CDKEY=(LICENÇA):
+* **Via Comando AT (Serial):** Com o código carregado e a serial aberta, envie o comando AT+CDKEY= seguido dos 4 números da licença colados, sem `0x`, vírgulas ou espaços:
   ```text
   AT+CDKEY=4819D3A63C4015EFC76E3CE59742010D
 
@@ -128,9 +128,9 @@ Esta seção descreve o procedimento completo para configurar as credenciais, re
 
 ### 1. Configuração de Credenciais (`secrets.h`)
 
-1. No repositório, acesse a pasta **`src/`** e navegue até a subpasta **`heltec_lorawan/`** (onde estão localizados o arquivo `.ino`/C++ do código de teste e os arquivos de cabeçalho).
-2. Localize o arquivo de exemplo **`secrets_example.h`**.
-3. Crie uma cópia desse arquivo no mesmo diretório e renomeie a cópia exatamente para **`secrets.h`**.
+1. No repositório, acesse a pasta **`src/`**. Nela está o arquivo de exemplo **`secrets_example.h`**, e a subpasta **`heltec_lorawan/`** contém o arquivo `.ino` do código de teste.
+2. Copie o **`secrets_example.h`** para dentro da subpasta **`heltec_lorawan/`** (a mesma pasta do `.ino`).
+3. Renomeie a cópia exatamente para **`secrets.h`**.
 4. Abra o `secrets.h` e substitua os valores padrão pelas credenciais reais que foram geradas dentro do painel da TTN (`devEui`, `appEui`, `appKey`) e pela sua licença da Heltec (`license`).
 5. Certifique-se de que no arquivo principal do código (`.ino`) exista a linha `#include "secrets.h"` para que o programa inclua e utilize suas chaves privadas.
 

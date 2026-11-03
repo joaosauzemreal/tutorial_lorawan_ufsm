@@ -75,12 +75,14 @@ Para deixar rodando sempre, mesmo depois de reiniciar o servidor, edite os camin
 
 ## Atualizar o que o bot sabe
 
-O bot lê os documentos sempre que inicia. Depois de editar o `README.md` do tutorial ou os arquivos de `conhecimento/`:
+O bot lê os documentos sempre que inicia. Depois de editar o `README.md` do tutorial ou os arquivos de `conhecimento/` e enviar para o GitHub, rode no servidor:
 
 ```bash
-git pull
-docker compose restart app     # ou: sudo systemctl restart assistente-lorawan
+~/tutorial_lorawan_ufsm/chatbot/atualizar.sh    # instalação sem Docker (serviço systemd)
+# ou, com Docker:  git pull && docker compose restart app
 ```
+
+O `atualizar.sh` baixa a versão nova, confere as dependências, reinicia o serviço e espera o assistente ficar pronto.
 
 Só os trechos que mudaram têm os embeddings recalculados.
 
@@ -98,6 +100,8 @@ docker compose exec app python -m app.avaliar --modelo qwen3:4b
 
 Sem Docker: `.venv/bin/python -m app.avaliar --modelo gemma3:4b`.
 
+Modelos que "pensam" antes de responder, como o `qwen3`, ficam bem mais rápidos com o raciocínio desligado: `THINK=false .venv/bin/python -m app.avaliar --modelo qwen3:14b`. Se o raciocínio estiver ligado, ele não aparece no chat, mas aumenta o tempo de resposta.
+
 O modelo é baixado automaticamente se ainda não existir. Para trocar o modelo do chat, mude `CHAT_MODEL` no `.env` e rode `docker compose up -d`. Os nomes dos modelos estão em [ollama.com/library](https://ollama.com/library).
 
 ## Configurações (`.env`)
@@ -111,6 +115,8 @@ O modelo é baixado automaticamente se ainda não existir. Para trocar o modelo 
 | `TEMPERATURE` | `0.2` | Criatividade (0 = mais previsível) |
 | `NUM_CTX` | `8192` | Tamanho da janela de contexto, em tokens |
 | `KEEP_ALIVE` | `60m` | Quanto tempo o modelo fica na RAM sem uso (`-1` = sempre) |
+| `MODELOS_TESTE` | (vazio) | Modelos extras que podem ser escolhidos por pergunta via API, só para comparação. Ex.: `qwen3:14b,gemma3:12b` |
+| `THINK` | (vazio) | `false` desliga o "raciocínio" de modelos como o `qwen3`, que fica mais rápido. Deixe vazio para modelos sem raciocínio |
 
 ## Desempenho
 
