@@ -58,7 +58,9 @@ async def principal(modelo: str) -> None:
                 "",
                 f"**Esperado:** {esperado}",
                 "",
-                f"**Fontes encontradas:** {', '.join(f['titulo'] for f in fontes)}",
+                "**Fontes encontradas (similaridade):** " + ", ".join(
+                    "{} ({:.2f})".format(f["titulo"], f["similaridade"]) for f in fontes
+                ),
                 "",
                 f"**Resposta ({tempo:.1f} s):**",
                 "",

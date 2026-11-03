@@ -28,7 +28,7 @@ async def preparar_conversa(
     trechos = [t.texto for t, _ in resultados]
 
     fontes, vistos = [], set()
-    for t, _ in resultados:
+    for t, nota in resultados:
         chave = (t.arquivo, t.titulo)
         if chave in vistos:
             continue
@@ -38,6 +38,7 @@ async def preparar_conversa(
             "arquivo": t.arquivo,
             "titulo": t.secao,
             "url": config.FONTES_URL_BASE + caminho if caminho else None,
+            "similaridade": round(nota, 3),  # 0 a 1: quanto o trecho se parece com a pergunta
         })
 
     anteriores = historico[:-1][-config.MAX_HISTORICO:]
