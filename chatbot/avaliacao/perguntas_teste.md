@@ -60,9 +60,9 @@ Entraram como perguntas novas na rodada 8. As que falharam (29 a 31) viraram se�
 | 33 | me explica o que foi a revolução francesa | Recusar |
 | 34 | quais os melhores restaurantes de santa maria? | Recusar |
 
-## Perguntas novas (não usadas para ajustar a base nem os exemplos do filtro)
+## Perguntas da rodada 9
 
-Servem para medir se as melhorias valem para perguntas que o sistema nunca "viu". Quando uma delas for usada para ajustar a base, ela deixa de ser "nova".
+Entraram como perguntas novas na rodada 9. A 36 foi recusada por engano e virou seção do FAQ.
 
 | # | Pergunta | A resposta precisa conter |
 |---|----------|---------------------------|
@@ -70,3 +70,14 @@ Servem para medir se as melhorias valem para perguntas que o sistema nunca "viu"
 | 36 | a placa precisa de internet ou wifi para mandar os dados? | Não; a placa usa o rádio LoRa até o gateway, e é o gateway que usa a internet |
 | 37 | quanto tempo dura a bateria com lorawan? | Pode durar anos com deep sleep e envios espaçados; depende do uso; o tutorial não mede isso |
 | 38 | quem é o reitor da ufsm? | Recusar |
+
+## Perguntas novas (não usadas para ajustar a base nem os exemplos do filtro)
+
+Servem para medir se as melhorias valem para perguntas que o sistema nunca "viu". Quando uma delas for usada para ajustar a base, ela deixa de ser "nova".
+
+| # | Pergunta | A resposta precisa conter |
+|---|----------|---------------------------|
+| 39 | o display da placa não mostra nada | Conferir a alimentação Vext (pinMode/digitalWrite antes do init) no setup; o código do tutorial já faz isso |
+| 40 | dá para mandar dados da TTN de volta para a placa? | Sim, por downlink; na classe A só depois de um uplink (janelas RX1/RX2); o tutorial não implementa isso |
+| 41 | qual a diferença entre a TTN e o The Things Stack? | A TTN é a rede pública e colaborativa; o The Things Stack é o software em que ela funciona |
+| 42 | me ajuda a escolher um notebook | Recusar |

@@ -70,9 +70,15 @@ Escolha a versão `LoRaWAN Specification 1.0.2` com `RP001 Regional Parameters 1
 
 A versão 1.0.2 é a usada pela biblioteca da Heltec.
 
+## A placa precisa de internet ou Wi-Fi para mandar os dados?
+
+**Não.** Neste tutorial, a placa envia os dados pelo **rádio LoRa** até o gateway. Quem usa a internet é o **gateway**, que repassa as mensagens para a TTN. O Wi-Fi da Heltec WiFi LoRa 32 V3 não é usado no tutorial.
+
+Por isso a placa funciona em lugares sem Wi-Fi, desde que esteja ao alcance de um gateway LoRaWAN da UFSM.
+
 ## Posso usar outra placa ou módulo LoRa (RFM95, SX1276, Arduino Uno, outro ESP32)?
 
-Este tutorial cobre **só a placa Heltec WiFi LoRa 32 V3**, com a biblioteca da Heltec. Outras placas e módulos (por exemplo RFM95 ou SX1276 ligados a um Arduino Uno ou a outro ESP32) usam outras bibliotecas, como a LMIC, e outra ligação de pinos, que **não fazem parte deste tutorial**. Por isso o assistente não tem a pinagem nem o código para eles.
+Este tutorial não ensina a ligar nem a programar outros módulos: ele cobre **só a placa Heltec WiFi LoRa 32 V3**, com a biblioteca da Heltec. Não há neste material ligação de pinos, bibliotecas nem código para outras placas. Outras placas e módulos (por exemplo RFM95 ou SX1276 ligados a um Arduino Uno ou a outro ESP32) usam outras bibliotecas, como a LMIC, e outra ligação de pinos, que **não fazem parte deste tutorial**. Por isso o assistente não tem a pinagem nem o código para eles.
 
 O que vale para qualquer dispositivo na rede da UFSM é a configuração da rede: aplicação no cluster **eu1** da TTN, plano `Australia 915-928 MHz, FSB 2`, ativação OTAA e antena sempre conectada antes de ligar. Para a ligação de pinos e o código de outra placa, consulte a documentação do fabricante do módulo e da biblioteca escolhida.
 
@@ -100,7 +106,11 @@ Nunca compartilhe a sua AppKey. Ela fica no `secrets.h`, que não vai para o Git
 
 ## O que a placa envia? Tamanho e formato do payload
 
-A placa envia **2 bytes**: a temperatura da CPU **multiplicada por 100**, como inteiro de 16 bits com sinal, com o **byte mais significativo (MSB) primeiro**. Exemplo: 36,25 °C → 3625 → bytes `0E 29`. Na TTN, o `decodeUplink` divide por 100.
+A placa envia **2 bytes**, que juntos formam **um único número**: a temperatura da CPU multiplicada por 100.
+- 1º byte: a parte alta do número (byte mais significativo, MSB);
+- 2º byte: a parte baixa do número (byte menos significativo, LSB).
+
+Exemplo: 36,25 °C → 3625 = `0x0E29` → 1º byte `0E`, 2º byte `29`. Na TTN, o `decodeUplink` junta os 2 bytes e divide por 100.
 
 No código do tutorial, cada mensagem (uplink) leva um **payload de 2 bytes** com a temperatura interna do processador ESP32-S3, enviado na porta 2:
 1. A temperatura é lida em graus Celsius e multiplicada por 100, para guardar 2 casas decimais em um número inteiro de 16 bits com sinal. Exemplo: 36,25 °C vira 3625.

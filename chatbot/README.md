@@ -113,7 +113,7 @@ O modelo é baixado automaticamente se ainda não existir. Para trocar o modelo 
 | `CHAT_MODEL` | `phi4-mini` | Modelo que escreve as respostas |
 | `EMBED_MODEL` | `bge-m3` | Modelo que faz a busca nos documentos |
 | `TOP_K` | `5` | Quantos trechos são buscados para cada pergunta |
-| `MARGEM_TRECHOS` | `0.06` | Só vão para o modelo os trechos com similaridade até esta distância do melhor trecho |
+| `MARGEM_TRECHOS` | `0.04` | Só vão para o modelo os trechos com similaridade até esta distância do melhor trecho |
 | `TEMPERATURE` | `0` | Criatividade (0 = sempre a mesma resposta, mais fiel aos trechos) |
 | `NUM_CTX` | `8192` | Tamanho da janela de contexto, em tokens |
 | `KEEP_ALIVE` | `60m` | Quanto tempo o modelo fica na RAM sem uso (`-1` = sempre) |

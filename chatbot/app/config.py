@@ -25,7 +25,7 @@ AVALIACAO_DIR = Path(os.getenv("AVALIACAO_DIR", str(_PASTA_CHATBOT / "avaliacao"
 TOP_K = int(os.getenv("TOP_K", "5"))                # quantos trechos vão junto com a pergunta
 # Só vão para o modelo os trechos com similaridade de no máximo MARGEM_TRECHOS abaixo do melhor.
 # Trechos bem menos parecidos que o melhor só distraem um modelo pequeno.
-MARGEM_TRECHOS = float(os.getenv("MARGEM_TRECHOS", "0.06"))
+MARGEM_TRECHOS = float(os.getenv("MARGEM_TRECHOS", "0.04"))
 NUM_CTX = int(os.getenv("NUM_CTX", "8192"))         # janela de contexto do modelo (tokens)
 TEMPERATURE = float(os.getenv("TEMPERATURE", "0"))  # 0 = sempre a mesma resposta, copia valores com mais fidelidade
 MAX_HISTORICO = int(os.getenv("MAX_HISTORICO", "6"))  # mensagens anteriores enviadas ao modelo
