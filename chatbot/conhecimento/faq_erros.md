@@ -82,6 +82,12 @@ Este tutorial não ensina a ligar nem a programar outros módulos: ele cobre **s
 
 O que vale para qualquer dispositivo na rede da UFSM é a configuração da rede: aplicação no cluster **eu1** da TTN, plano `Australia 915-928 MHz, FSB 2`, ativação OTAA e antena sempre conectada antes de ligar. Para a ligação de pinos e o código de outra placa, consulte a documentação do fabricante do módulo e da biblioteca escolhida.
 
+## O que colocar no JoinEUI (AppEUI)?
+
+Preencha o JoinEUI com **zeros**: `0000000000000000`. Você mesmo digita os zeros no cadastro do dispositivo; a TTN não gera o JoinEUI. Só o **DevEUI** e a **AppKey** têm o botão **Generate**.
+
+No `secrets.h`, o `appEui` fica com os 8 bytes zerados: `{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }`.
+
 ## Em que ordem copiar as chaves da TTN para o secrets.h: msb ou lsb?
 
 Use a ordem **msb**, que é a ordem em que o console da TTN mostra as chaves por padrão.
@@ -251,6 +257,14 @@ Se aparecer uma mensagem pedindo licença junto com o Chip ID, veja a seção so
 O alcance do LoRa é de cerca de **2 a 5 km em área urbana** e pode passar de **15 km com visada direta**, sem obstáculos entre a antena da placa e o gateway. O alcance real depende muito de prédios, árvores e relevo, da altura das antenas e do Spreading Factor usado.
 
 No campus da UFSM, o gateway citado neste projeto fica no CT. Se a placa não conectar, aproxime-se do CT, de preferência com visada direta, e confira a qualidade do sinal (RSSI e SNR) na aba Live data da TTN.
+
+## Dá para mandar dados da TTN para a placa (downlink)?
+
+**Sim.** Mensagens da rede para a placa se chamam **downlink**. No console da TTN, abra o dispositivo, vá em **Messaging** e use a opção de **Downlink** para agendar uma mensagem (os bytes em hexadecimal e a porta, FPort).
+
+Como a placa do tutorial é **classe A**, ela só recebe um downlink logo depois de enviar um uplink, nas janelas de recepção RX1 e RX2. Por isso o downlink agendado chega junto com o próximo envio da placa. A TTN permite no máximo 10 downlinks por dia por dispositivo.
+
+O código do tutorial só envia dados e não trata as mensagens recebidas. Para usar downlinks, é preciso acrescentar isso ao código, o que não faz parte deste tutorial.
 
 ## Como guardar os dados ou fazer gráficos da temperatura?
 

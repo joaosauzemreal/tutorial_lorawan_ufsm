@@ -71,9 +71,9 @@ Entraram como perguntas novas na rodada 9. A 36 foi recusada por engano e virou 
 | 37 | quanto tempo dura a bateria com lorawan? | Pode durar anos com deep sleep e envios espaçados; depende do uso; o tutorial não mede isso |
 | 38 | quem é o reitor da ufsm? | Recusar |
 
-## Perguntas novas (não usadas para ajustar a base nem os exemplos do filtro)
+## Perguntas da rodada 10
 
-Servem para medir se as melhorias valem para perguntas que o sistema nunca "viu". Quando uma delas for usada para ajustar a base, ela deixa de ser "nova".
+Entraram como perguntas novas na rodada 10. A 40 (downlink) falhou e virou seção do FAQ.
 
 | # | Pergunta | A resposta precisa conter |
 |---|----------|---------------------------|
@@ -81,3 +81,14 @@ Servem para medir se as melhorias valem para perguntas que o sistema nunca "viu"
 | 40 | dá para mandar dados da TTN de volta para a placa? | Sim, por downlink; na classe A só depois de um uplink (janelas RX1/RX2); o tutorial não implementa isso |
 | 41 | qual a diferença entre a TTN e o The Things Stack? | A TTN é a rede pública e colaborativa; o The Things Stack é o software em que ela funciona |
 | 42 | me ajuda a escolher um notebook | Recusar |
+
+## Perguntas novas (não usadas para ajustar a base nem os exemplos do filtro)
+
+Servem para medir se as melhorias valem para perguntas que o sistema nunca "viu". Quando uma delas for usada para ajustar a base, ela deixa de ser "nova".
+
+| # | Pergunta | A resposta precisa conter |
+|---|----------|---------------------------|
+| 43 | o que é ADR? | Adaptive Data Rate: a rede ajusta SF e potência conforme o sinal; no código, loraWanAdr = true |
+| 44 | posso usar a mesma AppKey em duas placas? | Não é o recomendado; cada placa é um dispositivo com seu DevEUI e AppKey; cadastrar cada uma (e cada uma tem sua licença Heltec) |
+| 45 | quanto custa usar a TTN? | A rede comunitária é gratuita para cadastrar dispositivos; tem limites de uso justo |
+| 46 | qual a melhor série da netflix? | Recusar |
