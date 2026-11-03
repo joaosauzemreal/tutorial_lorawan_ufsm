@@ -84,7 +84,7 @@ O que vale para qualquer dispositivo na rede da UFSM é a configuração da rede
 
 ## O que colocar no JoinEUI (AppEUI)?
 
-Preencha o JoinEUI com **zeros**: `0000000000000000`. Você mesmo digita os zeros no cadastro do dispositivo; a TTN não gera o JoinEUI. Só o **DevEUI** e a **AppKey** têm o botão **Generate**.
+Preencha o JoinEUI com **16 zeros** (8 bytes): `0000000000000000`. Você mesmo digita os zeros no cadastro do dispositivo; a TTN não gera o JoinEUI. Só o **DevEUI** e a **AppKey** têm o botão **Generate**.
 
 No `secrets.h`, o `appEui` fica com os 8 bytes zerados: `{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }`.
 

@@ -100,7 +100,11 @@ O **Data Rate (DR)** é o número que o LoRaWAN usa para combinar SF e largura d
 
 **Airtime** é o tempo que uma mensagem ocupa o canal de rádio. Depende do SF e do tamanho da mensagem. Ele importa por causa da bateria e dos limites de uso da rede (na TTN, 30 segundos por dia por dispositivo).
 
-**ADR (Adaptive Data Rate):** com o ADR ativado, o servidor de rede observa a qualidade do sinal do dispositivo e manda ele usar o menor SF e a menor potência que ainda funcionam. Funciona melhor com dispositivos parados. No código do tutorial, `loraWanAdr = true`.
+## ADR (Adaptive Data Rate): ajuste automático da taxa de dados
+
+O **ADR (Adaptive Data Rate)** é o ajuste automático da taxa de dados. Com o ADR ativado, o servidor de rede observa a qualidade do sinal do dispositivo (RSSI e SNR) e manda ele usar o **menor Spreading Factor e a menor potência de transmissão que ainda funcionam**. Assim, cada mensagem gasta menos tempo no ar e menos bateria.
+
+O ADR funciona melhor com dispositivos parados, porque a rede precisa de algumas mensagens para avaliar o sinal. No código do tutorial, o ADR está ligado: `loraWanAdr = true`.
 
 ## Planos de frequência: AU915 e a sub-banda 2 (FSB2)
 
