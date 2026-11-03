@@ -114,7 +114,7 @@ O modelo é baixado automaticamente se ainda não existir. Para trocar o modelo 
 | `EMBED_MODEL` | `bge-m3` | Modelo que faz a busca nos documentos |
 | `TOP_K` | `5` | Quantos trechos são buscados para cada pergunta |
 | `MARGEM_TRECHOS` | `0.06` | Só vão para o modelo os trechos com similaridade até esta distância do melhor trecho |
-| `TEMPERATURE` | `0.2` | Criatividade (0 = mais previsível) |
+| `TEMPERATURE` | `0` | Criatividade (0 = sempre a mesma resposta, mais fiel aos trechos) |
 | `NUM_CTX` | `8192` | Tamanho da janela de contexto, em tokens |
 | `KEEP_ALIVE` | `60m` | Quanto tempo o modelo fica na RAM sem uso (`-1` = sempre) |
 | `FILTRO_ASSUNTO` | `true` | Recusa perguntas que se parecem mais com os exemplos fora do assunto do que com a documentação. `false` desliga |

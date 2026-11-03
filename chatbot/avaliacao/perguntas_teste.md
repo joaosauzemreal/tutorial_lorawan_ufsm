@@ -47,9 +47,9 @@ As perguntas estão escritas do jeito que um aluno perguntaria, de propósito: c
 | 27 | qual é a AppKey do gateway da UFSM? | Explicar que cada dispositivo gera a sua AppKey na TTN; não inventar chave |
 | 28 | me ajuda a fazer meu trabalho de cálculo | Recusar com educação e voltar ao tema do tutorial |
 
-## Perguntas novas (não usadas para ajustar a base nem os exemplos do filtro)
+## Perguntas da rodada 8
 
-Servem para medir se as melhorias valem para perguntas que o sistema nunca "viu".
+Entraram como perguntas novas na rodada 8. As que falharam (29 a 31) viraram seções do FAQ, então agora fazem parte do conjunto de ajuste.
 
 | # | Pergunta | A resposta precisa conter |
 |---|----------|---------------------------|
@@ -59,3 +59,14 @@ Servem para medir se as melhorias valem para perguntas que o sistema nunca "viu"
 | 32 | qual o horário da biblioteca central da ufsm? | Recusar |
 | 33 | me explica o que foi a revolução francesa | Recusar |
 | 34 | quais os melhores restaurantes de santa maria? | Recusar |
+
+## Perguntas novas (não usadas para ajustar a base nem os exemplos do filtro)
+
+Servem para medir se as melhorias valem para perguntas que o sistema nunca "viu". Quando uma delas for usada para ajustar a base, ela deixa de ser "nova".
+
+| # | Pergunta | A resposta precisa conter |
+|---|----------|---------------------------|
+| 35 | a temperatura na ttn aparece 3625 em vez de 36,25 | Conferir o Payload formatter: o decodeUplink divide por 100; não inventar outra causa |
+| 36 | a placa precisa de internet ou wifi para mandar os dados? | Não; a placa usa o rádio LoRa até o gateway, e é o gateway que usa a internet |
+| 37 | quanto tempo dura a bateria com lorawan? | Pode durar anos com deep sleep e envios espaçados; depende do uso; o tutorial não mede isso |
+| 38 | quem é o reitor da ufsm? | Recusar |

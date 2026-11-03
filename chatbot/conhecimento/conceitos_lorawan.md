@@ -125,7 +125,7 @@ Na TTN:
 
 ## Clusters da TTN: por que usar o eu1 na UFSM
 
-Cluster e plano de frequência são coisas **independentes**. O cluster (**eu1**, na Europa) é o servidor da TTN onde os gateways da UFSM estão registrados, por isso a aplicação precisa ser criada nele. O plano de frequência (**AU915**) é a faixa de rádio que os dispositivos usam, e é o plano indicado para o Brasil. Um não depende do outro.
+Cluster e plano de frequência são coisas **independentes**. O cluster (**eu1**, na Europa) é o servidor da TTN onde os gateways da UFSM estão registrados, por isso a aplicação precisa ser criada nele. O plano de frequência (**AU915**) é a faixa de rádio que os dispositivos usam, e é o plano indicado para o Brasil. Um não depende do outro. O cluster não é escolhido pela localização de quem usa, e sim por ser o cluster em que os gateways da UFSM foram registrados.
 
 A TTN é dividida em **clusters** regionais, cada um com o seu endereço de console: por exemplo **eu1** (Europa), **nam1** (América do Norte) e **au1** (Austrália). Cada gateway é registrado em um cluster. Os gateways da UFSM estão registrados no cluster **eu1**, então a aplicação e o dispositivo também devem ser criados no eu1 (`https://eu1.cloud.thethings.network/console`). O nome do cluster não tem relação com o plano de frequência: na UFSM se usa o cluster europeu com o plano de frequência AU915.
 

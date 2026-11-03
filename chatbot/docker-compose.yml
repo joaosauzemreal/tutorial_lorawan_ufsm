@@ -30,7 +30,7 @@ services:
       CHAT_MODEL: ${CHAT_MODEL:-phi4-mini}
       EMBED_MODEL: ${EMBED_MODEL:-bge-m3}
       TOP_K: ${TOP_K:-5}
-      TEMPERATURE: ${TEMPERATURE:-0.2}
+      TEMPERATURE: ${TEMPERATURE:-0}
       NUM_CTX: ${NUM_CTX:-8192}
       KEEP_ALIVE: ${KEEP_ALIVE:-60m}
       OLLAMA_URL: http://ollama:11434

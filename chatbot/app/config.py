@@ -27,7 +27,7 @@ TOP_K = int(os.getenv("TOP_K", "5"))                # quantos trechos vão junto
 # Trechos bem menos parecidos que o melhor só distraem um modelo pequeno.
 MARGEM_TRECHOS = float(os.getenv("MARGEM_TRECHOS", "0.06"))
 NUM_CTX = int(os.getenv("NUM_CTX", "8192"))         # janela de contexto do modelo (tokens)
-TEMPERATURE = float(os.getenv("TEMPERATURE", "0.2"))
+TEMPERATURE = float(os.getenv("TEMPERATURE", "0"))  # 0 = sempre a mesma resposta, copia valores com mais fidelidade
 MAX_HISTORICO = int(os.getenv("MAX_HISTORICO", "6"))  # mensagens anteriores enviadas ao modelo
 _keep_alive = os.getenv("KEEP_ALIVE", "60m").strip()  # quanto tempo o modelo fica carregado (-1 = sempre)
 # O Ollama aceita duração com unidade ("60m") ou número de segundos (-1); texto "-1" sem unidade dá erro.

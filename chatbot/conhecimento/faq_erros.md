@@ -64,7 +64,7 @@ Depois clique em **Register end device**. A aplicação onde o dispositivo é ca
 
 ## Quais versões escolher no cadastro do dispositivo (versão LoRaWAN e versão dos parâmetros regionais)?
 
-São dois campos de versão no cadastro do dispositivo, e os dois precisam ser preenchidos:
+Escolha a versão `LoRaWAN Specification 1.0.2` com `RP001 Regional Parameters 1.0.2 Rev B`. São dois campos de versão no cadastro do dispositivo, e os dois precisam ser preenchidos:
 1. **LoRaWAN version:** `LoRaWAN Specification 1.0.2`
 2. **Regional Parameters version:** `RP001 Regional Parameters 1.0.2 Rev B`
 
@@ -162,12 +162,12 @@ Copie `src/secrets_example.h` para a pasta `src/heltec_lorawan/` (a mesma do `.i
 
 ## A placa não aparece em Ferramentas > Porta ou o upload falha
 
-Troque o cabo USB (pode ser só de carga), instale o driver CP210x, coloque a placa em modo de gravação (segure PRG, aperte e solte RST, solte PRG) e feche o Monitor Serial.
+Use um cabo USB-C de dados (cabos que só carregam não funcionam), instale o driver CP210x, coloque a placa em modo de gravação (segure PRG, aperte e solte RST, solte PRG) e feche o Monitor Serial.
 
 **Sintomas:** nenhuma porta COM aparece, ou o upload termina com erro de conexão (por exemplo "Failed to connect to ESP32").
 
 **Causas prováveis e soluções:**
-1. **Cabo USB só de carga.** Alguns cabos USB-C não transmitem dados. Teste outro cabo.
+1. **Cabo USB.** Use um cabo USB-C **de dados**. Cabos que só carregam a bateria não deixam o computador ver a placa; se estiver em dúvida, teste outro cabo.
 2. **Driver do conversor USB-serial.** A Heltec V3 usa um conversor USB-serial CP2102. No Windows, se a porta não aparecer, instale o driver CP210x, baixado da página oficial da Silicon Labs: https://www.silabs.com/developer-tools/usb-to-uart-bridge-vcp-drivers
 3. **Placa não entrou em modo de gravação.** Coloque a placa em modo de gravação com os dois botões dela, nesta ordem:
    1. aperte e **mantenha apertado** o botão **PRG** (boot);
@@ -225,6 +225,31 @@ O exemplo do tutorial envia a cada 15 segundos (`appTxDutyCycle = 15000`) com co
 ## O que significa setDefaultDR(3) no código?
 
 `LoRaWAN.setDefaultDR(3)` define a taxa de dados (Data Rate) inicial. Na região **AU915**, DR3 corresponde a **SF9 com 125 kHz**. A tabela completa está na seção sobre Spreading Factor e Data Rate. Com o ADR ativado (`loraWanAdr = true`), a rede pode ajustar a taxa de dados automaticamente conforme a qualidade do sinal.
+
+## A placa fica reiniciando sozinha ou trava
+
+Este problema não está coberto pelo tutorial, então não dá para apontar uma causa certa. Para investigar:
+1. Abra o Monitor Serial (115200 baud) e veja a última mensagem antes de a placa reiniciar. O ESP32 costuma mostrar o motivo do reinício; uma mensagem com "Brownout", por exemplo, indica falta de energia.
+2. Troque o cabo USB e a porta USB do computador, de preferência uma porta direta, sem hub. Falta de energia é uma causa comum de reinícios.
+3. Confira se a antena está conectada.
+4. Se você alterou o código, teste de novo com o código original do tutorial.
+
+Se aparecer uma mensagem pedindo licença junto com o Chip ID, veja a seção sobre o erro de licença.
+
+## Qual a distância máxima (alcance) até o gateway?
+
+O alcance do LoRa é de cerca de **2 a 5 km em área urbana** e pode passar de **15 km com visada direta**, sem obstáculos entre a antena da placa e o gateway. O alcance real depende muito de prédios, árvores e relevo, da altura das antenas e do Spreading Factor usado.
+
+No campus da UFSM, o gateway citado neste projeto fica no CT. Se a placa não conectar, aproxime-se do CT, de preferência com visada direta, e confira a qualidade do sinal (RSSI e SNR) na aba Live data da TTN.
+
+## Como guardar os dados ou fazer gráficos da temperatura?
+
+O tutorial termina com os dados chegando na aba Live data da TTN; gráficos e armazenamento não fazem parte dele. O caminho é usar as **integrações** da TTN: no console, abra a sua aplicação e a seção **Integrations**. Há opções como:
+- **MQTT** e **Webhooks**, para enviar cada mensagem a um programa ou serviço seu;
+- **Storage Integration**, que guarda as mensagens por um tempo na própria TTN;
+- integrações prontas com plataformas de painéis (dashboards), que fazem os gráficos.
+
+Use o campo `cpu_temperature`, que aparece depois de configurar o Payload formatter.
 
 ## Um problema que não está neste FAQ
 
