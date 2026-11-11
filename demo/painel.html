@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contador de visitantes LoRaWAN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --papel: #eef3f6;
+    --tinta: #14213d;
+    --tinta-suave: #4a5876;
+    --cobalto: #1f4fe0;
+    --pulso: #ffbf1f;
+    --linha: #c9d4de;
+    --ok: #1d8a5b;
+    --alerta: #c2410c;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --texto: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--papel);
+    color: var(--tinta);
+    font-family: var(--texto);
+    font-size: clamp(16px, 1.25vw, 26px);
+    line-height: 1.4;
+    display: grid;
+    grid-template-rows: auto 1fr auto auto;
+    padding: 2.2vw 3.2vw;
+    gap: 1.6vw;
+    overflow: hidden;
+  }
+
+  /* ---------- topo ---------- */
+  header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+  .convite { font-family: var(--display); font-weight: 500; font-size: 1.7em; margin: 0; }
+  .convite kbd {
+    font-family: var(--texto); font-weight: 700; font-size: .8em;
+    border: 2px solid var(--tinta); border-bottom-width: 5px; border-radius: .4em;
+    padding: .05em .45em; background: #fff;
+  }
+  .rede { display: flex; align-items: center; gap: .5em; color: var(--tinta-suave); white-space: nowrap; }
+  .rede i { width: .75em; height: .75em; border-radius: 50%; background: var(--alerta); display: inline-block; }
+  .rede.ok i { background: var(--ok); }
+
+  /* ---------- contador ---------- */
+  .contador { display: flex; align-items: center; gap: 3vw; min-height: 0; }
+  .numero {
+    font-family: var(--display); font-weight: 800;
+    font-size: clamp(120px, 23vw, 520px); line-height: .8;
+    letter-spacing: -.04em; font-variant-numeric: tabular-nums;
+    margin: 0; color: var(--tinta);
+    transform-origin: left 70%;
+  }
+  .numero.vazio { color: var(--linha); }
+  .numero.subiu { animation: subir .7s cubic-bezier(.2, 1.6, .4, 1); }
+  @keyframes subir { 0% { transform: scale(.92); color: var(--cobalto); } 100% { transform: scale(1); } }
+  .legenda { max-width: 22ch; }
+  .legenda p { margin: 0; font-size: 1.9em; line-height: 1.15; font-family: var(--display); font-weight: 500; }
+  .legenda small { display: block; margin-top: .8em; font-size: 1em; color: var(--tinta-suave); }
+
+  /* ---------- caminho do pacote ---------- */
+  .caminho { position: relative; }
+  .trilho { position: absolute; left: 0; right: 0; top: 1.9em; height: 3.2em; width: 100%; overflow: visible; }
+  .trilho .base { stroke: var(--linha); stroke-width: 3; fill: none; }
+  .trilho .onda { stroke: var(--cobalto); stroke-width: 3; fill: none; }
+  .trilho .faisca { fill: var(--pulso); stroke: var(--tinta); stroke-width: 2; opacity: 0; }
+  .paradas { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2vw; margin: 0; padding: 0; list-style: none; }
+  .parada { display: flex; flex-direction: column; align-items: flex-start; }
+  .parada:last-child { align-items: flex-end; text-align: right; }
+  .marco {
+    width: 3.2em; height: 3.2em; margin: 1.9em 0 .8em; border-radius: 50%;
+    background: #fff; border: 3px solid var(--tinta);
+    display: grid; place-items: center; position: relative; z-index: 1;
+    transition: background .25s, transform .25s;
+  }
+  .marco svg { width: 1.7em; height: 1.7em; stroke: var(--tinta); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .parada.aceso .marco { background: var(--pulso); transform: scale(1.12); }
+  .parada h2 { font-family: var(--display); font-weight: 800; font-size: 1.3em; margin: 0 0 .2em; }
+  .parada p { margin: 0; color: var(--tinta-suave); }
+  .parada p b { color: var(--tinta); font-weight: 700; }
+
+  /* ---------- curiosidade ---------- */
+  footer {
+    display: flex; gap: 1.2em; align-items: baseline;
+    border-top: 3px solid var(--tinta); padding-top: 1vw;
+  }
+  footer strong { font-family: var(--display); font-weight: 800; white-space: nowrap; }
+  #curiosidade { margin: 0; transition: opacity .5s; max-width: 75ch; }
+  #curiosidade.trocando { opacity: 0; }
+
+  .aviso-sim { position: fixed; right: 1rem; bottom: .6rem; font-size: .75em; color: var(--alerta); }
+
+  @media (max-width: 760px) {
+    html, body { height: auto; }
+    body { overflow: auto; font-size: 16px; padding: 16px; gap: 24px; grid-template-rows: none; }
+    .legenda p { font-size: 1.4em; }
+    .aviso-sim { position: static; }
+    header, .contador { flex-direction: column; align-items: flex-start; }
+    .trilho { display: none; }
+    .paradas { grid-template-columns: 1fr 1fr; }
+    .parada:last-child { align-items: flex-start; text-align: left; }
+    .marco { margin-top: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .numero.subiu { animation: none; }
+    .trilho .faisca { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="convite">Aperte o botão <kbd>PRG</kbd> da placa e entre na contagem</p>
+  <div class="rede" id="rede"><i></i><span>Conectando à The Things Network…</span></div>
+</header>
+
+<section class="contador" aria-live="polite">
+  <p class="numero vazio" id="numero">–</p>
+  <div class="legenda">
+    <p id="frase">visitantes já mandaram um sinal de rádio até aqui</p>
+    <small id="quando">Esperando o primeiro sinal da placa.</small>
+  </div>
+</section>
+
+<section class="caminho" aria-label="Caminho que o sinal percorreu">
+  <svg class="trilho" id="trilho" preserveAspectRatio="none" aria-hidden="true">
+    <path class="base" id="base"></path>
+    <path class="onda" id="onda"></path>
+    <circle class="faisca" id="faisca" r="9"></circle>
+  </svg>
+  <ol class="paradas">
+    <li class="parada" id="p-placa">
+      <span class="marco"><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="12" rx="2"/><path d="M8 7V3M12 13h.01M16 7V4"/></svg></span>
+      <h2>Placa LoRa</h2>
+      <p id="t-placa">Envia o total pelo rádio, sem Wi-Fi e sem chip de celular.</p>
+    </li>
+    <li class="parada" id="p-gateway">
+      <span class="marco"><svg viewBox="0 0 24 24"><path d="M12 12v9M8 21h8M8.5 8.5a5 5 0 0 1 7 0M5.5 5.5a9 9 0 0 1 13 0"/><circle cx="12" cy="11.5" r="1"/></svg></span>
+      <h2>Gateway</h2>
+      <p id="t-gateway">A antena da UFSM que escuta os sinais LoRa.</p>
+    </li>
+    <li class="parada" id="p-ttn">
+      <span class="marco"><svg viewBox="0 0 24 24"><path d="M7 18a4 4 0 0 1-.6-8A6 6 0 0 1 18 9a4.5 4.5 0 0 1-.5 9z"/></svg></span>
+      <h2>The Things Network</h2>
+      <p id="t-ttn">Servidor na internet que recebe o pacote do gateway.</p>
+    </li>
+    <li class="parada" id="p-tela">
+      <span class="marco"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M9 20h6M12 16v4"/></svg></span>
+      <h2>Esta tela</h2>
+      <p id="t-tela">Mostra o número assim que ele chega.</p>
+    </li>
+  </ol>
+</section>
+
+<footer>
+  <strong>Você sabia?</strong>
+  <p id="curiosidade">LoRa vem de “Long Range”, longo alcance: em campo aberto, um sinal como esse pode viajar mais de 10 km.</p>
+</footer>
+
+<div class="aviso-sim" id="aviso-sim" hidden>Modo de ensaio: visitantes simulados</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const fmtHora = new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const fmtNum = new Intl.NumberFormat("pt-BR");
+  const semMovimento = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const curiosidades = [
+    "LoRa vem de “Long Range”, longo alcance: em campo aberto, um sinal como esse pode viajar mais de 10 km.",
+    "Cada aperto do botão manda só 4 bytes: 2 para o número de visitantes e 2 para a temperatura do chip da placa.",
+    "Sensores LoRaWAN podem funcionar anos com a mesma bateria, porque passam quase o tempo todo em silêncio.",
+    "O rádio LoRa manda o sinal em “chirps”, assobios que sobem de frequência. Isso deixa o receptor entender o sinal mesmo quando ele está mais fraco que o ruído.",
+    "A The Things Network é uma rede comunitária: os gateways são instalados por universidades, empresas e voluntários no mundo todo.",
+    "No campo, LoRaWAN mede umidade do solo, nível de rios, temperatura de estufas e até se uma vaga de estacionamento está livre.",
+    "A placa não precisa saber onde está o gateway: ela só grita pelo rádio, e qualquer gateway da rede que ouvir repassa a mensagem.",
+    "O pacote é criptografado: o gateway repassa a mensagem, mas só quem tem a chave da aplicação consegue ler o número.",
+  ];
+  let iCuriosidade = 0;
+  function trocarCuriosidade(texto) {
+    const el = $("curiosidade");
+    el.classList.add("trocando");
+    setTimeout(() => { el.textContent = texto; el.classList.remove("trocando"); }, 500);
+  }
+  setInterval(() => {
+    iCuriosidade = (iCuriosidade + 1) % curiosidades.length;
+    trocarCuriosidade(curiosidades[iCuriosidade]);
+  }, 14000);
+
+  /* ---------- trilho com a onda "chirp" entre a placa e o gateway ---------- */
+  function centro(id) {
+    const marco = $(id).querySelector(".marco").getBoundingClientRect();
+    const caixa = $("trilho").getBoundingClientRect();
+    return { x: marco.left + marco.width / 2 - caixa.left, y: marco.top + marco.height / 2 - caixa.top };
+  }
+  let pontos = [];
+  function desenharTrilho() {
+    const svg = $("trilho");
+    const r = svg.getBoundingClientRect();
+    svg.setAttribute("viewBox", `0 0 ${r.width} ${r.height}`);
+    pontos = ["p-placa", "p-gateway", "p-ttn", "p-tela"].map(centro);
+    const [a, b] = pontos;
+    // chirp: ondas que ficam mais apertadas no caminho do rádio
+    let d = `M${a.x},${a.y}`;
+    const passos = 140, ondas = 9;
+    for (let i = 1; i <= passos; i++) {
+      const t = i / passos;
+      const x = a.x + (b.x - a.x) * t;
+      const fase = 2 * Math.PI * ondas * t * t;
+      const amp = 10 * Math.sin(Math.PI * t);
+      d += ` L${x.toFixed(1)},${(a.y + amp * Math.sin(fase)).toFixed(1)}`;
+    }
+    $("onda").setAttribute("d", d);
+    $("base").setAttribute("d", `M${b.x},${b.y} L${pontos[3].x},${pontos[3].y}`);
+  }
+  addEventListener("resize", desenharTrilho);
+  document.fonts && document.fonts.ready.then(desenharTrilho);
+  desenharTrilho();
+
+  function acender(id, ms = 900) {
+    const el = $(id);
+    el.classList.add("aceso");
+    setTimeout(() => el.classList.remove("aceso"), ms);
+  }
+
+  // A faísca percorre o caminho todo; cada parada acende quando a faísca passa
+  function animarPacote(depois) {
+    if (semMovimento || pontos.length < 4) { ["p-placa", "p-gateway", "p-ttn", "p-tela"].forEach((id) => acender(id)); depois(); return; }
+    const faisca = $("faisca");
+    const onda = $("onda");
+    const compOnda = onda.getTotalLength();
+    const trechos = [1100, 700, 700];      // ms em cada trecho
+    const ids = ["p-gateway", "p-ttn", "p-tela"];
+    acender("p-placa");
+    faisca.style.opacity = 1;
+    let trecho = 0, inicio = performance.now();
+    function quadro(agora) {
+      const t = Math.min((agora - inicio) / trechos[trecho], 1);
+      let p;
+      if (trecho === 0) p = onda.getPointAtLength(compOnda * t);
+      else {
+        const a = pontos[trecho], b = pontos[trecho + 1];
+        p = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+      }
+      faisca.setAttribute("cx", p.x);
+      faisca.setAttribute("cy", p.y);
+      if (t < 1) return requestAnimationFrame(quadro);
+      acender(ids[trecho]);
+      trecho++;
+      if (trecho < trechos.length) { inicio = agora; return requestAnimationFrame(quadro); }
+      faisca.style.opacity = 0;
+      depois();
+    }
+    requestAnimationFrame(quadro);
+  }
+
+  /* ---------- textos a partir do pacote ---------- */
+  function forcaDoSinal(rssi) {
+    if (rssi == null) return "";
+    if (rssi >= -80) return "sinal forte";
+    if (rssi >= -100) return "sinal bom";
+    if (rssi >= -115) return "sinal fraco";
+    return "sinal bem fraco";
+  }
+  const num = (v, casas = 1) => (v == null ? "?" : Number(v).toLocaleString("pt-BR", { maximumFractionDigits: casas }));
+
+  function textosDoPacote(u) {
+    $("t-placa").innerHTML =
+      `Enviou <b>${fmtNum.format(u.visitantes)}</b>` +
+      (u.temperatura != null ? `, com o chip a <b>${num(u.temperatura)} °C</b>` : "") +
+      (u.tempo_no_ar_ms ? `. O sinal ficou <b>${u.tempo_no_ar_ms} ms</b> no ar` : "") +
+      (u.frequencia_mhz ? ` em <b>${num(u.frequencia_mhz)} MHz</b>.` : ".");
+    $("t-gateway").innerHTML =
+      `Ouviu com <b>${num(u.rssi, 0)} dBm</b> (${forcaDoSinal(u.rssi)}). ` +
+      (u.snr != null && u.snr < 0
+        ? `SNR de <b>${num(u.snr)} dB</b>: o sinal chegou mais fraco que o ruído, e mesmo assim foi entendido.`
+        : `SNR de <b>${num(u.snr)} dB</b>.`) +
+      (u.gateways > 1 ? ` ${u.gateways} gateways ouviram este pacote.` : "");
+    $("t-ttn").innerHTML =
+      `Recebeu o pacote nº <b>${u.contador_quadro ?? "?"}</b>` +
+      (u.gateway ? ` vindo de <b>${u.gateway}</b>` : "") + `.`;
+    $("t-tela").innerHTML = `Atualizada às <b>${fmtHora.format(new Date(u.recebido_em))}</b>.`;
+  }
+
+  let totalMostrado = null;
+  function mostrarNumero(total, animar) {
+    const el = $("numero");
+    el.classList.toggle("vazio", total == null);
+    el.textContent = total == null ? "–" : fmtNum.format(total);
+    $("frase").textContent = total === 1
+      ? "visitante já mandou um sinal de rádio até aqui"
+      : "visitantes já mandaram um sinal de rádio até aqui";
+    if (animar) { el.classList.remove("subiu"); void el.offsetWidth; el.classList.add("subiu"); }
+    totalMostrado = total;
+  }
+
+  function mostrarRede(situacao, simulacao) {
+    const el = $("rede");
+    const ok = situacao === "conectado" || simulacao;
+    el.classList.toggle("ok", ok);
+    const textos = {
+      "conectado": "Ligado à The Things Network",
+      "conectando": "Conectando à The Things Network…",
+      "reconectando": "Sem internet: tentando de novo…",
+      "simulação": "Modo de ensaio",
+      "painel desligado": "Sem contato com o programa do painel",
+    };
+    el.querySelector("span").textContent = textos[situacao] || `TTN: ${situacao}`;
+    $("aviso-sim").hidden = !simulacao;
+  }
+
+  let ultimoPacote = null;
+  function aplicar(estado) {
+    mostrarRede(estado.ttn, estado.simulacao);
+    const u = estado.ultimo;
+    if (!u) return;
+    const chave = `${u.recebido_em}|${u.contador_quadro}`;
+    const novo = ultimoPacote !== null && chave !== ultimoPacote;
+    const primeiro = ultimoPacote === null;
+    ultimoPacote = chave;
+    const atualizar = (animar) => {
+      textosDoPacote(u);
+      $("quando").textContent = `Último sinal recebido às ${fmtHora.format(new Date(u.recebido_em))}.`;
+      mostrarNumero(estado.visitantes, animar && estado.visitantes !== totalMostrado);
+    };
+    if (primeiro) atualizar(false);
+    else if (novo) animarPacote(() => atualizar(true));
+  }
+
+  function conectar() {
+    const fonte = new EventSource("/api/eventos");
+    fonte.onmessage = (e) => aplicar(JSON.parse(e.data));
+    fonte.onerror = () => mostrarRede("painel desligado", false);
+  }
+  conectar();
+})();
+</script>
+</body>
+</html>

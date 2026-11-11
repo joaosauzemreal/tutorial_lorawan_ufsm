@@ -156,3 +156,9 @@ Esta seção descreve o procedimento completo para configurar as credenciais, re
 3. **Observação crítica sobre o enlace de comunicação (Uplink vs. Downlink):**
    - Dependendo da sua localização em relação aos Gateways da UFSM, a Heltec V3 pode conseguir enviar o *payload* com a temperatura (*Uplink*) até o Gateway, mas o sinal de resposta de confirmação do Gateway (*Downlink / ACK*) pode não ser forte o suficiente para alcançar a placa de volta devido a obstáculos.
    - **Consulta indispensável:** É fundamental consultar a aba **Live Data** no painel da TTN para confirmar se as mensagens estão chegando e sendo decodificadas no servidor, mesmo que a placa na bancada não tenha recebido a confirmação de ACK.
+
+---
+
+## 🎪 Demonstração para eventos: contador de visitantes
+
+A pasta [`demo/`](demo/) tem uma demonstração para feiras e visitas: cada visitante aperta o botão da placa, o LED pisca quando o pacote sai pelo rádio, a tela OLED mostra o total e um painel no projetor atualiza o número assim que a TTN recebe o pacote. O passo a passo está em [`demo/README.md`](demo/README.md).
