@@ -14,7 +14,7 @@ O que acontece a cada aperto:
 2. **Pelo rádio:** a placa envia o novo total (4 bytes, porta 3). Quando o pacote sai pelo rádio, o LED branco pisca 3 vezes e a tela mostra "Enviado ao gateway!".
 3. **No painel:** quando a TTN recebe o pacote, a página do projetor anima o caminho placa → gateway → TTN → tela e mostra o novo número, com a força do sinal (RSSI), o SNR e o gateway que ouviu.
 
-O LED indica que o pacote **saiu** da placa. A prova de que ele **chegou** é o número mudar no painel. Como o pacote leva o total (e não "+1"), um pacote perdido não estraga a contagem: o próximo corrige.
+O LED pisca quando o rádio termina de transmitir, ou seja, quando o pacote **saiu** da placa. A prova de que ele **chegou** é o número mudar no painel. Como o pacote leva o total (e não "+1"), um pacote perdido não estraga a contagem: o próximo corrige.
 
 ## Arquivos
 
@@ -43,6 +43,7 @@ O cadastro na TTN é o mesmo do tutorial principal: não precisa criar outro dis
 Ajustes no topo do `.ino`:
 
 - `INTERVALO_MINIMO_MS` (10 s): espera mínima entre dois envios. Se vários visitantes apertarem seguido, todos contam na hora na tela da placa e o total vai no próximo pacote. A tela mostra "Envia em N s".
+- `REENVIO_MS` (30 s): depois do último envio, a placa manda o mesmo total mais uma vez. Se um pacote se perdeu no ar (sinal fraco), a página se corrige sozinha. Na página, esse reenvio só atualiza os detalhes, sem a animação.
 - `DATA_RATE` (5 = SF7): o pacote mais curto possível. Se os pacotes não chegarem ao gateway no local do evento, troque para 3 (SF9), que alcança mais longe e ocupa o rádio por mais tempo.
 - `PINO_BOTAO`: para usar um botão externo maior (mais fácil para o público), ligue-o entre um pino livre e o GND e coloque o número do pino aqui.
 

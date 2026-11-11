@@ -8,6 +8,8 @@
 //   4. o gateway repassa à The Things Network, e a página demo/ mostra o novo total.
 //
 // Segurar o botão PRG por 3 segundos zera o contador (e envia o zero).
+// 30 s depois do último envio a placa manda o total mais uma vez (reenvio de garantia):
+// se algum pacote se perdeu no ar, a página se corrige sozinha.
 // O total fica gravado na memória flash: desligar a placa não perde a contagem.
 //
 // Mesmo cadastro da TTN do tutorial (mesmas chaves em secrets.h). A diferença é
@@ -34,6 +36,10 @@
 #define INTERVALO_MINIMO_MS 10000  // Espera mínima entre dois envios. Apertos durante a espera
                                    // somam no contador e vão todos juntos no próximo pacote.
 #define TEMPO_ZERAR_MS      3000   // Segurar o botão por este tempo zera o contador
+#define REENVIO_MS          30000  // 30 s depois do último envio, manda o total mais uma vez.
+                                   // Se um pacote se perdeu no ar, a página se corrige sozinha.
+#define JANELAS_RX_MS       3000   // Depois de transmitir, o rádio escuta a resposta da rede
+                                   // (1 s e 2 s depois). Nesse tempo não gravamos na flash.
 
 // ============================================================================
 // 2. DISPLAY OLED E REDE (iguais ao tutorial)
@@ -55,17 +61,30 @@ bool isTxConfirmed            = false;   // Sem ACK: cada ACK gasta um dos 10 do
 uint8_t appPort               = 3;       // Porta 3 = pacotes da demonstração (o tutorial usa a 2)
 uint8_t confirmedNbTrials     = 4;
 
+// Indica se o rádio está transmitindo agora (variável da biblioteca LoRaWAN da Heltec).
+// Com ela o LED só pisca quando o pacote realmente saiu pela antena.
+extern "C" bool lora_txing;
+
 // ============================================================================
 // 3. ESTADO DA DEMONSTRAÇÃO
 // ============================================================================
 Preferences memoria;           // Guarda o contador na flash (NVS)
 uint16_t visitantes = 0;       // Total de visitantes
-uint16_t enviadoTotal = 0;     // Último total que saiu pelo rádio
 uint32_t pacotesEnviados = 0;
 bool conectado = false;        // Já fez o join com a rede?
 bool envioPendente = false;    // Há um total novo esperando para ser enviado?
-uint32_t ultimoEnvio = 0;      // millis() do último envio
+bool salvarPendente = false;   // Há um total novo esperando para ser gravado na flash?
+uint32_t ultimoEnvio = 0;      // millis() do início do último envio
+uint32_t proximaTentativa = 0; // Depois de uma falha, espera um pouco antes de tentar de novo
 uint32_t tentativasJoin = 0;
+
+// Transmissão em andamento
+bool transmitindo = false;
+bool envioEhReenvio = false;   // O pacote no ar é o reenvio de garantia?
+bool reenvioPendente = false;  // Ainda falta o reenvio de garantia do último total?
+uint16_t totalNoAr = 0;        // Total que está sendo transmitido
+uint32_t inicioTx = 0;
+uint32_t fimTx = 0;            // millis() do fim da última transmissão (0 = nenhuma ainda)
 
 // Botão (com filtro de ruído)
 bool botaoApertado = false;
@@ -94,6 +113,7 @@ void mostrarRodape(const String &texto, uint32_t duracaoMs = 0) {
 
 String rodapePadrao() {
   if (!conectado) return "Conectando a rede...";
+  if (transmitindo) return "Transmitindo...";
   if (envioPendente) {
     uint32_t passou = millis() - ultimoEnvio;
     if (pacotesEnviados > 0 && passou < INTERVALO_MINIMO_MS) {
@@ -149,22 +169,80 @@ void piscarLed(uint8_t vezes) {
   proximaTrocaLed = millis();
 }
 
-void tentarEnviar() {
-  if (!conectado || !envioPendente) return;
-  if (pacotesEnviados > 0 && millis() - ultimoEnvio < INTERVALO_MINIMO_MS) return;
+// O rádio está ocupado transmitindo ou escutando a resposta da rede?
+bool radioOcupado() {
+  return transmitindo || (fimTx != 0 && millis() - fimTx < JANELAS_RX_MS);
+}
 
+// Grava o contador na flash só quando o rádio está livre: uma gravação na flash
+// trava o processador por alguns milissegundos e pode atrapalhar as janelas de recepção.
+void salvarSePuder() {
+  if (salvarPendente && !radioOcupado()) {
+    salvarContador();
+    salvarPendente = false;
+  }
+}
+
+void tentarEnviar() {
+  if (!conectado || transmitindo) return;
+  if (millis() < proximaTentativa) return;
+
+  bool reenvio = false;
+  if (!envioPendente) {
+    // Nada novo: faz o reenvio de garantia do último total, uma vez, 30 s depois
+    if (!reenvioPendente || millis() - ultimoEnvio < REENVIO_MS) return;
+    reenvio = true;
+  }
+  if (pacotesEnviados > 0 && millis() - ultimoEnvio < INTERVALO_MINIMO_MS) return;
+  if (radioOcupado()) return;
+
+  salvarSePuder();
   montarPacote();
-  // SendFrame() devolve false quando o rádio aceitou o pacote e ele já está saindo.
-  // Devolve true se o rádio ainda está ocupado (janelas de recepção do envio anterior):
-  // nesse caso o pedido continua pendente e tentamos de novo na próxima volta do loop.
-  if (SendFrame() == false) {
-    enviadoTotal = visitantes;
-    envioPendente = false;
+  // SendFrame() devolve false quando a camada LoRaWAN aceitou o pacote; true se ela ainda
+  // está ocupada com o envio anterior (aí tentamos de novo na próxima volta do loop).
+  if (SendFrame() == true) return;
+
+  if (!lora_txing) {
+    // A camada LoRaWAN aceitou, mas o rádio não começou a transmitir: tenta de novo em 1 s
+    Serial.println("Aviso: pacote aceito, mas o radio nao transmitiu. Tentando de novo.");
+    proximaTentativa = millis() + 1000;
+    return;
+  }
+
+  transmitindo = true;
+  envioEhReenvio = reenvio;
+  totalNoAr = visitantes;
+  inicioTx = millis();
+  ultimoEnvio = inicioTx;
+  envioPendente = false;
+  telaSuja = true;
+}
+
+// Acompanha a transmissão até o rádio terminar
+void acompanharTransmissao() {
+  if (!transmitindo) return;
+  uint32_t duracao = millis() - inicioTx;
+
+  if (lora_txing && duracao < 6000) return;   // ainda transmitindo
+
+  transmitindo = false;
+  fimTx = millis();
+  telaSuja = true;
+
+  if (!lora_txing && duracao < 2000) {
+    // Terminou normalmente (um pacote em SF7 leva uns 50 ms no ar)
     pacotesEnviados++;
-    ultimoEnvio = millis();
+    reenvioPendente = !envioEhReenvio;
     piscarLed(3);
-    mostrarRodape("Enviado ao gateway!", 2500);
-    Serial.printf("Pacote #%lu enviado: %u visitantes\n", (unsigned long)pacotesEnviados, visitantes);
+    mostrarRodape(envioEhReenvio ? "Reenviado" : "Enviado ao gateway!", 2500);
+    Serial.printf("Pacote #%lu %s: %u visitantes (%lu ms no ar)\n", (unsigned long)pacotesEnviados,
+                  envioEhReenvio ? "reenviado" : "enviado", totalNoAr, (unsigned long)duracao);
+  } else {
+    // O rádio não terminou a tempo (timeout de transmissão): tenta de novo
+    envioPendente = true;
+    proximaTentativa = millis() + 2000;
+    mostrarRodape("Falha no radio, tentando", 2500);
+    Serial.printf("Falha: a transmissao nao terminou (%lu ms). Tentando de novo.\n", (unsigned long)duracao);
   }
 }
 
@@ -184,7 +262,7 @@ void lerBotao() {
     } else if (!zerouNesteAperto) {
       // Soltou o botão: conta um visitante
       if (visitantes < 65535) visitantes++;
-      salvarContador();
+      salvarPendente = true;
       envioPendente = true;
       rodapeAte = 0;
       telaSuja = true;
@@ -196,7 +274,7 @@ void lerBotao() {
   if (botaoApertado && !zerouNesteAperto && agora - inicioAperto >= TEMPO_ZERAR_MS) {
     zerouNesteAperto = true;
     visitantes = 0;
-    salvarContador();
+    salvarPendente = true;
     envioPendente = true;
     mostrarRodape("Contador zerado", 2000);
     Serial.println("Contador zerado");
@@ -229,7 +307,6 @@ void setup() {
 
   memoria.begin("demo", false);
   visitantes = memoria.getUShort("visitantes", 0);
-  enviadoTotal = visitantes;
   envioPendente = true;  // Envia o total atual logo após conectar, para a página sincronizar
 
   desenharTela();
@@ -285,7 +362,9 @@ void loop() {
 
   lerBotao();
   atualizarLed();
+  acompanharTransmissao();
   tentarEnviar();
+  salvarSePuder();
 
   // Redesenha a tela quando algo mudou, quando uma mensagem temporária expira
   // e uma vez por segundo (para a contagem regressiva do próximo envio)

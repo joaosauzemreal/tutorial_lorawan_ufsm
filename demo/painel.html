@@ -335,6 +335,8 @@
       mostrarNumero(estado.visitantes, animar && estado.visitantes !== totalMostrado);
     };
     if (primeiro) atualizar(false);
+    // Pacote com o mesmo total (reenvio de garantia da placa): só atualiza os detalhes
+    else if (novo && estado.visitantes === totalMostrado) atualizar(false);
     else if (novo) animarPacote(() => atualizar(true));
   }
 
