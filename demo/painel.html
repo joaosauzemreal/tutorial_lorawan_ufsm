@@ -26,34 +26,37 @@
     background: var(--papel);
     color: var(--tinta);
     font-family: var(--texto);
+    font-size: 16px;                          /* navegadores antigos */
     font-size: clamp(16px, 1.25vw, 26px);
     line-height: 1.4;
     display: grid;
     grid-template-rows: auto 1fr auto auto;
     padding: 2.2vw 3.2vw;
+    grid-gap: 1.6vw;
     gap: 1.6vw;
     overflow: hidden;
   }
 
   /* ---------- topo ---------- */
-  header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-  .convite { font-family: var(--display); font-weight: 500; font-size: 1.7em; margin: 0; }
+  header { display: flex; justify-content: space-between; align-items: center; }
+  .convite { font-family: var(--display); font-weight: 500; font-size: 1.7em; margin: 0 1rem 0 0; }
   .convite kbd {
     font-family: var(--texto); font-weight: 700; font-size: .8em;
     border: 2px solid var(--tinta); border-bottom-width: 5px; border-radius: .4em;
     padding: .05em .45em; background: #fff;
   }
-  .rede { display: flex; align-items: center; gap: .5em; color: var(--tinta-suave); white-space: nowrap; }
-  .rede i { width: .75em; height: .75em; border-radius: 50%; background: var(--alerta); display: inline-block; }
+  .rede { display: flex; align-items: center; color: var(--tinta-suave); white-space: nowrap; }
+  .rede i { width: .75em; height: .75em; border-radius: 50%; background: var(--alerta); display: inline-block; margin-right: .5em; }
   .rede.ok i { background: var(--ok); }
 
   /* ---------- contador ---------- */
-  .contador { display: flex; align-items: center; gap: 3vw; min-height: 0; }
+  .contador { display: flex; align-items: center; min-height: 0; }
   .numero {
     font-family: var(--display); font-weight: 800;
+    font-size: 23vw;                          /* navegadores antigos */
     font-size: clamp(120px, 23vw, 520px); line-height: .8;
     letter-spacing: -.04em; font-variant-numeric: tabular-nums;
-    margin: 0; color: var(--tinta);
+    margin: 0 3vw 0 0; color: var(--tinta);
     transform-origin: left 70%;
   }
   .numero.vazio { color: var(--linha); }
@@ -69,13 +72,13 @@
   .trilho .base { stroke: var(--linha); stroke-width: 3; fill: none; }
   .trilho .onda { stroke: var(--cobalto); stroke-width: 3; fill: none; }
   .trilho .faisca { fill: var(--pulso); stroke: var(--tinta); stroke-width: 2; opacity: 0; }
-  .paradas { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2vw; margin: 0; padding: 0; list-style: none; }
+  .paradas { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); grid-gap: 2vw; gap: 2vw; margin: 0; padding: 0; list-style: none; }
   .parada { display: flex; flex-direction: column; align-items: flex-start; }
   .parada:last-child { align-items: flex-end; text-align: right; }
   .marco {
     width: 3.2em; height: 3.2em; margin: 1.9em 0 .8em; border-radius: 50%;
     background: #fff; border: 3px solid var(--tinta);
-    display: grid; place-items: center; position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: center; position: relative; z-index: 1;
     transition: background .25s, transform .25s;
   }
   .marco svg { width: 1.7em; height: 1.7em; stroke: var(--tinta); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -86,10 +89,10 @@
 
   /* ---------- curiosidade ---------- */
   footer {
-    display: flex; gap: 1.2em; align-items: baseline;
+    display: flex; align-items: baseline;
     border-top: 3px solid var(--tinta); padding-top: 1vw;
   }
-  footer strong { font-family: var(--display); font-weight: 800; white-space: nowrap; }
+  footer strong { margin-right: 1.2em; font-family: var(--display); font-weight: 800; white-space: nowrap; }
   #curiosidade { margin: 0; transition: opacity .5s; max-width: 75ch; }
   #curiosidade.trocando { opacity: 0; }
 
@@ -97,13 +100,16 @@
 
   /* tablet em pé: número em cima, texto embaixo */
   @media (orientation: portrait) and (min-width: 761px) {
-    .contador { flex-direction: column; align-items: flex-start; justify-content: center; gap: 2vh; }
+    .contador { flex-direction: column; align-items: flex-start; justify-content: center; }
+    .numero { margin: 0 0 2vh; }
     .numero { font-size: 40vw; }
     .legenda { max-width: 30ch; }
   }
   @media (max-width: 760px) {
     html, body { height: auto; }
-    body { overflow: auto; font-size: 16px; padding: 16px; gap: 24px; grid-template-rows: none; }
+    body { overflow: auto; font-size: 16px; padding: 16px; grid-gap: 24px; gap: 24px; grid-template-rows: none; }
+    .numero { margin: 0 0 16px; }
+    .convite { margin: 0 0 8px; }
     .legenda p { font-size: 1.4em; }
     .aviso-sim { position: static; }
     header, .contador { flex-direction: column; align-items: flex-start; }
@@ -175,6 +181,8 @@
   const $ = (id) => document.getElementById(id);
   const fmtHora = new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
   const fmtNum = new Intl.NumberFormat("pt-BR");
+  // A TTN manda a hora com nanossegundos; o Safari antigo só entende até milissegundos
+  const data = (texto) => new Date(String(texto).replace(/(\.\d{3})\d+/, "$1"));
   const semMovimento = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const curiosidades = [
@@ -288,9 +296,9 @@
         : `SNR de <b>${num(u.snr)} dB</b>.`) +
       (u.gateways > 1 ? ` ${u.gateways} gateways ouviram este pacote.` : "");
     $("t-ttn").innerHTML =
-      `Recebeu o pacote nº <b>${u.contador_quadro ?? "?"}</b>` +
+      `Recebeu o pacote nº <b>${u.contador_quadro != null ? u.contador_quadro : "?"}</b>` +
       (u.gateway ? ` vindo de <b>${u.gateway}</b>` : "") + `.`;
-    $("t-tela").innerHTML = `Atualizada às <b>${fmtHora.format(new Date(u.recebido_em))}</b>.`;
+    $("t-tela").innerHTML = `Atualizada às <b>${fmtHora.format(data(u.recebido_em))}</b>.`;
   }
 
   let totalMostrado = null;
@@ -331,7 +339,7 @@
     ultimoPacote = chave;
     const atualizar = (animar) => {
       textosDoPacote(u);
-      $("quando").textContent = `Último sinal recebido às ${fmtHora.format(new Date(u.recebido_em))}.`;
+      $("quando").textContent = `Último sinal recebido às ${fmtHora.format(data(u.recebido_em))}.`;
       mostrarNumero(estado.visitantes, animar && estado.visitantes !== totalMostrado);
     };
     if (primeiro) atualizar(false);
