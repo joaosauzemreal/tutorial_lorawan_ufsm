@@ -259,6 +259,10 @@ O tutorial só envia a temperatura, mas o caminho é este:
 
 A ligação e o código do sensor de umidade não fazem parte do tutorial.
 
+## Onde comprar a placa Heltec e quanto ela custa?
+
+**O tutorial não indica lojas nem preços.** Ele só explica como usar a placa Heltec WiFi LoRa 32 V3 (com a antena) na rede da UFSM. Para comprar, procure pelo nome exato do modelo, "Heltec WiFi LoRa 32 V3", e confira se a versão é para a faixa de 915 MHz, a usada no Brasil.
+
 ## Como montar ou configurar um gateway LoRaWAN próprio?
 
 **Isso não faz parte do tutorial.** O tutorial usa os gateways que a UFSM já tem, registrados no cluster eu1 da TTN; quem segue o tutorial não precisa instalar nem configurar gateway. Para montar um gateway próprio, consulte a documentação da TTN e do fabricante do gateway.

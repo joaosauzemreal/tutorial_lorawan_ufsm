@@ -178,7 +178,7 @@ Mensagens de uma ou duas palavras, que antes faziam o modelo inventar respostas.
 | 105 | o que é LPWAN | Low Power Wide Area Network: redes de longo alcance e baixo consumo | [modelo]; low power/baixo consumo |
 | 106 | lora serve pra mandar video? | Não; a taxa de dados é baixa, serve para mensagens pequenas | [modelo]; nao; pequen/baixa |
 | 107 | o que é a modulação chirp do lora | CSS (Chirp Spread Spectrum): a frequência varia no tempo; resiste a ruído | [modelo]; chirp |
-| 108 | dá pra usar lora sem lorawan? | Sim, comunicação direta entre dois rádios, mas sem gateways, servidor de rede e segurança do LoRaWAN | [modelo]; sim; direta/dois radios/sem gateways |
+| 108 | dá pra usar lora sem lorawan? | Sim, comunicação direta entre dois rádios, mas sem gateways, servidor de rede e segurança do LoRaWAN | [modelo]; sim; direta/dois radios/sem gateways/servidor de rede |
 | 109 | o que é a classe C | O rádio fica ouvindo o tempo todo; recebe comandos na hora, mas consome muita energia | [modelo]; tempo todo/sempre/continu |
 | 110 | qual classe a placa do tutorial usa | Classe A | [modelo]; classe a |
 | 111 | o que é o SX1262 | O rádio LoRa da Heltec WiFi LoRa 32 V3 | [modelo]; radio |
@@ -189,7 +189,7 @@ Mensagens de uma ou duas palavras, que antes faziam o modelo inventar respostas.
 
 | # | Pergunta | A resposta precisa conter | Verificação |
 |---|----------|---------------------------|-------------|
-| 114 | qual o link do moodle da ufsm | Recusar | [recusa] |
+| 114 | qual o link do moodle da ufsm | Recusar ou dizer que não está no tutorial, sem inventar link | [recusa/modelo]; !http |
 | 115 | como faço um bolo de cenoura | Recusar | [recusa] |
 | 116 | quanto é 2+2 | Recusar ou pedir detalhes | [recusa/detalhes] |
 | 117 | escreve um código em python pra ordenar uma lista | Recusar | [recusa] |

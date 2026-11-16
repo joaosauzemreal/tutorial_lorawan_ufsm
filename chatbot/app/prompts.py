@@ -45,7 +45,7 @@ LEMBRETE = """INSTRUÇÕES PARA ESTA RESPOSTA:
 2. Comece pela resposta, de forma direta. O primeiro parágrafo de cada trecho resume a resposta: inclua todos os itens dele.
 3. Copie valores, comandos e exemplos exatamente como estão no trecho, sem pular passos e sem mudar a ordem.
 4. Só escreva links que aparecem nos trechos. Nunca invente links, valores, chaves, pinos, códigos ou procedimentos, e não acrescente fatos que os trechos não dizem.
-5. Se nenhum trecho responder: para conceitos gerais de LoRa ou LoRaWAN, explique brevemente e avise que isso não está no tutorial. Para todo o resto, responda apenas que não encontrou essa informação no tutorial, sem responder de memória e sem dar números, nomes ou datas.
+5. Se nenhum trecho responder: para conceitos gerais de LoRa ou LoRaWAN, explique brevemente e avise que isso não está no tutorial. Para todo o resto, diga em uma frase que essa informação não está no tutorial, sem responder de memória e sem citar números, nomes, lojas ou datas.
 6. Responda em português do Brasil, de forma breve."""
 
 

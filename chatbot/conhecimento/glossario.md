@@ -24,7 +24,7 @@ O DevEUI é o identificador único do dispositivo, com 8 bytes. No cadastro do d
 
 ## ABP (Activation By Personalization)
 
-ABP é a ativação sem join: o endereço (DevAddr) e as chaves de sessão ficam gravados fixos no dispositivo. É mais simples, mas menos segura que o OTAA. O tutorial não usa ABP.
+ABP é a ativação sem join: o endereço (DevAddr) e as chaves de sessão ficam gravados fixos no dispositivo. É mais simples, mas menos segura que o OTAA. O tutorial não usa ABP: ele usa OTAA.
 
 ## Gateway
 
@@ -89,6 +89,10 @@ A The Things Network é uma rede LoRaWAN pública e comunitária, em que qualque
 ## Classe A
 
 Classe A é a classe de dispositivo LoRaWAN usada no tutorial e a que mais economiza energia: depois de cada uplink, a placa abre duas janelas curtas de recepção (RX1 e RX2).
+
+## Classe C
+
+Na classe C, o rádio do dispositivo fica **ouvindo o tempo todo**, exceto quando transmite. Recebe comandos quase na hora, mas consome muita energia e normalmente precisa de alimentação na tomada. O tutorial usa a classe A.
 
 ## ACK
 
