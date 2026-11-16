@@ -390,7 +390,17 @@
     );
     document.getElementById('nova').addEventListener('click', () => location.reload());
 
-    verificarStatus();
+    // Perguntas enviadas pela página do projeto (GitHub Pages), que abre este chat num painel:
+    // na primeira abertura vêm em ?pergunta=..., depois por postMessage. Só aceita a origem do Pages.
+    const ORIGENS_PERMITIDAS = ['https://joaosauzemreal.github.io'];
+    window.addEventListener('message', e => {
+      if (ORIGENS_PERMITIDAS.indexOf(e.origin) < 0 || !e.data || e.data.tipo !== 'perguntar') return;
+      if (typeof e.data.texto === 'string') enviar(e.data.texto.slice(0, 500));
+    });
+    const perguntaInicial = new URLSearchParams(location.search).get('pergunta');
+    if (perguntaInicial) history.replaceState(null, '', location.pathname);  // recarregar não repete a pergunta
+
+    verificarStatus().then(() => { if (perguntaInicial) enviar(perguntaInicial.slice(0, 500)); });
     entrada.focus();
   </script>
 </body>

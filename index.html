@@ -79,6 +79,71 @@
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+
+    /* ---------- Balão flutuante do assistente (fixo em todos os slides) ---------- */
+    #balao-assistente { position: fixed; right: 20px; bottom: 96px; z-index: 30; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+    #balao-botao {
+      position: relative; width: 64px; height: 64px; border-radius: 9999px; border: 0; cursor: pointer;
+      background: linear-gradient(135deg, #10b981, #0284c7); color: #fff;
+      box-shadow: 0 12px 28px -8px rgba(2, 132, 199, 0.55);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s;
+    }
+    #balao-botao:hover { transform: scale(1.08) rotate(-4deg); box-shadow: 0 16px 32px -8px rgba(2, 132, 199, 0.65); }
+    #balao-botao:active { transform: scale(0.95); }
+    #balao-botao svg { width: 30px; height: 30px; }
+    #balao-botao::before {  /* anel pulsando em volta do botão */
+      content: ""; position: absolute; inset: 0; border-radius: 9999px; border: 3px solid #34d399;
+      animation: balao-pulso 2.4s ease-out infinite;
+    }
+    #balao-botao .selo {  /* bolinha "online" */
+      position: absolute; top: 3px; right: 3px; width: 14px; height: 14px; border-radius: 9999px;
+      background: #22c55e; border: 2px solid #fff;
+    }
+    @keyframes balao-pulso { 0% { transform: scale(1); opacity: 0.8; } 80%, 100% { transform: scale(1.5); opacity: 0; } }
+
+    #balao-cartao {
+      position: relative; width: 280px; max-width: calc(100vw - 40px); padding: 14px 14px 12px; border-radius: 18px;
+      background: #fff; border: 1px solid #e2e8f0; box-shadow: 0 18px 40px -12px rgba(15, 23, 42, 0.25);
+      text-align: left; transform-origin: bottom right;
+      transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    #balao-cartao::after {  /* "rabinho" do balão de fala, apontando para o botão */
+      content: ""; position: absolute; right: 24px; bottom: -8px; width: 16px; height: 16px;
+      background: #fff; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; transform: rotate(45deg);
+    }
+    #balao-cartao.escondido { opacity: 0; transform: translateY(10px) scale(0.9); pointer-events: none; }
+    #balao-cartao .titulo { font-size: 13px; font-weight: 800; color: #0f172a; padding-right: 22px; }
+    #balao-cartao .sub { font-size: 11px; color: #64748b; margin: 2px 0 10px; }
+    #balao-cartao .fechar {
+      position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 9999px; border: 0;
+      background: #f1f5f9; color: #475569; font-weight: 700; cursor: pointer; line-height: 1;
+    }
+    #balao-cartao .fechar:hover { background: #e2e8f0; }
+    #balao-sugestoes { display: flex; flex-direction: column; gap: 6px; transition: opacity 0.2s; }
+    #balao-sugestoes button {
+      text-align: left; font-size: 12px; font-weight: 600; color: #075985; cursor: pointer;
+      background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 7px 10px;
+      transition: background 0.15s, transform 0.15s;
+    }
+    #balao-sugestoes button:hover { background: #e0f2fe; transform: translateX(-2px); }
+    #balao-sugestoes button::before { content: "💬 "; }
+
+    /* O painel do chat abre como um pop-up que cresce a partir do balão */
+    #chat-painel {
+      transform-origin: bottom right;
+      transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.34, 1.3, 0.64, 1), visibility 0s;
+    }
+    #chat-painel.fechado {
+      opacity: 0; transform: translate(24px, 24px) scale(0.85); visibility: hidden; pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #chat-painel, #chat-painel.fechado { transition: none; }
+      #balao-botao::before { animation: none; display: none; }
+      #balao-botao, #balao-cartao, #balao-sugestoes button { transition: none; }
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between overflow-hidden relative selection:bg-sky-500 selection:text-white">
@@ -526,7 +591,7 @@
 
   <!-- Painel do Assistente LoRaWAN UFSM (chatbot no servidor, publicado pelo Tailscale Funnel) -->
   <div id="chat-fundo" onclick="fecharChat()" class="fixed inset-0 bg-slate-900/30 z-40 hidden"></div>
-  <aside id="chat-painel" aria-hidden="true" class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white shadow-2xl border-l border-slate-200 z-50 flex flex-col transition-transform duration-300 translate-x-full">
+  <aside id="chat-painel" aria-hidden="true" class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white shadow-2xl border-l border-slate-200 z-50 flex flex-col fechado">
     <!-- Só os controles do painel: o nome e o status do assistente já aparecem no cabeçalho do próprio chat -->
     <div class="flex items-center justify-end gap-3 px-3 py-1.5 border-b border-slate-200 bg-slate-50">
       <a id="chat-nova-aba" href="https://joao-1.sokoke-minor.ts.net/" target="_blank" rel="noopener" class="text-xs text-sky-700 hover:underline font-semibold">Abrir em nova aba ↗</a>
@@ -536,27 +601,100 @@
     <p class="px-4 py-2 text-[11px] text-slate-500 border-t border-slate-200">Se o chat não carregar, o servidor da UFSM pode estar desligado no momento.</p>
   </aside>
 
+  <!-- Balão flutuante do assistente: fica no canto inferior direito em todos os slides e
+       sugere perguntas sobre o slide que está na tela -->
+  <div id="balao-assistente">
+    <div id="balao-cartao" class="escondido" role="dialog" aria-label="Sugestões do assistente">
+      <button class="fechar" onclick="dispensarBalao()" aria-label="Esconder as sugestões" title="Esconder">×</button>
+      <p class="titulo">Ficou com alguma dúvida? 👋</p>
+      <p class="sub">Pergunte ao assistente. Por exemplo:</p>
+      <div id="balao-sugestoes"></div>
+    </div>
+    <button id="balao-botao" onclick="abrirChat()" aria-label="Abrir o assistente LoRaWAN" title="Assistente LoRaWAN UFSM">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.83L3 20l1.4-3.72A7.6 7.6 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+      <span class="selo"></span>
+    </button>
+  </div>
+
   <script>
     // Endereço público do chatbot (Tailscale Funnel). O chat só é carregado quando o painel é aberto.
     const CHAT_URL = 'https://joao-1.sokoke-minor.ts.net/';
+    const CHAT_ORIGEM = 'https://joao-1.sokoke-minor.ts.net';
     const chatPainel = document.getElementById('chat-painel');
     const chatFundo = document.getElementById('chat-fundo');
     const chatFrame = document.getElementById('chat-frame');
+    const balaoCartao = document.getElementById('balao-cartao');
+    const balaoSugestoes = document.getElementById('balao-sugestoes');
     let chatAberto = false;
+    let chatCarregado = false;
+    let perguntaPendente = null;
 
-    function abrirChat() {
-      if (!chatFrame.src) chatFrame.src = CHAT_URL;
-      chatPainel.classList.remove('translate-x-full');
+    chatFrame.addEventListener('load', () => {
+      chatCarregado = true;
+      if (perguntaPendente) {
+        chatFrame.contentWindow.postMessage({ tipo: 'perguntar', texto: perguntaPendente }, CHAT_ORIGEM);
+        perguntaPendente = null;
+      }
+    });
+
+    // Abre o painel. Com uma pergunta, o chat já a envia.
+    function abrirChat(pergunta) {
+      if (!chatFrame.getAttribute('src')) {
+        chatFrame.src = CHAT_URL + (pergunta ? '?pergunta=' + encodeURIComponent(pergunta) : '');
+      } else if (pergunta) {
+        if (chatCarregado) chatFrame.contentWindow.postMessage({ tipo: 'perguntar', texto: pergunta }, CHAT_ORIGEM);
+        else perguntaPendente = pergunta;
+      }
+      chatPainel.classList.remove('fechado');
       chatPainel.setAttribute('aria-hidden', 'false');
       chatFundo.classList.remove('hidden');
+      balaoCartao.classList.add('escondido');
       chatAberto = true;
     }
 
     function fecharChat() {
-      chatPainel.classList.add('translate-x-full');
+      chatPainel.classList.add('fechado');
       chatPainel.setAttribute('aria-hidden', 'true');
       chatFundo.classList.add('hidden');
       chatAberto = false;
+    }
+
+    // Perguntas sugeridas para cada slide (na ordem dos slides)
+    const SUGESTOES = [
+      ['O que é LoRaWAN?', 'O que é a The Things Network?'],
+      ['Quanto tempo dura a bateria com LoRaWAN?', 'Qual a distância máxima até o gateway?'],
+      ['Qual a diferença entre LoRa e LoRaWAN?', 'Dá para usar LoRa sem LoRaWAN?'],
+      ['Qual a diferença entre classe A, B e C?', 'Qual classe a placa do tutorial usa?'],
+      ['O que é OTAA?', 'O que é spreading factor?'],
+      ['Onde fica o gateway da UFSM?', 'Por que a UFSM usa o servidor da Europa?'],
+      ['Qual frequency plan eu escolho?', 'O que coloco no JoinEUI?'],
+      ['Minha placa fica em ENVIANDO JOIN, o que faço?', 'Posso ligar a placa sem antena?'],
+    ];
+    let balaoDispensado = false;
+    let balaoMostrado = false;
+    try { balaoDispensado = sessionStorage.getItem('balaoDispensado') === '1'; } catch (e) {}
+
+    function atualizarBalao(indice) {
+      const perguntas = SUGESTOES[indice] || SUGESTOES[0];
+      balaoSugestoes.style.opacity = '0';
+      setTimeout(() => {
+        balaoSugestoes.innerHTML = '';
+        perguntas.forEach(p => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = p;
+          b.onclick = () => abrirChat(p);
+          balaoSugestoes.appendChild(b);
+        });
+        balaoSugestoes.style.opacity = '1';
+      }, 150);
+      if (!balaoDispensado && !chatAberto) balaoCartao.classList.remove('escondido');
+    }
+
+    function dispensarBalao() {
+      balaoDispensado = true;
+      balaoCartao.classList.add('escondido');
+      try { sessionStorage.setItem('balaoDispensado', '1'); } catch (e) {}
     }
   </script>
 
@@ -616,6 +754,7 @@
 
       btnPrev.disabled = currentSlide === 0;
       btnNext.disabled = currentSlide === slides.length - 1;
+      if (balaoMostrado) atualizarBalao(currentSlide);
     }
 
     function changeSlide(direction) {
@@ -665,6 +804,8 @@
     if (location.hash === '#video') currentSlide = videoSlideIndex;
     updateUI();
     if (abrirAssistente) abrirChat();
+    // As sugestões do balão aparecem sozinhas alguns segundos depois de a página abrir
+    setTimeout(() => { balaoMostrado = true; atualizarBalao(currentSlide); }, 2500);
   </script>
 </body>
 </html>
