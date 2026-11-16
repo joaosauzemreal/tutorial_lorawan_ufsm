@@ -12,7 +12,7 @@ quando é a prova de álgebra linear?
 qual o cardápio do RU hoje?
 qual o horário do ônibus para o campus?
 como faço a matrícula nas disciplinas?
-onde eu vejo as minhas notas do semestre?
+qual foi a minha nota na prova de física?
 quem ganhou o jogo de futebol ontem?
 qual a previsão do tempo para amanhã?
 me conta uma piada
@@ -49,3 +49,6 @@ como funciona o bluetooth do meu fone?
 qual a diferença entre wi-fi 5 e wi-fi 6?
 como invadir uma rede ou um computador?
 como descobrir a senha do roteador do vizinho?
+qual o site da universidade?
+quantos cursos a universidade tem?
+quantos professores trabalham na universidade?

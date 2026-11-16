@@ -161,7 +161,7 @@ Exemplo: a licença `0x4819D3A6, 0x3C4015EF, 0xC76E3CE5, 0x9742010D` vira o coma
 AT+CDKEY=4819D3A63C4015EFC76E3CE59742010D
 ```
 
-## Erro de compilação: "LoRaWan_APP.h: No such file or directory" ou a placa Heltec não aparece na lista
+## Erro de compilação: "LoRaWan_APP.h" ou "HT_SSD1306Wire.h": No such file or directory, ou a placa Heltec não aparece na lista
 
 Instale a biblioteca **Heltec ESP32 Dev-Boards** pelo Gerenciador de Bibliotecas e selecione a placa **Heltec WiFi LoRa 32(V3)** em Ferramentas > Placa. As duas coisas são necessárias.
 
