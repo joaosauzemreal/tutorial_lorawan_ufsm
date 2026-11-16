@@ -72,7 +72,7 @@ python servidor.py
 
 Abra **http://localhost:8001** e aperte **F11** para tela cheia. O canto superior direito mostra se o painel está ligado à TTN.
 
-**Para ensaiar sem placa** (ou testar o projetor antes do evento):
+**Para testar sem placa e sem TTN:**
 
 ```bash
 python servidor.py --simular
@@ -105,21 +105,3 @@ Comandos úteis:
 | Ver se está rodando | `systemctl status painel-visitantes` |
 | Ver o log (pacotes recebidos, erros da TTN) | `journalctl -u painel-visitantes -f` |
 | Desligar | `sudo systemctl disable --now painel-visitantes` |
-
-## Checklist do evento
-
-- [ ] Um dia antes, no **mesmo local** do evento: ligar a placa e conferir na aba **Live data** da TTN se os pacotes da porta 3 chegam. Se não chegarem, aproximar a placa de uma janela ou usar `DATA_RATE 3`.
-- [ ] Testar a internet do local com o painel ligado (indicador verde "Ligado à The Things Network"). Se a rede do evento bloquear a porta 8883, usar o roteador do celular.
-- [ ] Antena sempre conectada antes de ligar a placa.
-- [ ] Zerar o contador (segurar PRG 3 s) antes de abrir para o público.
-- [ ] Deixar `python servidor.py --simular` pronto como plano B se a rede cair.
-
-## Roteiro de 2 minutos para o público
-
-> Esta plaquinha tem um rádio, mas não usa Wi-Fi nem chip de celular. Quando você aperta o botão, ela "grita" um pacote de 4 bytes pelo ar usando uma tecnologia chamada **LoRa**, de *Long Range*: em campo aberto, esse sinal pode passar de 10 km.
->
-> Em um dos prédios do campus tem uma antena, o **gateway**, que fica escutando. Ela não sabe nada sobre esta placa: só repassa o pacote pela internet para a **The Things Network**, uma rede comunitária mantida por universidades, empresas e voluntários no mundo todo. O pacote vai criptografado, e só nós temos a chave para ler o número.
->
-> O nosso computador recebe o pacote e mostra o total aqui no telão. Vejam o **RSSI**: é a força com que o gateway ouviu a placa. E o **SNR**: quando ele fica negativo, o sinal chegou mais fraco que o ruído de fundo, e mesmo assim foi entendido. É por isso que LoRa alcança tão longe gastando pouca bateria.
->
-> Isso é usado de verdade para medir umidade do solo em lavouras, nível de rios, temperatura de estufas e vagas de estacionamento. Agora aperta o botão!
