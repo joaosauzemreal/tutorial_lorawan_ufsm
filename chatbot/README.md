@@ -96,7 +96,7 @@ Para ensinar algo novo ao bot (um erro novo, por exemplo), acrescente uma seçã
 
 ## Testar e comparar modelos
 
-O arquivo [`avaliacao/perguntas_teste.md`](avaliacao/perguntas_teste.md) tem 28 perguntas, com o que cada resposta precisa conter. O script abaixo faz todas as perguntas e salva as respostas e o tempo de cada uma em `avaliacao/resultados/`:
+O arquivo [`avaliacao/perguntas_teste.md`](avaliacao/perguntas_teste.md) tem 208 perguntas, separadas em ajuste e validação, com o que cada resposta precisa conter e regras de correção automática. O script abaixo faz todas as perguntas, corrige e salva as respostas e o tempo de cada uma em `avaliacao/resultados/`:
 
 ```bash
 docker compose exec app python -m app.avaliar                       # modelo atual
