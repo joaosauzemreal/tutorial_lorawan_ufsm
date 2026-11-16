@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Assistente LoRaWAN UFSM</title>
+  <title>LorIA · Assistente LoRaWAN UFSM</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
@@ -147,8 +147,8 @@
     <div class="marca">
       <span class="ponto" id="ponto"></span>
       <div>
-        <h1>Assistente LoRaWAN UFSM</h1>
-        <p id="subtitulo">Tutorial Heltec V3 + The Things Network</p>
+        <h1>LorIA</h1>
+        <p id="subtitulo">Assistente LoRaWAN da UFSM</p>
       </div>
     </div>
     <div class="acoes">
@@ -163,7 +163,7 @@
     <div class="coluna" id="conversa">
       <section class="boas-vindas" id="boas-vindas">
         <span class="selo">📡 Projeto Integrador IV · UFSM</span>
-        <h2>Dúvidas sobre <span>LoRaWAN</span> e o tutorial?</h2>
+        <h2>Oi! Eu sou a <span>LorIA</span> 👋</h2>
         <p>Pergunte sobre qualquer etapa da conexão da Heltec WiFi LoRa 32 V3 à rede da UFSM, sobre erros que apareceram ou sobre como funcionam LoRa, LoRaWAN e a TTN.</p>
         <div class="sugestoes">
           <button class="sugestao" type="button"><small>Problema</small>Minha placa fica em "ENVIANDO JOIN" e não conecta</button>
@@ -255,7 +255,7 @@
         ponto.classList.toggle('pronto', pronto);
         if (pronto) {
           aviso.style.display = 'none';
-          subtitulo.textContent = `Tutorial Heltec V3 + TTN · modelo ${s.modelo}`;
+          subtitulo.textContent = `Assistente LoRaWAN da UFSM · modelo ${s.modelo}`;
           return;
         }
         aviso.className = s.situacao === 'erro' ? 'erro' : '';

@@ -16,10 +16,10 @@ Prefere acompanhar em vídeo? O passo a passo completo deste guia, da criação 
 
 ## 💬 Assistente (chatbot) do tutorial
 
-Ficou com alguma dúvida? O **Assistente LoRaWAN UFSM** responde perguntas sobre este tutorial, LoRa, LoRaWAN e a The Things Network:
+Ficou com alguma dúvida? A **LorIA** (LoRa + IA), assistente do tutorial, responde perguntas sobre este tutorial, LoRa, LoRaWAN e a The Things Network:
 
 * **Direto:** [https://joao-1.sokoke-minor.ts.net](https://joao-1.sokoke-minor.ts.net)
-* **Na página do projeto:** botão **💬 Assistente** no [GitHub Pages](https://joaosauzemreal.github.io/tutorial_lorawan_ufsm/#assistente)
+* **Na página do projeto:** balão da **LorIA** no canto inferior direito do [GitHub Pages](https://joaosauzemreal.github.io/tutorial_lorawan_ufsm/#assistente)
 
 O assistente roda num servidor da UFSM, com um modelo de IA local. Se ele não abrir, o servidor pode estar desligado no momento. Como ele funciona está em [`chatbot/`](chatbot/README.md).
 

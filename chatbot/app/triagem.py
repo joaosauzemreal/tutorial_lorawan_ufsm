@@ -24,6 +24,7 @@ SAUDACOES = {
     "bom dia", "boa tarde", "boa noite", "tudo bem", "tudo bom", "oi tudo bem", "ola tudo bem",
     "oi bom dia", "oi boa tarde", "oi boa noite", "ola bom dia", "ola boa tarde", "ola boa noite",
     "quem e voce", "quem e vc", "o que voce faz", "o que vc faz", "ajuda", "help", "menu",
+    "qual seu nome", "qual o seu nome", "qual e o seu nome", "como voce se chama", "oi loria", "ola loria", "loria",
 }
 AGRADECIMENTOS = {
     "obrigado", "obrigada", "obg", "brigado", "brigada", "muito obrigado", "muito obrigada",

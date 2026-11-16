@@ -82,6 +82,19 @@
 
     /* ---------- Balão flutuante do assistente (fixo em todos os slides) ---------- */
     #balao-assistente { position: fixed; right: 20px; bottom: 96px; z-index: 30; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+    .balao-linha { display: flex; align-items: center; gap: 10px; }
+    #balao-nome {
+      display: flex; flex-direction: column; align-items: flex-end; line-height: 1.15; cursor: pointer;
+      padding: 7px 14px; border-radius: 9999px; background: #fff; border: 1px solid #e2e8f0;
+      box-shadow: 0 8px 20px -8px rgba(15, 23, 42, 0.25); transition: transform 0.2s;
+    }
+    #balao-nome:hover { transform: translateX(-3px); }
+    #balao-nome strong { font-size: 16px; font-weight: 900; color: #0f172a; letter-spacing: -0.01em; }
+    #balao-nome strong span {
+      background: linear-gradient(135deg, #10b981, #0284c7); -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    #balao-nome small { font-size: 10px; font-weight: 600; color: #64748b; }
+    @media (max-width: 480px) { #balao-nome small { display: none; } }
     #balao-botao {
       position: relative; width: 64px; height: 64px; border-radius: 9999px; border: 0; cursor: pointer;
       background: linear-gradient(135deg, #10b981, #0284c7); color: #fff;
@@ -161,7 +174,7 @@
     <div class="flex items-center gap-3">
       <button onclick="abrirChat()" class="px-3.5 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-xs text-white font-semibold transition flex items-center gap-1.5 cursor-pointer shadow-sm" title="Tire dúvidas sobre o tutorial com o assistente">
         <span>💬</span>
-        <span>Assistente</span>
+        <span>LorIA</span>
       </button>
       <button onclick="goToVideo()" class="px-3.5 py-1.5 rounded-full bg-sky-600 hover:bg-sky-500 text-xs text-white font-semibold transition flex items-center gap-1.5 cursor-pointer shadow-sm">
         <span>▶</span>
@@ -597,7 +610,7 @@
       <a id="chat-nova-aba" href="https://joao-1.sokoke-minor.ts.net/" target="_blank" rel="noopener" class="text-xs text-sky-700 hover:underline font-semibold">Abrir em nova aba ↗</a>
       <button onclick="fecharChat()" aria-label="Fechar o assistente" title="Fechar (Esc)" class="w-7 h-7 rounded-full bg-white hover:bg-slate-200 border border-slate-300 text-slate-700 font-bold leading-none">×</button>
     </div>
-    <iframe id="chat-frame" title="Assistente LoRaWAN UFSM" class="flex-1 w-full border-0"></iframe>
+    <iframe id="chat-frame" title="LorIA, assistente LoRaWAN da UFSM" class="flex-1 w-full border-0"></iframe>
     <p class="px-4 py-2 text-[11px] text-slate-500 border-t border-slate-200">Se o chat não carregar, o servidor da UFSM pode estar desligado no momento.</p>
   </aside>
 
@@ -606,14 +619,20 @@
   <div id="balao-assistente">
     <div id="balao-cartao" class="escondido" role="dialog" aria-label="Sugestões do assistente">
       <button class="fechar" onclick="dispensarBalao()" aria-label="Esconder as sugestões" title="Esconder">×</button>
-      <p class="titulo">Ficou com alguma dúvida? 👋</p>
-      <p class="sub">Pergunte ao assistente. Por exemplo:</p>
+      <p class="titulo">Oi! Eu sou a LorIA 👋</p>
+      <p class="sub">Ficou com alguma dúvida? Pergunte, por exemplo:</p>
       <div id="balao-sugestoes"></div>
     </div>
-    <button id="balao-botao" onclick="abrirChat()" aria-label="Abrir o assistente LoRaWAN" title="Assistente LoRaWAN UFSM">
+    <div class="balao-linha">
+      <button id="balao-nome" type="button" onclick="abrirChat()" tabindex="-1" aria-hidden="true">
+        <strong>Lor<span>IA</span></strong>
+        <small>Assistente LoRaWAN da UFSM</small>
+      </button>
+    <button id="balao-botao" onclick="abrirChat()" aria-label="Abrir a LorIA, assistente LoRaWAN da UFSM" title="LorIA · Assistente LoRaWAN da UFSM">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.83L3 20l1.4-3.72A7.6 7.6 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
       <span class="selo"></span>
     </button>
+    </div>
   </div>
 
   <script>
