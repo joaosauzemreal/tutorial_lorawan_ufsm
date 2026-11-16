@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Atualiza o assistente com a versão do GitHub e reinicia o serviço.
-# Uso (no servidor):  ~/tutorial_lorawan_ufsm/chatbot/atualizar.sh
+# Uso (no servidor, instalação com o serviço systemd):  ./atualizar.sh  (dentro da pasta chatbot/)
 set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")"
 

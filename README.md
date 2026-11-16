@@ -21,7 +21,7 @@ Ficou com alguma dúvida? A **LorIA** (LoRa + IA), assistente do tutorial, respo
 * **Direto:** [https://joao-1.sokoke-minor.ts.net](https://joao-1.sokoke-minor.ts.net)
 * **Na página do projeto:** balão da **LorIA** no canto inferior direito do [GitHub Pages](https://joaosauzemreal.github.io/tutorial_lorawan_ufsm/#assistente)
 
-O assistente roda num servidor da UFSM, com um modelo de IA local. Se ele não abrir, o servidor pode estar desligado no momento. Como ele funciona está em [`chatbot/`](chatbot/README.md).
+A LorIA roda num servidor com um modelo de IA local, sem enviar nada para serviços externos. Se ela não abrir, o servidor pode estar desligado no momento. Como ele funciona está em [`chatbot/`](chatbot/README.md).
 
 ---
 

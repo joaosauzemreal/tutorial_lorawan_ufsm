@@ -2,7 +2,7 @@
 # Instala (ou atualiza) o painel de visitantes como serviço no servidor.
 # Depois disso o painel liga sozinho junto com o servidor, na porta 8001.
 #
-# Uso (no servidor):  ~/tutorial_lorawan_ufsm/demo/instalar_servico.sh
+# Uso (no servidor, dentro da pasta demo/):  ./instalar_servico.sh
 # Rodar de novo depois de um "git pull" aplica as mudanças e reinicia o painel.
 set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")"

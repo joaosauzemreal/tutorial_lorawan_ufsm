@@ -81,10 +81,10 @@ Para deixar rodando sempre, mesmo depois de reiniciar o servidor, edite os camin
 
 ## Atualizar o que o bot sabe
 
-O bot lê os documentos sempre que inicia. Depois de editar o `README.md` do tutorial ou os arquivos de `conhecimento/` e enviar para o GitHub, rode no servidor:
+O bot lê os documentos sempre que inicia. Depois de editar o `README.md` do tutorial ou os arquivos de `conhecimento/` (e enviar para o GitHub, se o servidor baixa de lá), rode no servidor, dentro da pasta `chatbot/`:
 
 ```bash
-~/tutorial_lorawan_ufsm/chatbot/atualizar.sh    # instalação sem Docker (serviço systemd)
+./atualizar.sh                                  # instalação sem Docker (serviço systemd)
 # ou, com Docker:  git pull && docker compose up -d --build app
 ```
 
@@ -143,16 +143,17 @@ Sem GPU, quem define a velocidade é o processador. O tempo até a primeira pala
 
 ## Acesso pela rede
 
-- Na rede da UFSM, o chat fica em `http://IP-DO-SERVIDOR:8000`. Talvez seja preciso liberar a porta no firewall do servidor.
-- Para acesso de fora do campus e para o chat dentro do GitHub Pages, o servidor precisa de um endereço **HTTPS**. Hoje isso é feito pelo [Tailscale Funnel](https://tailscale.com/kb/1223/funnel), que publica o chat em **https://joao-1.sokoke-minor.ts.net** (porta 443; a 8443 é usada pela página do evento):
+- Na rede local, o chat fica em `http://IP-DO-SERVIDOR:8000` (no próprio computador, `http://localhost:8000`). Talvez seja preciso liberar a porta no firewall.
+- Para abrir o chat pela internet (e dentro de uma página como o GitHub Pages), o servidor precisa de um endereço **HTTPS**. Uma forma gratuita, sem abrir portas no roteador, é o [Tailscale Funnel](https://tailscale.com/kb/1223/funnel). Com o Tailscale instalado no servidor:
 
   ```bash
   sudo tailscale funnel --bg --https=443 http://127.0.0.1:8000   # ligar (continua ligado depois de reiniciar)
-  tailscale funnel status                                         # conferir
+  tailscale funnel status                                         # mostra o endereço público (https://NOME.SUA-REDE.ts.net)
   sudo tailscale funnel --https=443 off                           # desligar
   ```
 
-  O Funnel só aceita as portas 443, 8443 e 10000. A página do projeto no GitHub Pages (`index.html` na raiz do repositório) abre esse endereço num pop-up pelo balão da **LorIA**, no canto inferior direito; se o endereço mudar, troque `CHAT_URL` no `index.html`.
+  O Funnel só aceita as portas 443, 8443 e 10000. Outra opção é um proxy reverso (Nginx ou Caddy) com certificado HTTPS.
+- A página do projeto no GitHub Pages (`index.html` na raiz do repositório) abre a LorIA oficial do projeto num pop-up, pelo balão no canto inferior direito. Para apontar para o seu próprio chat, troque `CHAT_URL` e `CHAT_ORIGEM` no `index.html` e acrescente o endereço da sua página em `ORIGENS_PERMITIDAS`, no fim de `app/static/index.html`.
 - Com o chat aberto na internet, cada IP pode fazer no máximo `LIMITE_POR_MINUTO` perguntas por minuto e `LIMITE_POR_HORA` por hora (veja a tabela de configurações).
 
 ## Solução de problemas

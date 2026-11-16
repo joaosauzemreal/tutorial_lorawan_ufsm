@@ -80,20 +80,20 @@ python servidor.py --simular
 
 Visitantes inventados aparecem a cada 6–15 s, e a página avisa que está em modo de ensaio.
 
-### No servidor do laboratório, como serviço (opcional)
+### Num servidor Linux, como serviço (opcional)
 
-O painel também roda no servidor, ao lado do chatbot, e abre em qualquer aparelho ligado ao Tailscale (PC, celular, iPad). Um único comando prepara o Python, cria o `.env` e instala o serviço, que liga sozinho junto com o servidor:
+Se você tiver um servidor Linux (ou um computador que fica sempre ligado), o painel pode rodar nele como serviço e abrir em qualquer aparelho da mesma rede (PC, celular, tablet). Um único comando, dentro da pasta `demo/`, prepara o Python, cria o `.env` e instala o serviço, que liga sozinho junto com o servidor:
 
 ```bash
-~/tutorial_lorawan_ufsm/demo/instalar_servico.sh
+./instalar_servico.sh
 ```
 
-Endereço: `http://100.102.113.101:8001`.
+No final, o script mostra o endereço do painel, no formato `http://IP-DO-SERVIDOR:8001`.
 
 Na primeira vez, o `.env` é criado em **modo de ensaio** (`SIMULAR=1`). Para usar a placa de verdade:
 
 ```bash
-nano ~/tutorial_lorawan_ufsm/demo/.env      # preencha TTN_APP_ID e TTN_API_KEY e troque SIMULAR=1 por SIMULAR=0
+nano .env      # preencha TTN_APP_ID e TTN_API_KEY e troque SIMULAR=1 por SIMULAR=0
 sudo systemctl restart painel-visitantes
 ```
 
@@ -101,7 +101,7 @@ Comandos úteis:
 
 | Para | Comando |
 |---|---|
-| Atualizar depois de um `git pull` | `~/tutorial_lorawan_ufsm/demo/instalar_servico.sh` |
+| Atualizar depois de um `git pull` | `./instalar_servico.sh` (dentro de `demo/`) |
 | Ver se está rodando | `systemctl status painel-visitantes` |
 | Ver o log (pacotes recebidos, erros da TTN) | `journalctl -u painel-visitantes -f` |
 | Desligar | `sudo systemctl disable --now painel-visitantes` |
