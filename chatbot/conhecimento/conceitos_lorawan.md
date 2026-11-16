@@ -118,7 +118,7 @@ A rede da UFSM usa a **sub-banda 2 (FSB2)**: canais 8 a 15, de **916,8 a 918,2 M
 
 ## O que é a The Things Network (TTN)
 
-A **The Things Network (TTN)** é uma rede LoRaWAN pública e colaborativa, usada no mundo todo. Pessoas e instituições instalam gateways e os registram na TTN, e qualquer pessoa pode cadastrar dispositivos gratuitamente e usar esses gateways. A TTN funciona sobre o software **The Things Stack**, da empresa The Things Industries. No tutorial, a aplicação é criada no cluster **eu1** da TTN, onde os gateways da UFSM estão registrados.
+A **The Things Network (TTN)** é uma rede LoRaWAN pública e colaborativa, usada no mundo todo. Pessoas e instituições instalam gateways e os registram na TTN, e qualquer pessoa pode cadastrar dispositivos gratuitamente e usar esses gateways. **No tutorial, a aplicação e a placa são cadastradas no cluster eu1 da TTN**, onde os gateways da UFSM estão registrados.
 
 Na TTN:
 - **Aplicação (Application):** agrupa dispositivos e define o que fazer com os dados (decodificador de payload, integrações).
@@ -126,6 +126,8 @@ Na TTN:
 - **Live data:** aba que mostra em tempo real o que a rede recebe e envia: join requests, uplinks, downlinks, RSSI e SNR. É a principal ferramenta de diagnóstico.
 - **Payload formatter:** função em JavaScript que converte os bytes recebidos em valores legíveis (por exemplo, `cpu_temperature`).
 - **Integrações:** formas de levar os dados para fora da TTN, como MQTT, webhooks (HTTP) e o armazenamento de dados (Storage Integration).
+
+A TTN funciona sobre o software **The Things Stack**, da empresa The Things Industries.
 
 ## Diferença entre a The Things Network (TTN) e o The Things Stack
 

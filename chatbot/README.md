@@ -24,6 +24,7 @@ chatbot/
 ├── conhecimento/          # o que o bot sabe, além do README do tutorial
 │   ├── conceitos_lorawan.md
 │   ├── faq_erros.md
+│   ├── glossario.md   # um termo por seção (ajuda nas mensagens de uma palavra)
 │   └── projeto_ufsm.md
 ├── avaliacao/perguntas_teste.md
 ├── deploy/assistente-lorawan.service   # serviço systemd (instalação sem Docker)
