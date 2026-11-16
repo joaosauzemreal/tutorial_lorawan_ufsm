@@ -118,7 +118,8 @@ def conferir_limite(ip: str) -> None:
 
 @app.get("/")
 async def pagina():
-    return FileResponse(PASTA_STATIC / "index.html")
+    # no-cache: o navegador sempre confere se a página mudou, para as atualizações aparecerem na hora
+    return FileResponse(PASTA_STATIC / "index.html", headers={"Cache-Control": "no-cache"})
 
 
 @app.get("/api/status")
