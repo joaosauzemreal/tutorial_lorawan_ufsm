@@ -14,6 +14,17 @@ Prefere acompanhar em vídeo? O passo a passo completo deste guia, da criação 
 
 ---
 
+## 💬 Assistente (chatbot) do tutorial
+
+Ficou com alguma dúvida? O **Assistente LoRaWAN UFSM** responde perguntas sobre este tutorial, LoRa, LoRaWAN e a The Things Network:
+
+* **Direto:** [https://joao-1.sokoke-minor.ts.net](https://joao-1.sokoke-minor.ts.net)
+* **Na página do projeto:** botão **💬 Assistente** no [GitHub Pages](https://joaosauzemreal.github.io/tutorial_lorawan_ufsm/#assistente)
+
+O assistente roda num servidor da UFSM, com um modelo de IA local. Se ele não abrir, o servidor pode estar desligado no momento. Como ele funciona está em [`chatbot/`](chatbot/README.md).
+
+---
+
 ## 📌 Conceitos Fundamentais
 
 * **LoRa e LoRaWAN:** **LoRa** (Long Range) é a tecnologia de modulação por rádio de baixo consumo e longo alcance (camada física). **LoRaWAN** é o protocolo de rede (camada de enlace e rede) que gerencia a segurança, o endereçamento dos nós sensores, a confirmação de pacotes e a comunicação bidirecional com os Gateways.

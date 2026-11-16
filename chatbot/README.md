@@ -124,6 +124,8 @@ O modelo é baixado automaticamente se ainda não existir. Para trocar o modelo 
 | `LIMIAR_MINIMO` | `0` | Qualquer pergunta com similaridade abaixo disso é recusada (0 = desligado) |
 | `MAX_PALAVRAS_CURTA` | `3` | Até quantas palavras uma mensagem conta como "curta" |
 | `EXPANDIR_CURTA` | `true` | Busca mensagens curtas como "o que é <mensagem>" |
+| `LIMITE_POR_MINUTO` | `10` | Perguntas por minuto que cada IP pode fazer (0 = sem limite) |
+| `LIMITE_POR_HORA` | `60` | Perguntas por hora que cada IP pode fazer (0 = sem limite) |
 | `MODELOS_TESTE` | (vazio) | Modelos extras que podem ser escolhidos por pergunta via API, só para comparação. Ex.: `qwen3:14b,gemma3:12b` |
 | `THINK` | (vazio) | `false` desliga o "raciocínio" de modelos como o `qwen3`, que fica mais rápido. Deixe vazio para modelos sem raciocínio |
 
@@ -138,7 +140,16 @@ Sem GPU, quem define a velocidade é o processador. O tempo até a primeira pala
 ## Acesso pela rede
 
 - Na rede da UFSM, o chat fica em `http://IP-DO-SERVIDOR:8000`. Talvez seja preciso liberar a porta no firewall do servidor.
-- Para acesso de fora do campus, ou para colocar o chat dentro do GitHub Pages, o servidor precisa de um endereço **HTTPS** (por exemplo, um proxy reverso Nginx ou Caddy com certificado). Isso costuma ser feito pelo setor de TI.
+- Para acesso de fora do campus e para o chat dentro do GitHub Pages, o servidor precisa de um endereço **HTTPS**. Hoje isso é feito pelo [Tailscale Funnel](https://tailscale.com/kb/1223/funnel), que publica o chat em **https://joao-1.sokoke-minor.ts.net** (porta 443; a 8443 é usada pela página do evento):
+
+  ```bash
+  sudo tailscale funnel --bg --https=443 http://127.0.0.1:8000   # ligar (continua ligado depois de reiniciar)
+  tailscale funnel status                                         # conferir
+  sudo tailscale funnel --https=443 off                           # desligar
+  ```
+
+  O Funnel só aceita as portas 443, 8443 e 10000. A página do projeto no GitHub Pages (`index.html` na raiz do repositório) abre esse endereço num painel lateral pelo botão **💬 Assistente**; se o endereço mudar, troque `CHAT_URL` no `index.html`.
+- Com o chat aberto na internet, cada IP pode fazer no máximo `LIMITE_POR_MINUTO` perguntas por minuto e `LIMITE_POR_HORA` por hora (veja a tabela de configurações).
 
 ## Solução de problemas
 

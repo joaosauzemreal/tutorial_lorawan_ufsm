@@ -8,12 +8,14 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import time
+from collections import defaultdict, deque
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Literal
 
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -82,6 +84,38 @@ class PedidoChat(BaseModel):
     think: bool | None = None
 
 
+# Limite de perguntas por pessoa (IP), para o chat público não ser sobrecarregado.
+_pedidos_por_ip: dict[str, deque[float]] = defaultdict(deque)
+
+
+def ip_do_cliente(request: Request) -> str:
+    ip = request.client.host if request.client else "?"
+    # Pelo Tailscale Funnel (ou outro proxy local), o pedido chega de 127.0.0.1 e o IP real vem no cabeçalho.
+    if ip in ("127.0.0.1", "::1"):
+        encaminhado = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+        if encaminhado:
+            ip = encaminhado
+    return ip
+
+
+def conferir_limite(ip: str) -> None:
+    agora = time.monotonic()
+    for janela, limite in ((60, config.LIMITE_POR_MINUTO), (3600, config.LIMITE_POR_HORA)):
+        if limite <= 0:
+            continue
+        recentes = sum(1 for t in _pedidos_por_ip[ip] if agora - t < janela)
+        if recentes >= limite:
+            espera = "um minuto" if janela == 60 else "alguns minutos"
+            raise HTTPException(429, f"Muitas perguntas seguidas. Espere {espera} e tente de novo.")
+    fila = _pedidos_por_ip[ip]
+    while fila and agora - fila[0] >= 3600:
+        fila.popleft()
+    fila.append(agora)
+    if len(_pedidos_por_ip) > 5000:  # não deixa a tabela crescer sem fim
+        for chave in [k for k, v in _pedidos_por_ip.items() if not v or agora - v[-1] >= 3600]:
+            del _pedidos_por_ip[chave]
+
+
 @app.get("/")
 async def pagina():
     return FileResponse(PASTA_STATIC / "index.html")
@@ -102,7 +136,8 @@ async def status():
 
 
 @app.post("/api/chat")
-async def chat(pedido: PedidoChat):
+async def chat(pedido: PedidoChat, request: Request):
+    conferir_limite(ip_do_cliente(request))
     if estado["situacao"] != "pronto":
         raise HTTPException(503, f"O assistente ainda está se preparando ({estado['situacao']}).")
     modelo = config.CHAT_MODEL

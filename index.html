@@ -94,6 +94,10 @@
     </div>
 
     <div class="flex items-center gap-3">
+      <button onclick="abrirChat()" class="px-3.5 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-xs text-white font-semibold transition flex items-center gap-1.5 cursor-pointer shadow-sm" title="Tire dúvidas sobre o tutorial com o assistente">
+        <span>💬</span>
+        <span>Assistente</span>
+      </button>
       <button onclick="goToVideo()" class="px-3.5 py-1.5 rounded-full bg-sky-600 hover:bg-sky-500 text-xs text-white font-semibold transition flex items-center gap-1.5 cursor-pointer shadow-sm">
         <span>▶</span>
         <span>Vídeo Tutorial</span>
@@ -520,6 +524,47 @@
     </button>
   </footer>
 
+  <!-- Painel do Assistente LoRaWAN UFSM (chatbot no servidor, publicado pelo Tailscale Funnel) -->
+  <div id="chat-fundo" onclick="fecharChat()" class="fixed inset-0 bg-slate-900/30 z-40 hidden"></div>
+  <aside id="chat-painel" aria-hidden="true" class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white shadow-2xl border-l border-slate-200 z-50 flex flex-col transition-transform duration-300 translate-x-full">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200">
+      <div>
+        <p class="text-sm font-extrabold text-slate-800">💬 Assistente LoRaWAN UFSM</p>
+        <p class="text-[11px] text-slate-500">Tira dúvidas sobre o tutorial, LoRa, LoRaWAN e a TTN</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <a id="chat-nova-aba" href="https://joao-1.sokoke-minor.ts.net/" target="_blank" rel="noopener" class="text-xs text-sky-700 hover:underline font-semibold">Nova aba ↗</a>
+        <button onclick="fecharChat()" aria-label="Fechar o assistente" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold">×</button>
+      </div>
+    </div>
+    <iframe id="chat-frame" title="Assistente LoRaWAN UFSM" class="flex-1 w-full border-0"></iframe>
+    <p class="px-4 py-2 text-[11px] text-slate-500 border-t border-slate-200">Se o chat não carregar, o servidor da UFSM pode estar desligado no momento.</p>
+  </aside>
+
+  <script>
+    // Endereço público do chatbot (Tailscale Funnel). O chat só é carregado quando o painel é aberto.
+    const CHAT_URL = 'https://joao-1.sokoke-minor.ts.net/';
+    const chatPainel = document.getElementById('chat-painel');
+    const chatFundo = document.getElementById('chat-fundo');
+    const chatFrame = document.getElementById('chat-frame');
+    let chatAberto = false;
+
+    function abrirChat() {
+      if (!chatFrame.src) chatFrame.src = CHAT_URL;
+      chatPainel.classList.remove('translate-x-full');
+      chatPainel.setAttribute('aria-hidden', 'false');
+      chatFundo.classList.remove('hidden');
+      chatAberto = true;
+    }
+
+    function fecharChat() {
+      chatPainel.classList.add('translate-x-full');
+      chatPainel.setAttribute('aria-hidden', 'true');
+      chatFundo.classList.add('hidden');
+      chatAberto = false;
+    }
+  </script>
+
   <script>
     let currentSlide = 0;
     const slides = document.querySelectorAll('.slide');
@@ -604,6 +649,10 @@
 
     // Keyboard Arrow Navigation
     document.addEventListener('keydown', (e) => {
+      if (chatAberto) {
+        if (e.key === 'Escape') fecharChat();
+        return; // com o assistente aberto, as setas não trocam de slide
+      }
       if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
         changeSlide(1);
       } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
@@ -616,8 +665,11 @@
     });
 
     // Permite abrir direto no vídeo: .../tutorial_lorawan_ufsm/#video
+    // .../tutorial_lorawan_ufsm/#assistente abre a página já com o chat aberto
+    const abrirAssistente = location.hash === '#assistente';
     if (location.hash === '#video') currentSlide = videoSlideIndex;
     updateUI();
+    if (abrirAssistente) abrirChat();
   </script>
 </body>
 </html>

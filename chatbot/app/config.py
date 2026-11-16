@@ -50,6 +50,10 @@ LIMIAR_MINIMO = float(os.getenv("LIMIAR_MINIMO", "0"))
 # Mensagens curtas são buscadas como "o que é <mensagem>", que se parece mais com a documentação.
 EXPANDIR_CURTA = os.getenv("EXPANDIR_CURTA", "true").strip().lower() != "false"
 
+# Limite de perguntas por IP (0 = sem limite). Importante com o chat aberto na internet (Tailscale Funnel).
+LIMITE_POR_MINUTO = int(os.getenv("LIMITE_POR_MINUTO", "10"))
+LIMITE_POR_HORA = int(os.getenv("LIMITE_POR_HORA", "60"))
+
 # Modelos extras que podem ser escolhidos por pergunta, só para testes de comparação (separados por vírgula).
 # Ex.: MODELOS_TESTE=qwen3:14b,gemma3:12b  — são baixados automaticamente depois que o chat inicia.
 MODELOS_TESTE = [m.strip() for m in os.getenv("MODELOS_TESTE", "").split(",") if m.strip()]
