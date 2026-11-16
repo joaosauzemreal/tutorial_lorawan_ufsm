@@ -43,7 +43,7 @@ LEMBRETE = """INSTRUÇÕES PARA ESTA RESPOSTA:
 1. Responda à pergunta usando o trecho acima que trata do mesmo assunto. O trecho mais relevante é o último, logo acima destas instruções.
 2. Comece pela resposta, de forma direta. O primeiro parágrafo de cada trecho resume a resposta: inclua todos os itens dele.
 3. Copie valores, comandos e exemplos exatamente como estão no trecho, sem pular passos e sem mudar a ordem.
-4. Só escreva links que aparecem nos trechos. Nunca invente links, valores, chaves, pinos ou procedimentos.
+4. Só escreva links que aparecem nos trechos. Nunca invente links, valores, chaves, pinos, códigos ou procedimentos, e não acrescente fatos que os trechos não dizem.
 5. Se nenhum trecho responder: para conceitos gerais de LoRa ou LoRaWAN, explique brevemente e avise que isso não está no tutorial; para todo o resto, diga que não encontrou essa informação no tutorial.
 6. Responda em português do Brasil, de forma breve."""
 

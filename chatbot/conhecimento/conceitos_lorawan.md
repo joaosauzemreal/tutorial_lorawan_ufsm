@@ -127,6 +127,10 @@ Na TTN:
 - **Payload formatter:** função em JavaScript que converte os bytes recebidos em valores legíveis (por exemplo, `cpu_temperature`).
 - **Integrações:** formas de levar os dados para fora da TTN, como MQTT, webhooks (HTTP) e o armazenamento de dados (Storage Integration).
 
+## Diferença entre a The Things Network (TTN) e o The Things Stack
+
+A **The Things Network (TTN)** é a rede LoRaWAN pública e colaborativa, formada pelos gateways que pessoas e instituições registram nela. O **The Things Stack** é o software de servidor de rede LoRaWAN em que a TTN funciona, feito pela empresa The Things Industries. O console da TTN usado no tutorial (por exemplo `https://eu1.cloud.thethings.network/console`) é a interface do The Things Stack. O tutorial não trata dos componentes internos do The Things Stack.
+
 ## Clusters da TTN: por que usar o eu1 na UFSM
 
 Cluster e plano de frequência são coisas **independentes**. O cluster (**eu1**, na Europa) é o servidor da TTN onde os gateways da UFSM estão registrados, por isso a aplicação precisa ser criada nele. O plano de frequência (**AU915**) é a faixa de rádio que os dispositivos usam, e é o plano indicado para o Brasil. Um não depende do outro. O cluster não é escolhido pela localização de quem usa, e sim por ser o cluster em que os gateways da UFSM foram registrados.

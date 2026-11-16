@@ -90,7 +90,7 @@ No `secrets.h`, o `appEui` fica com os 8 bytes zerados: `{ 0x00, 0x00, 0x00, 0x0
 
 ## Em que ordem copiar as chaves da TTN para o secrets.h: msb ou lsb?
 
-Use a ordem **msb**, que é a ordem em que o console da TTN mostra as chaves por padrão.
+Use a ordem **msb** (byte mais significativo primeiro), que é a ordem em que o console da TTN mostra as chaves por padrão.
 
 São três chaves, todas copiadas do dispositivo (end device) no console da TTN para o arquivo `secrets.h`:
 - `devEui`: DevEUI, 8 bytes;
@@ -215,6 +215,22 @@ Configure o Payload formatter: em **Payload formatters > Uplink**, escolha **Cus
 
 **Como resolver:** no console da TTN, abra **Payload formatters > Uplink**, escolha **Custom javascript formatter** e cole a função `decodeUplink` do tutorial. Ela lê 2 bytes (o primeiro é o mais significativo), trata números negativos e divide por 100. Depois disso, as novas mensagens aparecem com `cpu_temperature` em graus Celsius. Mensagens antigas não são decodificadas de novo.
 
+A função do tutorial é esta (copie exatamente):
+
+```javascript
+function decodeUplink(input) {
+  var tempInt = (input.bytes[0] << 8) | input.bytes[1];
+  if (tempInt & 0x8000) {
+    tempInt = tempInt - 0x10000;
+  }
+  return {
+    data: {
+      cpu_temperature: tempInt / 100.0
+    }
+  };
+}
+```
+
 ## O display OLED fica apagado
 
 **Causa provável:** a alimentação externa Vext, que liga o display, não foi ativada.
@@ -265,6 +281,10 @@ No campus da UFSM, o gateway citado neste projeto fica no CT. Se a placa não co
 Como a placa do tutorial é **classe A**, ela só recebe um downlink logo depois de enviar um uplink, nas janelas de recepção RX1 e RX2. Por isso o downlink agendado chega junto com o próximo envio da placa. A TTN permite no máximo 10 downlinks por dia por dispositivo.
 
 O código do tutorial só envia dados e não trata as mensagens recebidas. Para usar downlinks, é preciso acrescentar isso ao código, o que não faz parte deste tutorial.
+
+## Quanto tempo dura a bateria de um dispositivo LoRaWAN?
+
+Um dispositivo LoRaWAN pode durar **anos** com bateria, desde que passe a maior parte do tempo em repouso profundo (*deep sleep*) e envie mensagens pequenas e espaçadas. A duração real depende do uso: intervalo entre envios, spreading factor, mensagens confirmadas e o que mais a placa faz (o display OLED, por exemplo, gasta energia). **O tutorial não mede o consumo nem a duração da bateria**: nele a placa é alimentada pelo cabo USB.
 
 ## Como guardar os dados ou fazer gráficos da temperatura?
 

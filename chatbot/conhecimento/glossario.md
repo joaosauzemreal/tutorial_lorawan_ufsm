@@ -16,7 +16,7 @@ O gateway é o equipamento com antena que recebe o rádio LoRa das placas e repa
 
 ## Antena
 
-A antena da Heltec WiFi LoRa 32 V3 deve estar sempre conectada: **nunca ligue a placa sem a antena**, porque isso pode danificar o rádio SX1262. Conecte a antena antes do cabo USB e desligue a placa antes de retirá-la.
+A antena é a peça que transmite e recebe o sinal de rádio LoRa da placa Heltec WiFi LoRa 32 V3. Ela deve estar sempre conectada: **nunca ligue a placa sem a antena**, porque isso pode danificar o rádio SX1262. Conecte a antena antes do cabo USB e desligue a placa antes de retirá-la. Uma antena mal conectada ou mal posicionada também reduz o alcance até o gateway.
 
 ## Join
 
