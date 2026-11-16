@@ -152,7 +152,7 @@ Sem GPU, quem define a velocidade é o processador. O tempo até a primeira pala
   sudo tailscale funnel --https=443 off                           # desligar
   ```
 
-  O Funnel só aceita as portas 443, 8443 e 10000. A página do projeto no GitHub Pages (`index.html` na raiz do repositório) abre esse endereço num pop-up pelo balão da **LorIA** (canto inferior direito) e pelo botão **💬 LorIA** do cabeçalho; se o endereço mudar, troque `CHAT_URL` no `index.html`.
+  O Funnel só aceita as portas 443, 8443 e 10000. A página do projeto no GitHub Pages (`index.html` na raiz do repositório) abre esse endereço num pop-up pelo balão da **LorIA**, no canto inferior direito; se o endereço mudar, troque `CHAT_URL` no `index.html`.
 - Com o chat aberto na internet, cada IP pode fazer no máximo `LIMITE_POR_MINUTO` perguntas por minuto e `LIMITE_POR_HORA` por hora (veja a tabela de configurações).
 
 ## Solução de problemas
