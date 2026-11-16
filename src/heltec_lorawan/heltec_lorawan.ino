@@ -28,6 +28,9 @@ uint16_t userChannelsMask[6] = { 0xFF00, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 
 // ============================================================================
 LoRaMacRegion_t loraWanRegion = ACTIVE_REGION; // Definido na IDE (LORAMAC_REGION_AU915)
 DeviceClass_t   loraWanClass  = CLASS_A;        // Classe A: Maior economia de energia
+// 15 s com ACK serve para testar o tutorial por alguns minutos. Para deixar a placa ligada por
+// horas, respeite o uso justo da TTN (30 s de airtime e 10 downlinks por dia): use, por exemplo,
+// appTxDutyCycle = 600000 (10 minutos) e isTxConfirmed = false.
 uint32_t appTxDutyCycle       = 15000;          // Intervalo de transmissão: 15 segundos
 bool overTheAirActivation     = true;           // Tipo de Ativação: OTAA (True)
 bool loraWanAdr               = true;           // Adaptive Data Rate (ADR) ativado
@@ -83,7 +86,7 @@ void setup() {
 
   // Inicializa a tela OLED
   oledDisplay.init();
-  drawStatus("INICIANDO...", "Licenca Ok", "Lendo Sensores...");
+  drawStatus("INICIANDO...", "Carregando licenca", "Aguarde...");
 
   // Registra a licença do chip (importada via secrets.h) na biblioteca Heltec
   Mcu.setlicense(license, HELTEC_BOARD);
@@ -125,7 +128,7 @@ void loop() {
     {
       // Agenda a próxima transmissão com variação aleatória de tempo (Jitter)
       txDutyCycleTime = appTxDutyCycle + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
-      drawStatus("PACOTE ENVIADO", "Temp CPU: " + String(cpuTemp, 1) + " C", "Proximo envio: 15s");
+      drawStatus("PACOTE ENVIADO", "Temp CPU: " + String(cpuTemp, 1) + " C", "Proximo envio: " + String(appTxDutyCycle / 1000) + "s");
       LoRaWAN.cycle(txDutyCycleTime);
       deviceState = DEVICE_STATE_SLEEP;
       break;

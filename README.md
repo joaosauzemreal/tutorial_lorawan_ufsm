@@ -79,7 +79,8 @@ Para sincronizar o formato dos dados enviados pela placa e permitir que a TTN de
        }
      };
    }
-
+   ```
+4. Clique em **Save changes**. As mensagens que chegarem depois disso aparecem no **Live data** com o campo `cpu_temperature` em graus Celsius.
 
 ---
 # 📦 Biblioteca e Suporte Oficial Heltec para Arduino IDE
@@ -126,6 +127,7 @@ A licença é uma chave de 128 bits (4 números de 32 bits) gerada a partir do C
 * **Via Comando AT (Serial):** Com o código carregado e a serial aberta, envie o comando AT+CDKEY= seguido dos 4 números da licença colados, sem `0x`, vírgulas ou espaços:
   ```text
   AT+CDKEY=4819D3A63C4015EFC76E3CE59742010D
+  ```
 
 ---
 ## 🚀 Upload do Código de Exemplo: Telemetria da Temperatura Interna da CPU

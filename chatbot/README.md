@@ -17,8 +17,11 @@ chatbot/
 │   ├── main.py            # servidor web (FastAPI): página, /api/chat e /api/status
 │   ├── rag.py             # divide os documentos, gera embeddings e faz a busca
 │   ├── motor.py           # monta a conversa e fala com o Ollama
-│   ├── prompts.py         # instruções fixas do assistente
+│   ├── prompts.py         # instruções fixas e respostas prontas do assistente
+│   ├── triagem.py         # cumprimentos, rabiscos e palavras soltas, antes do modelo
+│   ├── exemplos_fora_do_assunto.txt  # exemplos usados pelo filtro de assunto
 │   ├── avaliar.py         # roda as perguntas de teste e salva as respostas
+│   ├── calibrar.py        # mede a similaridade de mensagens curtas (para LIMIAR_CURTA)
 │   ├── config.py          # configurações (lidas das variáveis de ambiente)
 │   └── static/index.html  # interface do chat
 ├── conhecimento/          # o que o bot sabe, além do README do tutorial
@@ -28,6 +31,7 @@ chatbot/
 │   └── projeto_ufsm.md
 ├── avaliacao/perguntas_teste.md
 ├── deploy/assistente-lorawan.service   # serviço systemd (instalação sem Docker)
+├── atualizar.sh           # git pull + reinício do serviço systemd
 ├── docker-compose.yml
 ├── Dockerfile
 └── .env.example
@@ -81,7 +85,7 @@ O bot lê os documentos sempre que inicia. Depois de editar o `README.md` do tut
 
 ```bash
 ~/tutorial_lorawan_ufsm/chatbot/atualizar.sh    # instalação sem Docker (serviço systemd)
-# ou, com Docker:  git pull && docker compose restart app
+# ou, com Docker:  git pull && docker compose up -d --build app
 ```
 
 O `atualizar.sh` baixa a versão nova, confere as dependências, reinicia o serviço e espera o assistente ficar pronto.
