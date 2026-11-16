@@ -199,6 +199,14 @@ Use um cabo USB-C de dados (cabos que só carregam não funcionam), instale o dr
    4. clique em **Carregar** na Arduino IDE.
 4. **Porta ocupada.** Feche o Monitor Serial ou outro programa que esteja usando a porta.
 
+## Preciso instalar algum driver no Windows para a placa?
+
+Só se a porta não aparecer em **Ferramentas > Porta**. A Heltec V3 usa o conversor USB-serial CP2102; no Windows, instale o **driver CP210x** da Silicon Labs: https://www.silabs.com/developer-tools/usb-to-uart-bridge-vcp-drivers. Use também um cabo USB-C de dados.
+
+## Como saber se os dados da placa chegaram na TTN?
+
+Abra o console da TTN (cluster eu1), entre na sua aplicação, no seu dispositivo (end device) e na aba **Live data**. Cada mensagem que chega aparece ali na hora, com o payload, o RSSI e o SNR. Se o Payload formatter estiver configurado, aparece também o campo `cpu_temperature`.
+
 ## Os dados chegam na TTN, mas a placa não recebe a confirmação (ACK)
 
 Se as mensagens aparecem no Live data, a conexão funciona. O ACK é um downlink, mais difícil de receber: aproxime-se do gateway ou desligue a confirmação com `isTxConfirmed = false`.
@@ -238,6 +246,23 @@ function decodeUplink(input) {
 }
 ```
 
+## Colei o decodificador, mas as mensagens antigas continuam em hexadecimal
+
+É normal. O Payload formatter só decodifica as mensagens que chegam **depois** de salvo; as mensagens antigas não são decodificadas de novo. Espere a próxima mensagem da placa no Live data: ela já deve aparecer com o campo `cpu_temperature`.
+
+## Como enviar outros dados além da temperatura (umidade, outro sensor)?
+
+O tutorial só envia a temperatura, mas o caminho é este:
+1. Na função `prepareTxFrame` do código, aumente `appDataSize` e preencha mais posições de `appData` com o novo valor (por exemplo, a umidade multiplicada por 100, em 2 bytes).
+2. Na TTN, atualize o `decodeUplink` para ler os bytes novos.
+3. Lembre que mensagens maiores gastam mais airtime (limite de 30 segundos por dia na TTN).
+
+A ligação e o código do sensor de umidade não fazem parte do tutorial.
+
+## Como montar ou configurar um gateway LoRaWAN próprio?
+
+**Isso não faz parte do tutorial.** O tutorial usa os gateways que a UFSM já tem, registrados no cluster eu1 da TTN; quem segue o tutorial não precisa instalar nem configurar gateway. Para montar um gateway próprio, consulte a documentação da TTN e do fabricante do gateway.
+
 ## O display OLED fica apagado
 
 **Causa provável:** a alimentação externa Vext, que liga o display, não foi ativada.
@@ -246,7 +271,7 @@ function decodeUplink(input) {
 
 ## Posso deixar a placa enviando a cada 15 segundos o dia inteiro? (política de uso justo da TTN)
 
-Não. A TTN permite por dispositivo **30 segundos de airtime de uplink** e **10 downlinks** por dia. Para uso contínuo, aumente `appTxDutyCycle` (ex.: `600000` = 10 minutos) e use `isTxConfirmed = false`.
+Não. A TTN permite por dispositivo **30 segundos de airtime de uplink por dia** e **10 downlinks por dia** (cada ACK é um downlink). Para uso contínuo, aumente `appTxDutyCycle` (ex.: `600000` = 10 minutos) e use `isTxConfirmed = false`.
 
 **Não.** Enviar a cada 15 segundos o dia inteiro ultrapassa os limites da rede pública da TTN. Esse intervalo serve só para testes de alguns minutos, durante a prática do tutorial.
 

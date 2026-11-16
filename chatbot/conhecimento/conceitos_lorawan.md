@@ -45,7 +45,9 @@ O downlink costuma ser mais difícil de receber que o uplink, porque o dispositi
 ## Mensagens confirmadas e não confirmadas (ACK)
 
 - **Não confirmada:** o dispositivo envia e não espera resposta. Gasta menos energia e menos recursos da rede. É o recomendado para a maioria dos sensores.
-- **Confirmada:** o dispositivo pede uma confirmação (ACK), que chega como um downlink. Se o ACK não chegar, o dispositivo tenta de novo. No código do tutorial, `isTxConfirmed = true` e `confirmedNbTrials = 4`.
+- **Confirmada:** o dispositivo pede uma confirmação (ACK), que chega como um downlink. Se o ACK não chegar, o dispositivo tenta de novo.
+
+O código do tutorial vem com mensagens confirmadas (`isTxConfirmed = true`, até `confirmedNbTrials = 4` tentativas), para testar o ACK durante a prática. Para uso contínuo, troque para não confirmadas: `isTxConfirmed = false`.
 
 Na TTN, cada ACK conta no limite de 10 downlinks por dia por dispositivo. Use mensagens confirmadas só quando for realmente necessário.
 
@@ -73,7 +75,7 @@ A cada novo join são geradas chaves novas, o que deixa a rede mais segura.
 ## Chaves e identificadores: DevEUI, JoinEUI (AppEUI), AppKey, NwkSKey, AppSKey, DevAddr
 
 - **DevEUI:** identificador único do dispositivo, com 8 bytes. A TTN pode gerar um.
-- **JoinEUI (antigo AppEUI):** identificador do servidor de join, com 8 bytes. No tutorial da UFSM é zerado (`0000000000000000`).
+- **JoinEUI (antigo AppEUI; os dois nomes são o mesmo campo):** identificador do servidor de join, com 8 bytes. No tutorial da UFSM é zerado (`0000000000000000`).
 - **AppKey:** chave secreta raiz, com 16 bytes, usada no join OTAA. Nunca deve ser publicada; por isso fica no arquivo `secrets.h`, que é ignorado pelo Git.
 - **NwkSKey (chave de sessão de rede):** gerada no join. Garante a integridade das mensagens entre o dispositivo e o servidor de rede.
 - **AppSKey (chave de sessão de aplicação):** gerada no join. Criptografa os dados úteis (payload) de ponta a ponta, do dispositivo até o servidor de aplicação.

@@ -6,6 +6,22 @@ Definições curtas dos termos que aparecem no tutorial. Cada termo tem mais det
 
 OTAA é a ativação pelo ar, a forma de entrar na rede usada no tutorial. A placa envia um **Join Request** com o DevEUI e o JoinEUI, assinado com a AppKey; a rede responde com um **Join Accept**, e os dois lados geram chaves de sessão novas (NwkSKey e AppSKey).
 
+## Join Request e Join Accept
+
+O **Join Request** é a mensagem que a placa envia para pedir para entrar na rede (OTAA), com o DevEUI e o JoinEUI, assinada com a AppKey. O **Join Accept** é a resposta da rede aceitando a placa. Depois do Join Accept, a placa e a rede calculam as chaves de sessão (NwkSKey e AppSKey) e a placa recebe o seu endereço (DevAddr).
+
+## NwkSKey e AppSKey (chaves de sessão)
+
+NwkSKey e AppSKey são as **chaves de sessão**, geradas a cada join OTAA. A NwkSKey (chave de sessão de rede) garante a integridade das mensagens entre a placa e o servidor de rede. A AppSKey (chave de sessão de aplicação) criptografa os dados até o servidor de aplicação. No tutorial elas não são preenchidas à mão: no código, `nwkSKey` e `appSKey` ficam zerados, porque o OTAA as gera.
+
+## DevEUI
+
+O DevEUI é o identificador único do dispositivo, com 8 bytes. No cadastro do dispositivo na TTN, **clique em Generate** para a TTN gerar o DevEUI; depois copie o valor (ordem msb) para o `devEui` do `secrets.h`.
+
+## JoinEUI e AppEUI (o mesmo campo)
+
+**Sim, JoinEUI e AppEUI são o mesmo campo**: AppEUI é o nome antigo, usado nas versões anteriores do LoRaWAN e no código da Heltec (`appEui`); JoinEUI é o nome atual, usado no console da TTN. No tutorial da UFSM ele é zerado: `0000000000000000`.
+
 ## ABP (Activation By Personalization)
 
 ABP é a ativação sem join: o endereço (DevAddr) e as chaves de sessão ficam gravados fixos no dispositivo. É mais simples, mas menos segura que o OTAA. O tutorial não usa ABP.
@@ -21,6 +37,18 @@ A antena é a peça que transmite e recebe o sinal de rádio LoRa da placa Helte
 ## Join
 
 Join é o processo de entrada da placa na rede LoRaWAN pelo OTAA. Enquanto tenta, o display mostra "ENVIANDO JOIN"; quando a rede aceita, mostra "JOIN SUCESSO".
+
+## SX1262 (rádio LoRa da placa)
+
+O SX1262 é o **rádio LoRa** da Heltec WiFi LoRa 32 V3, o chip que transmite e recebe os sinais LoRa. Ele pode ser danificado se a placa for ligada sem a antena conectada.
+
+## ESP32-S3 (microcontrolador da placa)
+
+O ESP32-S3 é o microcontrolador (o processador) da Heltec WiFi LoRa 32 V3. O código do tutorial roda nele, e a temperatura enviada à TTN (`cpu_temperature`) é a temperatura interna do ESP32-S3.
+
+## LoRa sem LoRaWAN
+
+**Sim, dá para usar LoRa sem LoRaWAN**: dois rádios LoRa podem conversar diretamente, ponto a ponto. Mas aí não existem gateways, servidor de rede, TTN nem a segurança do LoRaWAN. O tutorial usa LoRaWAN.
 
 ## Payload
 

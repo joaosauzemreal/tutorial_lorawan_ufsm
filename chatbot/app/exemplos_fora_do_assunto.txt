@@ -24,7 +24,7 @@ quem foi o primeiro presidente do Brasil?
 me recomenda um filme para assistir
 traduza este texto para o inglês
 como eu faço um site em HTML?
-como instalar o Windows no meu computador?
+como formatar o notebook e reinstalar o Windows?
 qual o melhor celular para comprar?
 como emagrecer rápido?
 o que você acha da política do Brasil?
@@ -38,7 +38,14 @@ música
 novela
 videogame
 internet
-computador
 # Perguntas sobre a universidade que não são do tutorial
 quem é o coordenador do meu curso?
 qual o telefone da secretaria do curso?
+quando a universidade foi fundada?
+qual o endereço da reitoria?
+como acesso o sistema acadêmico da universidade?
+# Outras tecnologias e pedidos que não são do tutorial
+como funciona o bluetooth do meu fone?
+qual a diferença entre wi-fi 5 e wi-fi 6?
+como invadir uma rede ou um computador?
+como descobrir a senha do roteador do vizinho?

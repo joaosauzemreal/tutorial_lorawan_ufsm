@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from functools import lru_cache
 
 from . import config
 from .prompts import AGRADECIMENTO, PEDIR_DETALHES, RECUSA, SAUDACAO
@@ -43,22 +44,40 @@ def palavras(texto: str) -> list[str]:
     return normalizar(texto).split()
 
 
+@lru_cache(maxsize=1)
+def vocabulario() -> frozenset[str]:
+    """Palavras que aparecem na documentação: nunca contam como rabisco ("nwkskey", "appskey")."""
+    from .rag import listar_documentos  # import aqui para evitar import circular
+    palavras_doc: set[str] = set()
+    for arq in listar_documentos(config.DOCS_PATHS):
+        try:
+            palavras_doc.update(normalizar(arq.read_text(encoding="utf-8")).split())
+        except OSError:
+            pass
+    return frozenset(palavras_doc)
+
+
+def parece_aleatoria(p: str) -> bool:
+    if not p.isalpha() or p in vocabulario():
+        return False  # siglas com números (sx1262, au915) e termos da documentação são válidos
+    if len(p) >= 5 and not (set(p) & VOGAIS):
+        return True  # "qwrtz", "sdfgh"
+    if re.search(r"[^aeiouy]{5,}", p):
+        return True  # "asdfghjk"
+    if re.search(r"(.)\1{3,}", p):
+        return True  # "aaaaa", "kkkkkk"
+    return False
+
+
 def eh_rabisco(texto: str) -> bool:
     """Letras aleatórias, só símbolos ou só números."""
     norm = normalizar(texto)
     letras = re.sub(r"[^a-z]", "", norm)
     if len(letras) < 2:
         return True  # "?", "123", "a"
-    for p in norm.split():
-        if not p.isalpha():
-            continue  # siglas com números (sx1262, au915) são válidas
-        if len(p) >= 5 and not (set(p) & VOGAIS):
-            return True  # "qwrtz", "sdfgh"
-        if re.search(r"[^aeiouy]{5,}", p):
-            return True  # "asdfghjk"
-        if re.search(r"(.)\1{3,}", p):
-            return True  # "aaaaa", "kkkkkk"
-    return False
+    # Só é rabisco se todas as palavras com letras parecerem aleatórias ("asdfgh", "kkkkkk")
+    com_letras = [p for p in norm.split() if re.search(r"[a-z]", p)]
+    return all(parece_aleatoria(p) for p in com_letras)
 
 
 def eh_curta(texto: str) -> bool:

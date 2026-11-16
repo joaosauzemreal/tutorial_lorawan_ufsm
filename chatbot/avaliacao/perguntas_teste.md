@@ -135,7 +135,7 @@ Mensagens de uma ou duas palavras, que antes faziam o modelo inventar respostas.
 | 67 | qual regional parameters version eu coloco | RP001 Regional Parameters 1.0.2 Rev B | [modelo]; rp001; rev b |
 | 68 | escolhi lorawan 1.0.3 no cadastro, tem problema? | Usar 1.0.2, a versão da biblioteca da Heltec, com RP001 1.0.2 Rev B | [modelo]; 1.0.2 |
 | 69 | qual região escolho na arduino ide | REGION_AU915 | [modelo]; region_au915 |
-| 70 | pra que serve o LoRaWAN Debug Level FREQ_AND_DIO | Mostra no Monitor Serial as frequências de cada envio, que devem ficar entre 916,8 e 918,2 MHz | [modelo]; serial; frequ |
+| 70 | pra que serve o LoRaWAN Debug Level FREQ_AND_DIO | Mostra no Monitor Serial as frequências de cada envio, que devem ficar entre 916,8 e 918,2 MHz | [modelo]; serial/debug; frequ |
 | 71 | qual velocidade do monitor serial | 115200 baud | [modelo]; 115200 |
 | 72 | onde fica o arquivo .ino do tutorial | Na pasta src/heltec_lorawan/ | [modelo]; heltec_lorawan |
 | 73 | o secrets.h vai pro github? | Não; ele fica no .gitignore porque guarda chaves privadas | [modelo]; gitignore/nao vai/ignorado |
@@ -152,7 +152,7 @@ Mensagens de uma ou duas palavras, que antes faziam o modelo inventar respostas.
 | 84 | como desligo o ack | isTxConfirmed = false | [modelo]; istxconfirmed |
 | 85 | quero mandar umidade também, como faço | Aumentar appDataSize, preencher mais posições de appData em prepareTxFrame e atualizar o decodeUplink | [modelo]; appdatasize/appdata; decodeuplink |
 | 86 | depois de colar o decoder as mensagens antigas continuam em hex | É normal: só as mensagens novas são decodificadas | [modelo]; nova/novas |
-| 87 | o que é o cpu_temperature que aparece na ttn | A temperatura interna do processador ESP32-S3, em °C, decodificada pelo decodeUplink | [modelo]; processador/cpu; esp32 |
+| 87 | o que é o cpu_temperature que aparece na ttn | A temperatura interna do processador ESP32-S3, em °C, decodificada pelo decodeUplink | [modelo]; processador/cpu |
 | 88 | onde vejo se meus dados chegaram | Na aba Live data do dispositivo, no console da TTN | [modelo]; live data |
 
 ## Ajuste: conceitos (rodada 13)
@@ -169,7 +169,7 @@ Mensagens de uma ou duas palavras, que antes faziam o modelo inventar respostas.
 | 96 | mensagem confirmada ou não confirmada, qual eu uso | Não confirmada na maioria dos casos; cada ACK conta nos 10 downlinks por dia | [modelo]; nao confirmada; downlink |
 | 97 | o que é FSB2 | Sub-banda 2 do AU915: canais 8 a 15, de 916,8 a 918,2 MHz | [modelo]; 8 a 15; 916 |
 | 98 | por que o plano se chama australia se estamos no brasil | O Brasil usa o plano AU915-928, o mesmo da Austrália, indicado pela LoRa Alliance | [modelo]; brasil |
-| 99 | o que é DR3 | Data Rate 3 = SF9 com 125 kHz no AU915 | [modelo]; sf9 |
+| 99 | o que é DR3 | Data Rate 3 = SF9 com 125 kHz no AU915 | [modelo]; sf9/spreading factor de 9 |
 | 100 | qual SF corresponde ao DR5 | SF7 com 125 kHz | [modelo]; sf7 |
 | 101 | o que é airtime | Tempo que a mensagem ocupa no ar; depende do SF e do tamanho; a TTN limita a 30 s por dia | [modelo]; tempo |
 | 102 | sf12 é melhor que sf7? | Depende: SF12 tem mais alcance, mas gasta mais tempo no ar e bateria | [modelo]; alcance; sf12 |
@@ -225,7 +225,7 @@ Mensagens de uma ou duas palavras, que antes faziam o modelo inventar respostas.
 | 142 | ABP | Ativação sem join, com chaves fixas; o tutorial usa OTAA | [modelo]; otaa |
 | 143 | downlink | Mensagem da rede para a placa | [modelo]; rede |
 | 144 | classe A | Duas janelas de recepção (RX1 e RX2) depois de cada uplink; menor consumo | [modelo]; rx1 |
-| 145 | secrets.h | Arquivo com as chaves e a licença; copiado de secrets_example.h | [modelo]; chave |
+| 145 | secrets.h | Arquivo com as chaves e a licença; copiado de secrets_example.h | [modelo]; chave/credencia |
 | 146 | live data | Aba da TTN que mostra em tempo real o que a rede recebe e envia | [modelo]; tempo real |
 | 147 | fair use | 30 s de airtime de uplink e 10 downlinks por dia | [modelo]; 30 |
 | 148 | SX1262 | O rádio LoRa da placa | [modelo]; radio |
