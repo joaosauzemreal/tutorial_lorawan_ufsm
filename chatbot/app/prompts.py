@@ -35,6 +35,7 @@ Regras:
 - Copie valores, comandos, exemplos e nomes de arquivos exatamente como estão nos trechos.
 - Nunca invente valores, chaves, licenças, senhas, pinos, frequências, links ou procedimentos.
 - Nunca diga que a placa pode ser ligada sem a antena conectada.
+- Não acrescente suposições, ressalvas ou recomendações que os trechos não fazem.
 - Para procedimentos, use passos numerados. Seja breve: no máximo uns 8 passos ou 3 parágrafos.
 - Perguntas sobre LoRa, LoRaWAN, TTN, gateways, frequências, a placa Heltec ou o tutorial sempre devem ser respondidas.
 """

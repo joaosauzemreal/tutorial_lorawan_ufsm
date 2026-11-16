@@ -12,7 +12,7 @@ ABP é a ativação sem join: o endereço (DevAddr) e as chaves de sessão ficam
 
 ## Gateway
 
-O gateway é o equipamento com antena que recebe o rádio LoRa das placas e repassa os pacotes pela internet ao servidor de rede da TTN. Ele não lê os dados, que vão criptografados. Na UFSM, o gateway fica no prédio do CT.
+O gateway é o equipamento com antena que recebe o rádio LoRa das placas e repassa os pacotes pela internet ao servidor de rede da TTN. O gateway não consegue ler o conteúdo das mensagens, porque os dados vão criptografados até o servidor. Na UFSM, o gateway fica no prédio do CT.
 
 ## Antena
 

@@ -70,6 +70,12 @@ Escolha a versão `LoRaWAN Specification 1.0.2` com `RP001 Regional Parameters 1
 
 A versão 1.0.2 é a usada pela biblioteca da Heltec.
 
+## A temperatura aparece como 3625 em vez de 36,25 (valor 100 vezes maior)
+
+Confira o **Payload formatter** da aplicação na TTN. A placa envia a temperatura multiplicada por 100 (36,25 °C vira 3625), e é a função `decodeUplink` do tutorial que divide por 100. Se aparece 3625, o formatter não está com a função do tutorial, ou ela foi alterada e perdeu a divisão `tempInt / 100.0`.
+
+Como resolver: em **Payload formatters > Uplink**, escolha **Custom javascript formatter**, cole de novo a função `decodeUplink` do tutorial e salve. As mensagens novas passam a mostrar `cpu_temperature` em graus Celsius. Não é problema na placa nem no código do `.ino`.
+
 ## A placa precisa de internet ou Wi-Fi para mandar os dados?
 
 **Não.** Neste tutorial, a placa envia os dados pelo **rádio LoRa** até o gateway. Quem usa a internet é o **gateway**, que repassa as mensagens para a TTN. O Wi-Fi da Heltec WiFi LoRa 32 V3 não é usado no tutorial.
@@ -78,7 +84,7 @@ Por isso a placa funciona em lugares sem Wi-Fi, desde que esteja ao alcance de u
 
 ## Posso usar outra placa ou módulo LoRa (RFM95, SX1276, Arduino Uno, outro ESP32)?
 
-Este tutorial não ensina a ligar nem a programar outros módulos: ele cobre **só a placa Heltec WiFi LoRa 32 V3**, com a biblioteca da Heltec. Não há neste material ligação de pinos, bibliotecas nem código para outras placas. Outras placas e módulos (por exemplo RFM95 ou SX1276 ligados a um Arduino Uno ou a outro ESP32) usam outras bibliotecas, como a LMIC, e outra ligação de pinos, que **não fazem parte deste tutorial**. Por isso o assistente não tem a pinagem nem o código para eles.
+**Este tutorial não cobre outras placas nem módulos**: ele cobre **só a placa Heltec WiFi LoRa 32 V3**, com a biblioteca da Heltec. Por isso não há aqui passos de montagem, ligação de pinos, bibliotecas nem código para outras placas, e a resposta certa é indicar a documentação do fabricante do módulo, sem passo a passo. Outras placas e módulos (por exemplo RFM95 ou SX1276 ligados a um Arduino Uno ou a outro ESP32) usam outras bibliotecas, como a LMIC, e outra ligação de pinos, que **não fazem parte deste tutorial**. Por isso o assistente não tem a pinagem nem o código para eles.
 
 O que vale para qualquer dispositivo na rede da UFSM é a configuração da rede: aplicação no cluster **eu1** da TTN, plano `Australia 915-928 MHz, FSB 2`, ativação OTAA e antena sempre conectada antes de ligar. Para a ligação de pinos e o código de outra placa, consulte a documentação do fabricante do módulo e da biblioteca escolhida.
 
