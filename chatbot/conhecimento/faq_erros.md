@@ -167,10 +167,11 @@ Instale a biblioteca **Heltec ESP32 Dev-Boards** pelo Gerenciador de Bibliotecas
 
 **Sintomas:** a Arduino IDE não compila e diz que não encontra `LoRaWan_APP.h` ou `HT_SSD1306Wire.h`, ou a opção "Heltec WiFi LoRa 32(V3)" não aparece no menu de placas.
 
-**Causas prováveis e soluções:**
-1. A biblioteca **Heltec ESP32 Dev-Boards** (da Heltec Automation) não foi instalada. Instale pelo Gerenciador de Bibliotecas, buscando "heltec esp32".
-2. A placa selecionada não é a `Heltec WiFi LoRa 32(V3)`. Selecione em Ferramentas > Placa.
-3. A IDE não tem suporte a placas ESP32 instalado. Se "Heltec WiFi LoRa 32(V3)" não aparecer em Ferramentas > Placa, instale o suporte a placas ESP32 pelo Gerenciador de Placas e reinicie a IDE.
+**Como resolver:**
+1. Na barra lateral da Arduino IDE, abra o **Gerenciador de Bibliotecas** (`Ctrl + Shift + I`).
+2. Busque **`heltec esp32`**, localize a biblioteca **`Heltec ESP32 Dev-Boards`**, da Heltec Automation, e clique em **Instalar**.
+3. Em **Ferramentas > Placa**, selecione `Heltec ESP32 Series Arduino` > `Heltec WiFi LoRa 32(V3)`.
+4. Compile de novo. Se a placa ainda não aparecer no menu, feche e abra a Arduino IDE.
 
 Os menus "LoRaWAN Region" e "LoRaWAN Debug Level" só aparecem em Ferramentas com a placa Heltec selecionada.
 
