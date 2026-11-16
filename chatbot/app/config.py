@@ -67,4 +67,5 @@ LINKS_FONTES = {
     "faq_erros.md": "chatbot/conhecimento/faq_erros.md",
     "conceitos_lorawan.md": "chatbot/conhecimento/conceitos_lorawan.md",
     "projeto_ufsm.md": "chatbot/conhecimento/projeto_ufsm.md",
+    "glossario.md": "chatbot/conhecimento/glossario.md",
 }

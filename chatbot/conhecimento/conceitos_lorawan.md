@@ -148,15 +148,3 @@ Na aba Live data da TTN, cada mensagem recebida mostra:
 - **SNR (Signal-to-Noise Ratio):** relação entre sinal e ruído, em dB. Valores positivos são bons. O LoRa consegue receber mesmo com SNR negativo (até cerca de -7,5 dB em SF7 e -20 dB em SF12), mas, quanto mais negativo, mais perto de perder a mensagem.
 
 Se o RSSI estiver muito baixo ou o SNR muito negativo, aproxime-se do gateway, melhore a posição da antena ou deixe o ADR usar um SF maior.
-
-## Glossário rápido
-
-- **ACK:** confirmação de recebimento enviada pela rede.
-- **ADR:** ajuste automático da taxa de dados.
-- **Airtime:** tempo que uma mensagem ocupa no ar.
-- **Gateway:** antena que recebe o rádio LoRa e repassa os pacotes pela internet.
-- **ISM:** faixas de frequência de uso livre, sem licença.
-- **Join:** processo de entrada do dispositivo na rede (OTAA).
-- **LPWAN:** redes de longo alcance e baixo consumo (*Low Power Wide Area Network*), como o LoRaWAN.
-- **Payload:** os dados úteis da mensagem (no tutorial, 2 bytes com a temperatura).
-- **Uplink / downlink:** dispositivo para a rede / rede para o dispositivo.

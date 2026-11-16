@@ -37,3 +37,8 @@ cachorro
 música
 novela
 videogame
+internet
+computador
+# Perguntas sobre a universidade que não são do tutorial
+quem é o coordenador do meu curso?
+qual o telefone da secretaria do curso?

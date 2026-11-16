@@ -268,12 +268,12 @@ O código do tutorial só envia dados e não trata as mensagens recebidas. Para 
 
 ## Como guardar os dados ou fazer gráficos da temperatura?
 
-O tutorial termina com os dados chegando na aba Live data da TTN; gráficos e armazenamento não fazem parte dele. O caminho é usar as **integrações** da TTN: no console, abra a sua aplicação e a seção **Integrations**. Há opções como:
-- **MQTT** e **Webhooks**, para enviar cada mensagem a um programa ou serviço seu;
-- **Storage Integration**, que guarda as mensagens por um tempo na própria TTN;
-- integrações prontas com plataformas de painéis (dashboards), que fazem os gráficos.
+Gráficos e armazenamento **não fazem parte do tutorial**, que termina com os dados chegando na aba Live data da TTN. O caminho é usar uma **integração** da TTN (MQTT, Webhooks ou Storage Integration) para levar o campo `cpu_temperature` a um programa ou plataforma de gráficos.
 
-Use o campo `cpu_temperature`, que aparece depois de configurar o Payload formatter.
+Como fazer:
+1. No console da TTN, abra a sua aplicação e a seção **Integrations**.
+2. Escolha uma opção: **MQTT** ou **Webhooks**, para enviar cada mensagem a um programa ou serviço seu; **Storage Integration**, que guarda as mensagens por um tempo na própria TTN; ou uma integração pronta com uma plataforma de painéis (dashboards), que faz os gráficos.
+3. Na plataforma escolhida, use o campo `cpu_temperature` das mensagens. Ele só existe depois de configurar o Payload formatter do tutorial.
 
 ## Um problema que não está neste FAQ
 
