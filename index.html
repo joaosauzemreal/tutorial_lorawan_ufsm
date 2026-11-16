@@ -527,15 +527,10 @@
   <!-- Painel do Assistente LoRaWAN UFSM (chatbot no servidor, publicado pelo Tailscale Funnel) -->
   <div id="chat-fundo" onclick="fecharChat()" class="fixed inset-0 bg-slate-900/30 z-40 hidden"></div>
   <aside id="chat-painel" aria-hidden="true" class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white shadow-2xl border-l border-slate-200 z-50 flex flex-col transition-transform duration-300 translate-x-full">
-    <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200">
-      <div>
-        <p class="text-sm font-extrabold text-slate-800">💬 Assistente LoRaWAN UFSM</p>
-        <p class="text-[11px] text-slate-500">Tira dúvidas sobre o tutorial, LoRa, LoRaWAN e a TTN</p>
-      </div>
-      <div class="flex items-center gap-2">
-        <a id="chat-nova-aba" href="https://joao-1.sokoke-minor.ts.net/" target="_blank" rel="noopener" class="text-xs text-sky-700 hover:underline font-semibold">Nova aba ↗</a>
-        <button onclick="fecharChat()" aria-label="Fechar o assistente" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold">×</button>
-      </div>
+    <!-- Só os controles do painel: o nome e o status do assistente já aparecem no cabeçalho do próprio chat -->
+    <div class="flex items-center justify-end gap-3 px-3 py-1.5 border-b border-slate-200 bg-slate-50">
+      <a id="chat-nova-aba" href="https://joao-1.sokoke-minor.ts.net/" target="_blank" rel="noopener" class="text-xs text-sky-700 hover:underline font-semibold">Abrir em nova aba ↗</a>
+      <button onclick="fecharChat()" aria-label="Fechar o assistente" title="Fechar (Esc)" class="w-7 h-7 rounded-full bg-white hover:bg-slate-200 border border-slate-300 text-slate-700 font-bold leading-none">×</button>
     </div>
     <iframe id="chat-frame" title="Assistente LoRaWAN UFSM" class="flex-1 w-full border-0"></iframe>
     <p class="px-4 py-2 text-[11px] text-slate-500 border-t border-slate-200">Se o chat não carregar, o servidor da UFSM pode estar desligado no momento.</p>
