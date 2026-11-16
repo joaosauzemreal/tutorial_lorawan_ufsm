@@ -92,3 +92,22 @@ Servem para medir se as melhorias valem para perguntas que o sistema nunca "viu"
 | 44 | posso usar a mesma AppKey em duas placas? | Não é o recomendado; cada placa é um dispositivo com seu DevEUI e AppKey; cadastrar cada uma (e cada uma tem sua licença Heltec) |
 | 45 | quanto custa usar a TTN? | A rede comunitária é gratuita para cadastrar dispositivos; tem limites de uso justo |
 | 46 | qual a melhor série da netflix? | Recusar |
+
+## Mensagens curtas e vagas (rodada 12)
+
+Mensagens de uma ou duas palavras, que antes faziam o modelo inventar respostas. As do assunto devem ser explicadas; as outras recebem uma resposta pronta da triagem (cumprimento, agradecimento, "pode detalhar?" ou recusa), sem passar pelo modelo.
+
+| # | Pergunta | A resposta precisa conter |
+|---|----------|---------------------------|
+| 47 | oi | Cumprimento: diz o que o assistente faz e dá exemplos de perguntas |
+| 48 | obrigado | Agradecimento curto |
+| 49 | asdfgh | Pedir para escrever a pergunta com mais detalhes |
+| 50 | banana | Pedir detalhes ou recusar; nunca inventar uma relação com LoRaWAN |
+| 51 | teste | Pedir detalhes ou recusar; nunca inventar uma relação com LoRaWAN |
+| 52 | cadeira | Pedir detalhes ou recusar; nunca inventar uma relação com LoRaWAN |
+| 53 | OTAA | Explicar OTAA: ativação pelo ar com Join Request/Join Accept usando DevEUI, JoinEUI e AppKey |
+| 54 | gateway | Explicar o gateway: recebe o rádio LoRa e repassa ao servidor de rede pela internet |
+| 55 | antena | Nunca ligar a placa sem a antena; conectar antes do USB |
+| 56 | RSSI | Força do sinal recebido, em dBm; quanto mais perto de zero, melhor |
+| 57 | ttn | Explicar a The Things Network: rede LoRaWAN comunitária; o tutorial usa o cluster eu1 |
+| 58 | kkkkkk | Pedir para escrever a pergunta com mais detalhes |

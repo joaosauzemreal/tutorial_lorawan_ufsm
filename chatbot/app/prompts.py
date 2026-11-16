@@ -7,6 +7,22 @@ RECUSA = (
     "LoRaWAN da UFSM e com dúvidas sobre LoRa, LoRaWAN e a The Things Network."
 )
 
+# Respostas prontas da triagem (app/triagem.py): não passam pelo modelo.
+SAUDACAO = (
+    "Olá! Sou o Assistente LoRaWAN UFSM. Ajudo com o tutorial que conecta a placa Heltec "
+    "WiFi LoRa 32 V3 à The Things Network no campus e com dúvidas sobre LoRa e LoRaWAN. "
+    "Pergunte, por exemplo: \"minha placa fica em ENVIANDO JOIN\" ou \"o que é OTAA?\"."
+)
+AGRADECIMENTO = (
+    "De nada! Se aparecer outra dúvida sobre o tutorial ou sobre LoRaWAN, é só perguntar."
+)
+PEDIR_DETALHES = (
+    "Não entendi a sua pergunta. Pode escrever com mais detalhes o que você quer saber? "
+    "Por exemplo: \"o que é um gateway?\" ou \"minha placa não conecta na TTN\"."
+)
+# Uma palavra solta do assunto ("OTAA", "gateway") vira uma pergunta completa para o modelo.
+PERGUNTA_CURTA = 'Explique de forma simples o que é "{}" no contexto de LoRaWAN e deste tutorial.'
+
 SYSTEM_PROMPT = f"""Você é o Assistente LoRaWAN UFSM, um ajudante do tutorial "Guia de Conectividade LoRaWAN na UFSM", que ensina a conectar a placa Heltec WiFi LoRa 32 V3 à rede LoRaWAN da The Things Network (TTN) no campus da Universidade Federal de Santa Maria.
 
 Seu trabalho:

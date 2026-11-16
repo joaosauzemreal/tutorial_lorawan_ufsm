@@ -18,8 +18,8 @@ from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from . import config, rag
-from .motor import deve_recusar, gerar_resposta_stream, preparar_conversa
-from .prompts import RECUSA
+from .motor import gerar_resposta_stream, preparar_conversa, resposta_pronta
+from .triagem import resposta_antes_da_busca
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 log = logging.getLogger("assistente")
@@ -116,18 +116,32 @@ async def chat(pedido: PedidoChat):
     if historico[-1]["role"] != "user":
         raise HTTPException(400, "A última mensagem precisa ser do usuário.")
 
+    def resposta_fixa(texto: str) -> StreamingResponse:
+        async def eventos_fixos():
+            yield json.dumps({"tipo": "fontes", "fontes": []}) + "\n"
+            yield json.dumps({"tipo": "texto", "texto": texto}, ensure_ascii=False) + "\n"
+            yield json.dumps({"tipo": "fim"}) + "\n"
+        return StreamingResponse(eventos_fixos(), media_type="application/x-ndjson")
+
+    # Cumprimentos, agradecimentos e rabiscos: resposta pronta, sem busca e sem modelo
+    pronta = resposta_antes_da_busca(historico[-1]["content"])
+    if pronta:
+        log.info("Triagem antes da busca: %r", historico[-1]["content"][:80])
+        return resposta_fixa(pronta)
+
     try:
         mensagens, fontes, similaridade_fora = await preparar_conversa(cliente, estado["indice"], historico)
     except Exception as e:  # noqa: BLE001
         log.exception("Erro ao buscar nos documentos")
         raise HTTPException(502, f"Não consegui consultar o modelo de IA no servidor ({e.__class__.__name__}).") from e
 
-    if deve_recusar(fontes, similaridade_fora):
-        async def recusa():
-            yield json.dumps({"tipo": "fontes", "fontes": []}) + "\n"
-            yield json.dumps({"tipo": "texto", "texto": RECUSA}, ensure_ascii=False) + "\n"
-            yield json.dumps({"tipo": "fim"}) + "\n"
-        return StreamingResponse(recusa(), media_type="application/x-ndjson")
+    # Fora do assunto, ou palavra solta que não se parece com a documentação
+    pronta = resposta_pronta(historico, fontes, similaridade_fora)
+    if pronta:
+        log.info("Triagem depois da busca (doc %.2f, fora %.2f): %r",
+                 max((f["similaridade"] for f in fontes), default=0.0), similaridade_fora,
+                 historico[-1]["content"][:80])
+        return resposta_fixa(pronta)
 
     async def eventos():
         yield json.dumps({"tipo": "fontes", "fontes": fontes}, ensure_ascii=False) + "\n"

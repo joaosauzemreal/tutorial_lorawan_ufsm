@@ -28,3 +28,12 @@ como instalar o Windows no meu computador?
 qual o melhor celular para comprar?
 como emagrecer rápido?
 o que você acha da política do Brasil?
+# Palavras soltas fora do assunto: ajudam a recusar mensagens de uma palavra só
+banana
+futebol
+pizza
+carro
+cachorro
+música
+novela
+videogame

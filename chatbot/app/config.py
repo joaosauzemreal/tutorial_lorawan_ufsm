@@ -39,6 +39,17 @@ FILTRO_ASSUNTO = os.getenv("FILTRO_ASSUNTO", "true").strip().lower() != "false"
 MARGEM_FILTRO = float(os.getenv("MARGEM_FILTRO", "0.05"))
 EXEMPLOS_FORA = Path(__file__).parent / "exemplos_fora_do_assunto.txt"
 
+# Triagem de mensagens vagas (app/triagem.py). Similaridades de 0 a 1 com o melhor trecho da
+# documentação; os valores vêm da calibração (python -m app.calibrar).
+# Mensagem "curta" = até MAX_PALAVRAS_CURTA palavras, na primeira pergunta da conversa.
+MAX_PALAVRAS_CURTA = int(os.getenv("MAX_PALAVRAS_CURTA", "3"))
+# Uma mensagem curta abaixo deste valor recebe "pode detalhar a pergunta?" em vez de ir ao modelo.
+LIMIAR_CURTA = float(os.getenv("LIMIAR_CURTA", "0.50"))
+# Qualquer pergunta abaixo deste valor é recusada (0 = desligado).
+LIMIAR_MINIMO = float(os.getenv("LIMIAR_MINIMO", "0"))
+# Mensagens curtas são buscadas como "o que é <mensagem>", que se parece mais com a documentação.
+EXPANDIR_CURTA = os.getenv("EXPANDIR_CURTA", "true").strip().lower() != "false"
+
 # Modelos extras que podem ser escolhidos por pergunta, só para testes de comparação (separados por vírgula).
 # Ex.: MODELOS_TESTE=qwen3:14b,gemma3:12b  — são baixados automaticamente depois que o chat inicia.
 MODELOS_TESTE = [m.strip() for m in os.getenv("MODELOS_TESTE", "").split(",") if m.strip()]

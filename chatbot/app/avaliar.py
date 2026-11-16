@@ -18,8 +18,12 @@ from datetime import datetime
 import httpx
 
 from . import config, rag
-from .motor import deve_recusar, gerar_resposta, preparar_conversa
-from .prompts import RECUSA
+from .motor import gerar_resposta, preparar_conversa, resposta_pronta
+from .prompts import AGRADECIMENTO, PEDIR_DETALHES, RECUSA, SAUDACAO
+from .triagem import resposta_antes_da_busca
+
+NOMES_PRONTAS = {RECUSA: "recusa", PEDIR_DETALHES: "pedir detalhes", SAUDACAO: "cumprimento",
+                 AGRADECIMENTO: "agradecimento"}
 
 LINHA_RE = re.compile(r"^\|\s*(\d+)\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|\s*$")
 
@@ -43,7 +47,9 @@ async def principal(modelo: str) -> None:
             "",
             f"{datetime.now():%d/%m/%Y %H:%M} · embeddings: {config.EMBED_MODEL} · "
             f"TOP_K={config.TOP_K} · MARGEM_TRECHOS={config.MARGEM_TRECHOS} · temperatura={config.TEMPERATURE} · "
-            f"filtro de assunto: {'ligado, margem ' + str(config.MARGEM_FILTRO) if config.FILTRO_ASSUNTO else 'desligado'}",
+            f"filtro de assunto: {'ligado, margem ' + str(config.MARGEM_FILTRO) if config.FILTRO_ASSUNTO else 'desligado'} · "
+            f"LIMIAR_CURTA={config.LIMIAR_CURTA} · LIMIAR_MINIMO={config.LIMIAR_MINIMO} · "
+            f"EXPANDIR_CURTA={config.EXPANDIR_CURTA}",
             "",
             "Marque cada resposta: ✅ acertou · 🟡 parcial · ❌ errou/inventou",
             "",
@@ -51,12 +57,16 @@ async def principal(modelo: str) -> None:
         tempos = []
         for numero, pergunta, esperado in perguntas:
             historico = [{"role": "user", "content": pergunta}]
-            mensagens, fontes, sim_fora = await preparar_conversa(cliente, indice, historico)
             inicio = time.perf_counter()
-            if not deve_recusar(fontes, sim_fora):
-                resposta = await gerar_resposta(cliente, modelo, mensagens)
+            fontes, sim_fora = [], 0.0
+            pronta = resposta_antes_da_busca(pergunta)
+            if not pronta:
+                mensagens, fontes, sim_fora = await preparar_conversa(cliente, indice, historico)
+                pronta = resposta_pronta(historico, fontes, sim_fora)
+            if pronta:
+                resposta = f"_(resposta pronta da triagem: {NOMES_PRONTAS.get(pronta, '?')})_\n\n{pronta}"
             else:
-                resposta = f"_(recusada pelo filtro de assunto)_\n\n{RECUSA}"
+                resposta = await gerar_resposta(cliente, modelo, mensagens)
             tempo = time.perf_counter() - inicio
             tempos.append(tempo)
             print(f"[{numero}/{len(perguntas)}] {tempo:5.1f}s  {pergunta}")

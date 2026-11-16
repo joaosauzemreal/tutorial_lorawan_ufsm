@@ -8,8 +8,9 @@ from collections.abc import AsyncIterator
 import httpx
 
 from . import config
-from .prompts import SYSTEM_PROMPT, montar_pergunta
+from .prompts import PERGUNTA_CURTA, SYSTEM_PROMPT, montar_pergunta
 from .rag import Indice
+from .triagem import eh_curta, resposta_depois_da_busca
 
 
 async def preparar_conversa(
@@ -24,6 +25,10 @@ async def preparar_conversa(
     pergunta = perguntas[-1]
     # Para perguntas de continuação ("e como faço isso?"), a pergunta anterior ajuda a busca.
     consulta = "\n".join(perguntas[-2:])
+    # Palavra solta no começo da conversa ("OTAA"): busca e pergunta ao modelo como "o que é OTAA".
+    curta = len(perguntas) == 1 and eh_curta(pergunta)
+    if curta and config.EXPANDIR_CURTA:
+        consulta = f"o que é {pergunta.strip()}"
 
     resultados, similaridade_fora = await indice.buscar(cliente, consulta, config.TOP_K)
     # Mantém só os trechos próximos do melhor (o melhor sempre fica).
@@ -48,16 +53,16 @@ async def preparar_conversa(
     anteriores = historico[:-1][-config.MAX_HISTORICO:]
     mensagens = [{"role": "system", "content": SYSTEM_PROMPT}]
     mensagens += [{"role": m["role"], "content": m["content"]} for m in anteriores]
-    mensagens.append({"role": "user", "content": montar_pergunta(pergunta, trechos)})
+    pergunta_modelo = PERGUNTA_CURTA.format(pergunta.strip()) if curta else pergunta
+    mensagens.append({"role": "user", "content": montar_pergunta(pergunta_modelo, trechos)})
     return mensagens, fontes, similaridade_fora
 
 
-def deve_recusar(fontes: list[dict], similaridade_fora: float) -> bool:
-    """Recusa quando a pergunta se parece mais com os exemplos fora do assunto do que com a documentação."""
-    if not config.FILTRO_ASSUNTO:
-        return False
+def resposta_pronta(historico: list[dict], fontes: list[dict], similaridade_fora: float) -> str | None:
+    """Resposta pronta (recusa ou "pode detalhar?") quando a pergunta não deve ir ao modelo."""
+    perguntas = [m["content"] for m in historico if m["role"] == "user"]
     melhor_doc = max((f["similaridade"] for f in fontes), default=0.0)
-    return similaridade_fora - melhor_doc >= config.MARGEM_FILTRO
+    return resposta_depois_da_busca(perguntas[-1], len(perguntas) == 1, melhor_doc, similaridade_fora)
 
 
 def _corpo(modelo: str, mensagens: list[dict], stream: bool, think: bool | None = None) -> dict:

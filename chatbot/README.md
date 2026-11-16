@@ -119,6 +119,10 @@ O modelo é baixado automaticamente se ainda não existir. Para trocar o modelo 
 | `KEEP_ALIVE` | `60m` | Quanto tempo o modelo fica na RAM sem uso (`-1` = sempre) |
 | `FILTRO_ASSUNTO` | `true` | Recusa perguntas que se parecem mais com os exemplos fora do assunto do que com a documentação. `false` desliga |
 | `MARGEM_FILTRO` | `0.05` | Quanto a similaridade com os exemplos fora do assunto precisa superar a do melhor trecho da documentação para recusar |
+| `LIMIAR_CURTA` | `0.50` | Mensagem de até `MAX_PALAVRAS_CURTA` palavras (no começo da conversa) com similaridade abaixo disso recebe "pode detalhar a pergunta?" em vez de ir ao modelo |
+| `LIMIAR_MINIMO` | `0` | Qualquer pergunta com similaridade abaixo disso é recusada (0 = desligado) |
+| `MAX_PALAVRAS_CURTA` | `3` | Até quantas palavras uma mensagem conta como "curta" |
+| `EXPANDIR_CURTA` | `true` | Busca mensagens curtas como "o que é <mensagem>" |
 | `MODELOS_TESTE` | (vazio) | Modelos extras que podem ser escolhidos por pergunta via API, só para comparação. Ex.: `qwen3:14b,gemma3:12b` |
 | `THINK` | (vazio) | `false` desliga o "raciocínio" de modelos como o `qwen3`, que fica mais rápido. Deixe vazio para modelos sem raciocínio |
 
@@ -140,3 +144,16 @@ Sem GPU, quem define a velocidade é o processador. O tempo até a primeira pala
 - **A página diz "se preparando" por muito tempo:** veja `docker compose logs -f app`. Na primeira vez, o download dos modelos pode demorar.
 - **"Não consegui consultar o modelo de IA":** confira se o Ollama está rodando (`docker compose ps` ou `systemctl status ollama`).
 - **Respostas erradas sobre algum assunto:** veja quais fontes aparecem embaixo da resposta. Se a fonte certa não aparece, falta essa informação em `conhecimento/`, ou ela está escrita com palavras muito diferentes da pergunta.
+
+
+## Triagem de mensagens vagas
+
+Modelos pequenos inventam respostas quando recebem uma palavra solta ("banana", "teste"). Antes de chamar o modelo, `app/triagem.py` dá respostas prontas para:
+
+- **cumprimentos e agradecimentos** ("oi", "valeu"): diz o que o assistente faz;
+- **rabiscos** ("asdfgh", "kkkkk", "???"): pede para escrever a pergunta completa;
+- **palavras soltas fora do assunto** (similaridade abaixo de `LIMIAR_CURTA`): pede para detalhar.
+
+Palavras soltas do assunto ("OTAA", "gateway") vão para o modelo como "explique o que é ...".
+
+Para calibrar `LIMIAR_CURTA`, rode `python -m app.calibrar` (leva segundos e não chama o modelo de IA). A tabela mostra a similaridade de mensagens curtas do assunto e fora dele; o limiar deve ficar entre os dois grupos.
