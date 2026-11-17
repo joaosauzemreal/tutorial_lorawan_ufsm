@@ -634,6 +634,9 @@
   <script>
     // Endereço público do chatbot (Tailscale Funnel). O chat só é carregado quando o painel é aberto.
     const CHAT_URL = 'https://joao-1.sokoke-minor.ts.net/';
+    // Versão do chat: mudar este valor obriga os navegadores a buscar a página nova do chat,
+    // em vez de usar uma cópia antiga guardada no cache.
+    const CHAT_VERSAO = '2';
     const CHAT_ORIGEM = 'https://joao-1.sokoke-minor.ts.net';
     const chatPainel = document.getElementById('chat-painel');
     const chatFundo = document.getElementById('chat-fundo');
@@ -655,7 +658,7 @@
     // Abre o painel. Com uma pergunta, o chat já a envia.
     function abrirChat(pergunta) {
       if (!chatFrame.getAttribute('src')) {
-        chatFrame.src = CHAT_URL + (pergunta ? '?pergunta=' + encodeURIComponent(pergunta) : '');
+        chatFrame.src = CHAT_URL + '?v=' + CHAT_VERSAO + (pergunta ? '&pergunta=' + encodeURIComponent(pergunta) : '');
       } else if (pergunta) {
         if (chatCarregado) chatFrame.contentWindow.postMessage({ tipo: 'perguntar', texto: pergunta }, CHAT_ORIGEM);
         else perguntaPendente = pergunta;
