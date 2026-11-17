@@ -248,7 +248,6 @@
         ponto.classList.toggle('pronto', pronto);
         if (pronto) {
           aviso.style.display = 'none';
-          subtitulo.textContent = `Assistente LoRaWAN da UFSM · modelo ${s.modelo}`;
           return;
         }
         aviso.className = s.situacao === 'erro' ? 'erro' : '';
